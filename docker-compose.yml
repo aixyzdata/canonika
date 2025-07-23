@@ -155,6 +155,16 @@ services:
       - postgres
       - elasticsearch
 
+  tollgate:
+    build: ./tollgate
+    container_name: canonika_tollgate
+    ports:
+      - "7732:80"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
   ledger:
     build: ./ledger
     container_name: canonika_ledger
