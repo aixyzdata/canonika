@@ -1,28 +1,25 @@
-# Etapa 1: Build do frontend
-FROM node:20 AS frontend-build
-WORKDIR /app/web
-COPY web/package*.json ./
-RUN npm install
-COPY web/ ./
-RUN npm run build
+# Build simples para Harbor
+FROM python:3.11-alpine
 
-# Etapa 2: Backend Python
-FROM python:3.11-slim AS backend
-WORKDIR /app/api
-COPY api/ ./
-RUN pip install --no-cache-dir fastapi uvicorn python-jose[cryptography]
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    postgresql-dev \
+    nginx \
+    && rm -rf /var/cache/apk/*
 
-# Etapa 3: Nginx + integração
-FROM nginx:1.25-alpine
 WORKDIR /app
-COPY --from=frontend-build /app/web/dist /app/web
-COPY --from=backend /app/api /app/api
+COPY api/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
+
+COPY api/ ./api/
+COPY web/dist ./web/dist
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Uvicorn para backend
-RUN apk add --no-cache python3 py3-pip
-RUN pip install --break-system-packages fastapi uvicorn python-jose[cryptography]
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 80
-
-CMD ["/bin/sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"] 
+CMD ["/start.sh"] 
