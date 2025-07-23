@@ -146,13 +146,14 @@ services:
     depends_on:
       - postgres
 
-  quarter:
+  quartermaster:
     build: ./quarter
-    container_name: canonika_quarter
+    container_name: canonika_quartermaster
     ports:
       - "7725:80"
     depends_on:
       - postgres
+      - elasticsearch
 
   ledger:
     build: ./ledger

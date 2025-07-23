@@ -1,28 +1,47 @@
-# Etapa 1: Build do frontend
-FROM node:20 AS frontend-build
+# Multi-stage build para Quartermaster
+FROM node:18-alpine AS frontend-builder
+
 WORKDIR /app/web
 COPY web/package*.json ./
 RUN npm install
+
 COPY web/ ./
 RUN npm run build
 
-# Etapa 2: Backend Python
-FROM python:3.11-slim AS backend
-WORKDIR /app/api
-COPY api/ ./
-RUN pip install --no-cache-dir fastapi uvicorn python-jose[cryptography]
+# Backend stage
+FROM python:3.11-alpine
 
-# Etapa 3: Nginx + integração
-FROM nginx:1.25-alpine
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    && rm -rf /var/cache/apk/*
+
 WORKDIR /app
-COPY --from=frontend-build /app/web/dist /app/web
-COPY --from=backend /app/api /app/api
+
+# Copiar requirements e instalar dependências Python
+COPY api/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
+
+# Copiar código do backend
+COPY api/ ./api/
+
+# Copiar frontend buildado
+COPY --from=frontend-builder /app/web/dist ./web/dist
+
+# Copiar configuração do nginx
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Uvicorn para backend
-RUN apk add --no-cache python3 py3-pip
-RUN pip install --break-system-packages fastapi uvicorn python-jose[cryptography]
+# Instalar nginx
+RUN apk add --no-cache nginx
 
+# Expor porta
 EXPOSE 80
 
-CMD ["/bin/sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"] 
+# Script de inicialização
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"] 

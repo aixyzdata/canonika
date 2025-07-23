@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Iniciar uvicorn em background
+uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+
+# Iniciar nginx
+nginx -g 'daemon off;' 
