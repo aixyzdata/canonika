@@ -1,6 +1,13 @@
 <template>
-  <div class="ledger-view">
+  <div class="service-view">
     <div class="view-header">
+      <div class="view-title">
+        <i class="fas fa-book"></i>
+        <div class="title-content">
+          <h1>Ledger</h1>
+          <p>Sistema de Contabilidade Financeira</p>
+        </div>
+      </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
         <span>ONLINE</span>
@@ -9,6 +16,10 @@
         <button @click="refreshData()" class="action-btn">
           <i class="fas fa-sync-alt"></i>
           Atualizar
+        </button>
+        <button @click="openModule()" class="action-btn primary">
+          <i class="fas fa-book"></i>
+          Acessar Ledger
         </button>
       </div>
     </div>
@@ -19,12 +30,12 @@
           <div class="card-header">
             <h3>Ledger</h3>
             <div class="card-icon">
-              <i class="fas fa-cog"></i>
+              <i class="fas fa-book"></i>
             </div>
           </div>
           <div class="card-content">
             <div class="service-info">
-              <p>View específica do serviço Ledger</p>
+              <p>Sistema de contabilidade financeira</p>
               <div class="service-status">
                 <div class="status-dot online"></div>
                 <span>Serviço Online</span>
@@ -49,13 +60,16 @@ export default {
     refreshData() {
       console.log('Atualizando dados do Ledger...');
       // Implementar chamadas para a API do serviço
+    },
+    openModule() {
+      window.open('http://localhost:3707/', '_blank')
     }
   }
 }
 </script>
 
 <style scoped>
-.ledger-view {
+.service-view {
   height: 100%;
 }
 
@@ -68,6 +82,37 @@ export default {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 1rem;
   border: 1px solid #475569;
+}
+
+.view-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.view-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.title-content p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
 .view-status {
@@ -105,6 +150,16 @@ export default {
 .action-btn:hover {
   background: rgba(59, 130, 246, 0.2);
   transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
 .view-content {
@@ -160,7 +215,6 @@ export default {
   justify-content: center;
   gap: 0.5rem;
   color: #10b981;
-  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -169,6 +223,18 @@ export default {
   height: 0.5rem;
   background: #10b981;
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

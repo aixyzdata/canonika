@@ -1,75 +1,157 @@
-# Canonika – Cadastro Canônico de Produtos
+# Canonika - Plataforma de Desenvolvimento Simplificada
 
-## 🌊 Visão Geral
+## 🚀 Ambiente de Desenvolvimento Rápido
 
-Canonika é uma solução modular e inteligente para estruturar e enriquecer cadastros de produtos, a partir de fontes desestruturadas como XMLs de notas fiscais e buscas na web. Cada microserviço da solução representa um tripulante de uma embarcação, com responsabilidades bem definidas, utilizando IA, NLP, vector search e automações. Toda a solução será containerizada e padronizada para facilitar a escalabilidade e o reuso.
+O Canonika agora possui um ambiente de desenvolvimento simplificado e funcional, focado em velocidade e produtividade.
 
-## 🛳 Tripulação e Módulos
-- **Harbor**: SPA que concentra login, dashboard, gerenciamento de créditos e acesso aos demais serviços.
-- **Skipper**: crawler inteligente com CrewAI + BrowserUse, navega na web em fontes confiáveis coletando dados para enriquecer cadastros.
-- **Wayfinder**: microserviço com Milvus que opera como mecanismo de busca vetorial semântica (indexação, pesquisa e manutenção).
-- **MapMaker**: interpreta estruturas CSV/JSON desestruturadas e mapeia para o schema canônico.
-- **Quarter**: CRUD do cadastro canônico, detentor da versão final dos produtos estruturados.
-- **Ledger**: sistema de créditos e billing, responsável por contabilizar e descontar tokens por requisição.
-- **Seagull**: upload de XMLs (como notas fiscais), interpreta os dados e converte para a estrutura canônica de entidades.
-- **Beacon**: interface de consumo do stack, que permite testar o enriquecimento de produtos em tempo real.
-- **Dock**: serviço para simular chamadas e mostrar exemplos de uso da API com dados mock.
-- **Guardian**: controle de autenticação, segurança, tokens e permissões.
-- **Echo**: observabilidade e logging centralizado usando Elastic, Kibana, N8N e Evolution API.
+### 📋 Pré-requisitos
 
-## ⚙️ Stack Tecnológico
+- Docker e Docker Compose
+- Git
 
-### Infraestrutura
-- Docker + Docker Compose
-- PostgreSQL
-- Redis
-- RabbitMQ
-- Milvus
-- N8N
-- ElasticSearch + Kibana
-- Evolution API
-- Nginx (reverse proxy)
+### 🏃‍♂️ Início Rápido
 
-### Frontend
-- Vue 3
-- Bootstrap 5
-- SPA
-- Paleta sugerida:
-  - Azul Profundo (#002E5D)
-  - Verde Esmeralda (#00A896)
-  - Cinza Grafite (#1A1A1A)
-  - Branco Perolado (#F4F4F4)
+```bash
+# Clone o repositório
+git clone <repository-url>
+cd canonika
 
-### Backend
-- Python 3.11+
-- FastAPI
-- JWT para autenticação
-- CrewAI + BrowserUse (para Skipper)
-- OpenTelemetry (observabilidade futura)
+# Inicie o ambiente de desenvolvimento
+./dev.sh start
+```
 
-### IA
-- Azure GPT (oficial)
-- Versão Mini local para simulação
+### 🌐 Serviços Disponíveis
 
-## 🌐 Padrão de Endpoints por Serviço
+Após iniciar o ambiente, você terá acesso aos seguintes serviços:
 
-Cada microserviço terá um container com Nginx configurado:
-- `/api`: API do serviço (FastAPI)
-- `/web`: interface visual (Vue)
+| Serviço | URL | Descrição |
+|---------|-----|-----------|
+| **Harbor** | http://localhost:3701 | Portal principal e dashboard |
+| **Skipper** | http://localhost:3702 | Orquestrador de navegação e extração |
+| **Tollgate** | http://localhost:3703 | Sistema de controle e auditoria |
+| **Quarter** | http://localhost:3704 | Gerenciamento de recursos |
 
-## 🔐 Regras de Infraestrutura
-- Portas 7700 a 7720: stack de ferramentas (Postgres, Redis, RabbitMQ, N8N, Evolution, Elastic, Kibana)
-- Portas 7721 a 7799: serviços Canonika (um por microserviço)
-- Cada microserviço terá scripts auxiliares:
-  - build.py, rebuild.py, start.py, stop.py, destroy.py, publish.py
+### 🗄️ Infraestrutura
 
-## 🧪 Dados Mock
-- Todos os serviços devem iniciar com dados mockados que simulem operações reais.
-- O sistema deve ser funcional mesmo sem integrações externas durante o desenvolvimento.
+- **PostgreSQL**: localhost:5432
+- **Redis**: localhost:6379
 
-## ✅ Primeiras Tarefas
-1. Criar estrutura de pastas e containers para todos os serviços.
-2. Implementar SPA base do Harbor com login funcional.
-3. Criar containers com Nginx interno roteando para /api e /web em cada serviço.
-4. Levantar infraestrutura no docker-compose.yml com Postgres, Redis, Milvus, RabbitMQ, Elastic, Kibana, Evolution, N8N.
-5. Mockar chamadas de cada microserviço com rotas de exemplo e simulações básicas. 
+### 🛠️ Comandos de Desenvolvimento
+
+```bash
+# Iniciar ambiente
+./dev.sh start
+
+# Parar ambiente
+./dev.sh stop
+
+# Reiniciar ambiente
+./dev.sh restart
+
+# Ver logs em tempo real
+./dev.sh logs
+
+# Verificar status dos containers
+./dev.sh status
+
+# Reconstruir imagens
+./dev.sh rebuild
+
+# Limpar tudo (containers, volumes, imagens)
+./dev.sh clean
+
+# Mostrar ajuda
+./dev.sh help
+```
+
+### 🏗️ Arquitetura Simplificada
+
+O ambiente atual inclui apenas os serviços essenciais:
+
+- **Harbor**: Portal principal com dashboard
+- **Skipper**: Sistema de simulação e extração de dados
+- **Tollgate**: Controle de acesso e auditoria
+- **Quarter**: Gerenciamento de recursos
+
+### 🔧 Desenvolvimento
+
+#### Estrutura de Volumes
+
+Os containers estão configurados com volumes para desenvolvimento em tempo real:
+
+- `./shared/styles` → `/usr/share/nginx/html/shared/styles`
+- `./{service}/web` → `/usr/share/nginx/html`
+- `./{service}/api` → `/app/api`
+
+#### Hot Reload
+
+As mudanças nos arquivos são refletidas automaticamente nos containers. Para aplicar mudanças:
+
+1. Edite os arquivos no seu editor
+2. As mudanças são aplicadas automaticamente
+3. Recarregue a página no navegador
+
+### 🐛 Troubleshooting
+
+#### Problemas Comuns
+
+**Container não inicia:**
+```bash
+./dev.sh clean
+./dev.sh rebuild
+```
+
+**Porta já em uso:**
+```bash
+# Verifique se há outros containers rodando
+docker ps
+# Pare containers conflitantes
+docker stop <container-id>
+```
+
+**Problemas de permissão:**
+```bash
+# No macOS/Linux
+chmod +x dev.sh
+```
+
+### 📁 Estrutura do Projeto
+
+```
+canonika/
+├── harbor/          # Portal principal
+├── skipper/         # Orquestrador
+├── tollgate/        # Controle e auditoria
+├── quarter/         # Gerenciamento
+├── shared/          # Estilos e templates compartilhados
+├── docker-compose.yml
+└── dev.sh           # Script de desenvolvimento
+```
+
+### 🎯 Próximos Passos
+
+1. **Desenvolvimento**: Foque no desenvolvimento dos módulos principais
+2. **Testes**: Implemente testes automatizados
+3. **Documentação**: Documente APIs e funcionalidades
+4. **Deploy**: Configure ambiente de produção
+
+### 🤝 Contribuição
+
+Para contribuir com o projeto:
+
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature
+3. Desenvolva e teste suas mudanças
+4. Envie um pull request
+
+### 📞 Suporte
+
+Para dúvidas ou problemas:
+
+- Abra uma issue no GitHub
+- Consulte a documentação em `DEVELOPMENT.md`
+- Verifique os logs com `./dev.sh logs`
+
+---
+
+**Canonika** - Desenvolvimento simplificado, resultados extraordinários! 🚀 

@@ -1,129 +1,133 @@
 <template>
-  <div class="dashboard-view">
-    <!-- Header do Dashboard -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="canonika-card p-4">
-          <div class="row align-items-center">
-            <div class="col-md-8">
-              <h2 class="mb-2">
-                <i class="fas fa-chart-bar me-2"></i>
-                Dashboard Skipper
-              </h2>
-              <p class="text-muted mb-0">
-                Visão geral do sistema de navegação e extração
-              </p>
-            </div>
-            <div class="col-md-4 text-end">
-              <div class="d-flex justify-content-end gap-2">
-                <button @click="refreshData" class="btn btn-outline-light">
-                  <i class="fas fa-sync-alt me-1"></i>
-                  Atualizar
-                </button>
-              </div>
-            </div>
+  <div class="status-view-container">
+    <!-- Header Padrão do Serviço -->
+    <div class="canonika-status-header">
+      <div class="canonika-status-header-content">
+        <div class="canonika-status-header-info">
+          <div class="canonika-service-icon">
+            <i class="fas fa-ship"></i>
           </div>
+          <div class="canonika-service-info">
+            <div class="canonika-service-title">
+              <h1 class="canonika-service-name">Skipper</h1>
+            </div>
+            <p class="canonika-service-description">Sistema de navegação e extração inteligente de dados</p>
+          </div>
+        </div>
+        
+        <div class="canonika-status-indicator online">
+          <div class="canonika-status-dot"></div>
+          <span>ONLINE</span>
+        </div>
+        
+        <div class="canonika-status-actions">
+          <button @click="refreshData" class="canonika-btn canonika-btn-outline">
+            <i class="fas fa-sync-alt"></i>
+            Atualizar
+          </button>
+          <button @click="navigateToSimulation" class="canonika-btn canonika-btn-primary">
+            <i class="fas fa-play"></i>
+            Simulação
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Métricas Principais -->
-    <div class="row mb-4">
-      <div class="col-md-3 mb-3">
-        <div class="metric-card">
-          <div class="metric-icon">
+    <!-- Métricas do Serviço -->
+    <div class="canonika-metrics-grid">
+      <div class="canonika-metric-card">
+        <div class="canonika-metric-header">
+          <div class="canonika-metric-icon">
             <i class="fas fa-database"></i>
           </div>
-          <div class="metric-content">
-            <h3 class="metric-value">{{ metrics.totalSources }}</h3>
-            <p class="metric-label">Fontes Cadastradas</p>
-          </div>
+          <h3 class="canonika-metric-title">Fontes Cadastradas</h3>
         </div>
+        <div class="canonika-metric-value">{{ metrics.totalSources }}</div>
+        <p class="canonika-metric-label">Total de fontes disponíveis</p>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="metric-card">
-          <div class="metric-icon">
+      
+      <div class="canonika-metric-card">
+        <div class="canonika-metric-header">
+          <div class="canonika-metric-icon">
             <i class="fas fa-play"></i>
           </div>
-          <div class="metric-content">
-            <h3 class="metric-value">{{ metrics.activeSimulations }}</h3>
-            <p class="metric-label">Simulações Ativas</p>
-          </div>
+          <h3 class="canonika-metric-title">Simulações Ativas</h3>
         </div>
+        <div class="canonika-metric-value">{{ metrics.activeSimulations }}</div>
+        <p class="canonika-metric-label">Executando agora</p>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="metric-card">
-          <div class="metric-icon">
+      
+      <div class="canonika-metric-card">
+        <div class="canonika-metric-header">
+          <div class="canonika-metric-icon">
             <i class="fas fa-check-circle"></i>
           </div>
-          <div class="metric-content">
-            <h3 class="metric-value">{{ metrics.completedSimulations }}</h3>
-            <p class="metric-label">Simulações Concluídas</p>
-          </div>
+          <h3 class="canonika-metric-title">Simulações Concluídas</h3>
         </div>
+        <div class="canonika-metric-value">{{ metrics.completedSimulations }}</div>
+        <p class="canonika-metric-label">Total finalizadas</p>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="metric-card">
-          <div class="metric-icon">
+      
+      <div class="canonika-metric-card">
+        <div class="canonika-metric-header">
+          <div class="canonika-metric-icon">
             <i class="fas fa-chart-line"></i>
           </div>
-          <div class="metric-content">
-            <h3 class="metric-value">{{ metrics.successRate }}%</h3>
-            <p class="metric-label">Taxa de Sucesso</p>
-          </div>
+          <h3 class="canonika-metric-title">Taxa de Sucesso</h3>
         </div>
+        <div class="canonika-metric-value">{{ metrics.successRate }}%</div>
+        <p class="canonika-metric-label">Eficiência do sistema</p>
       </div>
     </div>
 
-    <!-- Status dos Sistemas -->
-    <div class="row mb-4">
-      <div class="col-md-6 mb-3">
-        <div class="canonika-card p-4">
-          <h4 class="mb-3">
-            <i class="fas fa-server me-2"></i>
-            Status dos Sistemas
-          </h4>
-          <div class="system-status-list">
-            <div 
-              v-for="system in systemStatus" 
-              :key="system.name"
-              class="system-status-item"
-            >
-              <div class="status-indicator" :class="system.status"></div>
-              <div class="system-info">
-                <h6 class="system-name">{{ system.name }}</h6>
-                <p class="system-description">{{ system.description }}</p>
-              </div>
-              <div class="system-port">
-                <span class="badge" :class="getStatusBadgeClass(system.status)">
-                  {{ system.status }}
-                </span>
-              </div>
+    <!-- Status dos Sistemas e Atividade Recente -->
+    <div class="canonika-system-grid">
+      <!-- Status dos Sistemas -->
+      <div class="canonika-system-card">
+        <div class="canonika-system-card-header">
+          <div class="canonika-system-card-icon">
+            <i class="fas fa-server"></i>
+          </div>
+          <h3 class="canonika-system-card-title">Status dos Sistemas</h3>
+        </div>
+        <div class="canonika-system-list">
+          <div 
+            v-for="system in systemStatus" 
+            :key="system.name"
+            class="canonika-system-item"
+            :class="system.status"
+          >
+            <div class="canonika-system-status-dot" :class="system.status"></div>
+            <div class="canonika-system-info">
+              <h4 class="canonika-system-name">{{ system.name }}</h4>
+              <p class="canonika-system-description">{{ system.description }}</p>
             </div>
+            <div class="canonika-system-port">{{ system.port }}</div>
           </div>
         </div>
       </div>
 
-      <div class="col-md-6 mb-3">
-        <div class="canonika-card p-4">
-          <h4 class="mb-3">
-            <i class="fas fa-clock me-2"></i>
-            Atividade Recente
-          </h4>
-          <div class="recent-activity-list">
-            <div 
-              v-for="activity in recentActivity" 
-              :key="activity.id"
-              class="activity-item"
-            >
-              <div class="activity-icon">
-                <i :class="getActivityIcon(activity.type)"></i>
-              </div>
-              <div class="activity-content">
-                <h6 class="activity-title">{{ activity.title }}</h6>
-                <p class="activity-description">{{ activity.description }}</p>
-                <small class="activity-time">{{ formatTime(activity.timestamp) }}</small>
-              </div>
+      <!-- Atividade Recente -->
+      <div class="canonika-system-card">
+        <div class="canonika-system-card-header">
+          <div class="canonika-system-card-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3 class="canonika-system-card-title">Atividade Recente</h3>
+        </div>
+        <div class="canonika-activity-list">
+          <div 
+            v-for="activity in recentActivity" 
+            :key="activity.id"
+            class="canonika-activity-item"
+          >
+            <div class="canonika-activity-icon">
+              <i :class="getActivityIcon(activity.type)"></i>
+            </div>
+            <div class="canonika-activity-content">
+              <h4 class="canonika-activity-title">{{ activity.title }}</h4>
+              <p class="canonika-activity-description">{{ activity.description }}</p>
+              <small class="canonika-activity-time">{{ formatTime(activity.timestamp) }}</small>
             </div>
           </div>
         </div>
@@ -131,40 +135,34 @@
     </div>
 
     <!-- Fontes Mais Utilizadas -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="canonika-card p-4">
-          <h4 class="mb-3">
-            <i class="fas fa-star me-2"></i>
-            Fontes Mais Utilizadas
-          </h4>
-          <div class="row">
-            <div 
-              v-for="source in topSources" 
-              :key="source.id"
-              class="col-md-4 mb-3"
-            >
-              <div class="source-usage-card">
-                <div class="source-header">
-                  <div class="source-icon">
-                    <i :class="getSourceIcon(source.name)"></i>
-                  </div>
-                  <div class="usage-stats">
-                    <span class="usage-count">{{ source.usageCount }}</span>
-                    <span class="usage-label">usos</span>
-                  </div>
+    <div class="canonika-system-grid">
+      <div class="canonika-system-card">
+        <div class="canonika-system-card-header">
+          <div class="canonika-system-card-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <h3 class="canonika-system-card-title">Fontes Mais Utilizadas</h3>
+        </div>
+        <div class="canonika-sources-grid">
+          <div 
+            v-for="source in topSources" 
+            :key="source.id"
+            class="canonika-source-item"
+          >
+            <div class="canonika-source-header">
+              <div class="canonika-source-icon">
+                <i :class="getSourceIcon(source.name)"></i>
+              </div>
+              <div class="canonika-source-info">
+                <h4 class="canonika-source-name">{{ source.name }}</h4>
+                <div class="canonika-source-type">
+                  <span class="canonika-badge" :class="getTypeBadgeClass(source.type)">
+                    {{ getTypeText(source.type) }}
+                  </span>
                 </div>
-                <div class="source-info">
-                  <h6 class="source-name">{{ source.name }}</h6>
-                  <div class="source-type">
-                    <span class="badge" :class="getTypeBadgeClass(source.type)">
-                      {{ getTypeText(source.type) }}
-                    </span>
-                  </div>
-                  <div class="success-rate">
-                    <span class="rate-label">Taxa de Sucesso:</span>
-                    <span class="rate-value">{{ source.successRate }}%</span>
-                  </div>
+                <div class="canonika-source-stats">
+                  <span class="canonika-source-usage">{{ source.usageCount }} usos</span>
+                  <span class="canonika-source-rate">{{ source.successRate }}% sucesso</span>
                 </div>
               </div>
             </div>
@@ -174,52 +172,37 @@
     </div>
 
     <!-- Ações Rápidas -->
-    <div class="row">
-      <div class="col-12">
-        <div class="canonika-card p-4">
-          <h4 class="mb-3">
-            <i class="fas fa-bolt me-2"></i>
-            Ações Rápidas
-          </h4>
-          <div class="row">
-            <div class="col-md-3 mb-3">
-              <button @click="navigateToSimulation" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-search"></i>
-                </div>
-                <h6 class="action-title">Nova Simulação</h6>
-                <p class="action-description">Iniciar pesquisa de produto</p>
-              </button>
-            </div>
-            <div class="col-md-3 mb-3">
-              <button @click="navigateToSources" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-database"></i>
-                </div>
-                <h6 class="action-title">Gerenciar Fontes</h6>
-                <p class="action-description">Configurar fontes de dados</p>
-              </button>
-            </div>
-            <div class="col-md-3 mb-3">
-              <button @click="viewLogs" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-file-alt"></i>
-                </div>
-                <h6 class="action-title">Ver Logs</h6>
-                <p class="action-description">Histórico de atividades</p>
-              </button>
-            </div>
-            <div class="col-md-3 mb-3">
-              <button @click="exportData" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-download"></i>
-                </div>
-                <h6 class="action-title">Exportar Dados</h6>
-                <p class="action-description">Baixar relatórios</p>
-              </button>
-            </div>
-          </div>
+    <div class="canonika-actions-grid">
+      <div class="canonika-action-card" @click="navigateToSimulation">
+        <div class="canonika-action-icon">
+          <i class="fas fa-search"></i>
         </div>
+        <h4 class="canonika-action-title">Nova Simulação</h4>
+        <p class="canonika-action-description">Iniciar pesquisa de produto</p>
+      </div>
+      
+      <div class="canonika-action-card" @click="navigateToSources">
+        <div class="canonika-action-icon">
+          <i class="fas fa-database"></i>
+        </div>
+        <h4 class="canonika-action-title">Gerenciar Fontes</h4>
+        <p class="canonika-action-description">Configurar fontes de dados</p>
+      </div>
+      
+      <div class="canonika-action-card" @click="viewLogs">
+        <div class="canonika-action-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h4 class="canonika-action-title">Ver Logs</h4>
+        <p class="canonika-action-description">Histórico de atividades</p>
+      </div>
+      
+      <div class="canonika-action-card" @click="exportData">
+        <div class="canonika-action-icon">
+          <i class="fas fa-download"></i>
+        </div>
+        <h4 class="canonika-action-title">Exportar Dados</h4>
+        <p class="canonika-action-description">Baixar relatórios</p>
       </div>
     </div>
   </div>
@@ -400,293 +383,45 @@ export default {
 </script>
 
 <style scoped>
-.dashboard-view {
-  padding: 1rem 0;
+/* Estilos específicos para a view de status do Skipper */
+.status-view-container {
+  padding: var(--canonika-spacing-lg) 0;
 }
 
-.metric-card {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-  border: 1px solid #444;
-  border-radius: 10px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: all 0.3s ease;
+/* Melhorias específicas para métricas */
+.canonika-metric-card {
+  position: relative;
+  overflow: hidden;
 }
 
-.metric-card:hover {
+.canonika-metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--canonika-green), var(--canonika-blue));
+}
+
+/* Melhorias para fontes */
+.canonika-source-item {
+  transition: var(--canonika-transition);
+}
+
+.canonika-source-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: var(--canonika-green);
+  box-shadow: var(--canonika-shadow);
 }
 
-.metric-icon {
-  width: 3rem;
-  height: 3rem;
-  background: linear-gradient(135deg, var(--canonika-green), #00a085);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.25rem;
-}
-
-.metric-content {
-  flex: 1;
-}
-
-.metric-value {
-  color: #e2e8f0;
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1;
-}
-
-.metric-label {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.system-status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.system-status-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border-left: 3px solid #666;
-}
-
-.system-status-item .status-indicator.online {
-  border-left-color: #28a745;
-}
-
-.system-status-item .status-indicator.offline {
-  border-left-color: #dc3545;
-}
-
-.system-status-item .status-indicator.warning {
-  border-left-color: #ffc107;
-}
-
-.status-indicator {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 50%;
-  background: #dc3545;
-  transition: all 0.3s ease;
-}
-
-.status-indicator.online {
-  background: #28a745;
-  box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
-}
-
-.status-indicator.offline {
-  background: #dc3545;
-}
-
-.status-indicator.warning {
-  background: #ffc107;
-}
-
-.system-info {
-  flex: 1;
-}
-
-.system-name {
-  color: #e2e8f0;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.system-description {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.recent-activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.activity-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-}
-
-.activity-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: rgba(0, 123, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #007bff;
-  font-size: 1rem;
-}
-
-.activity-content {
-  flex: 1;
-}
-
-.activity-title {
-  color: #e2e8f0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin: 0 0 0.25rem;
-}
-
-.activity-description {
-  color: #94a3b8;
-  font-size: 0.75rem;
-  margin: 0 0 0.25rem;
-}
-
-.activity-time {
-  color: #64748b;
-  font-size: 0.75rem;
-}
-
-.source-usage-card {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-  border: 1px solid #444;
-  border-radius: 10px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.source-usage-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: var(--canonika-green);
-}
-
-.source-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.source-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, var(--canonika-green), #00a085);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1rem;
-}
-
-.usage-stats {
-  text-align: right;
-}
-
-.usage-count {
-  display: block;
-  color: #e2e8f0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.usage-label {
-  color: #94a3b8;
-  font-size: 0.75rem;
-}
-
-.source-name {
-  color: #e2e8f0;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-}
-
-.source-type {
-  margin-bottom: 0.5rem;
-}
-
-.success-rate {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rate-label {
-  color: #94a3b8;
-  font-size: 0.875rem;
-}
-
-.rate-value {
-  color: #28a745;
-  font-weight: 600;
-}
-
-.action-card {
-  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
-  border: 1px solid #444;
-  border-radius: 10px;
-  padding: 1.5rem;
-  width: 100%;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  color: inherit;
-  text-decoration: none;
-}
-
-.action-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: var(--canonika-green);
-  color: inherit;
-  text-decoration: none;
-}
-
-.action-icon {
-  width: 3rem;
-  height: 3rem;
-  background: linear-gradient(135deg, var(--canonika-green), #00a085);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.25rem;
-  margin: 0 auto 1rem;
-}
-
-.action-title {
-  color: #e2e8f0;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-}
-
-.action-description {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  margin: 0;
+/* Responsividade específica */
+@media (max-width: 768px) {
+  .status-view-container {
+    padding: var(--canonika-spacing-md) 0;
+  }
+  
+  .canonika-sources-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 

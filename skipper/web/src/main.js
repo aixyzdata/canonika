@@ -4,6 +4,7 @@ import App from './App.vue'
 import SimulationView from './views/SimulationView.vue'
 import SourcesView from './views/SourcesView.vue'
 import DashboardView from './views/DashboardView.vue'
+import './styles/global.css'
 
 // Importar estilos do AG Grid
 import 'ag-grid-community/styles/ag-grid.css'

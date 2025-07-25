@@ -1,6 +1,13 @@
 <template>
   <div class="tollgate-view">
     <div class="view-header">
+      <div class="view-title">
+        <i class="fas fa-toll"></i>
+        <div class="title-content">
+          <h1>Tollgate</h1>
+          <p>Sistema de Controle de Acesso e Pagamentos</p>
+        </div>
+      </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
         <span>ONLINE</span>
@@ -253,6 +260,37 @@ export default {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 1rem;
   border: 1px solid #475569;
+}
+
+.view-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.view-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.title-content p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
 .view-status {

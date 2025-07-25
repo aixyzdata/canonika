@@ -1,47 +1,36 @@
-# Multi-stage build para Quartermaster
-FROM node:18-alpine AS frontend-builder
+# Dockerfile simplificado para Quarter - Desenvolvimento
+FROM nginx:1.25-alpine
 
-WORKDIR /app/web
-COPY web/package*.json ./
-RUN npm install
-
-COPY web/ ./
-RUN npm run build
-
-# Backend stage
-FROM python:3.11-alpine
-
-# Instalar dependências do sistema
+# Instalar Python e dependências
 RUN apk add --no-cache \
+    python3 \
+    py3-pip \
     gcc \
     musl-dev \
     libffi-dev \
     openssl-dev \
-    && rm -rf /var/cache/apk/*
-
-WORKDIR /app
-
-# Copiar requirements e instalar dependências Python
-COPY api/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
-
-# Copiar código do backend
-COPY api/ ./api/
-
-# Copiar frontend buildado
-COPY --from=frontend-builder /app/web/dist ./web/dist
+    postgresql-dev
 
 # Copiar configuração do nginx
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Instalar nginx
-RUN apk add --no-cache nginx
+# Copiar arquivos da aplicação
+COPY web/ /usr/share/nginx/html/
+COPY api/ /app/api/
 
-# Expor porta
-EXPOSE 80
+# Instalar dependências Python se existirem
+RUN if [ -f /app/api/requirements.txt ]; then \
+        pip3 install --no-cache-dir -r /app/api/requirements.txt --break-system-packages; \
+    fi
 
 # Script de inicialização
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'nginx -g "daemon off;" &' >> /start.sh && \
+    echo 'if [ -f /app/api/main.py ]; then' >> /start.sh && \
+    echo '    cd /app/api && python3 main.py &' >> /start.sh && \
+    echo 'fi' >> /start.sh && \
+    echo 'wait' >> /start.sh && \
+    chmod +x /start.sh
 
+EXPOSE 80
 CMD ["/start.sh"] 

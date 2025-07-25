@@ -1,16 +1,16 @@
 <template>
-  <div class="skipper-harbor-view">
+  <div class="tollgate-view">
     <div class="view-header">
       <div class="view-title">
         <i class="fas fa-ship"></i>
         <div class="title-content">
-          <h1>Skipper - Orquestrador de Navegação</h1>
-          <p>Pesquisa e extração inteligente de dados de produtos</p>
+          <h1>{{ config.serviceName }}</h1>
+          <p>{{ config.serviceDescription }}</p>
         </div>
       </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
-        <span>ONLINE</span>
+        <span>{{ config.statusText }}</span>
       </div>
       <div class="view-actions">
         <button @click="refreshData" class="action-btn">
@@ -19,87 +19,116 @@
         </button>
         <button @click="openModule" class="action-btn primary">
           <i class="fas fa-play"></i>
-          Simulação
+          Iniciar Simulação
         </button>
       </div>
     </div>
-
-    <div class="dashboard-cards">
-      <div class="card">
-        <div class="card-header">
-          <i class="fas fa-search"></i>
-          <h3>Pesquisas Realizadas</h3>
-        </div>
-        <div class="card-content">
-          <div class="metric">
-            <span class="number">{{ stats.searches }}</span>
-            <span class="label">Hoje</span>
+    
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Pesquisas Realizadas -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Pesquisas Realizadas</h3>
+            <div class="card-icon">
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">{{ config.metrics[0].value }}</div>
+              <div class="balance-label">{{ config.metrics[0].label }}</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Produtos Extraídos:</span>
+                <span class="detail-value">{{ config.metrics[1].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Fontes Ativas:</span>
+                <span class="detail-value">{{ config.metrics[2].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Taxa de Sucesso:</span>
+                <span class="detail-value">{{ config.metrics[3].value }}</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-header">
-          <i class="fas fa-database"></i>
-          <h3>Produtos Extraídos</h3>
-        </div>
-        <div class="card-content">
-          <div class="metric">
-            <span class="number">{{ stats.products }}</span>
-            <span class="label">Total</span>
+        <!-- Extrações Recentes -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Extrações Recentes</h3>
+            <div class="card-icon">
+              <i class="fas fa-history"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="transaction-list">
+              <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
+                <div class="transaction-icon success">
+                  <i :class="activity.icon"></i>
+                </div>
+                <div class="transaction-details">
+                  <div class="transaction-title">{{ activity.title }}</div>
+                  <div class="transaction-amount success">
+                    {{ activity.description }}
+                  </div>
+                  <div class="transaction-time">{{ activity.time }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-header">
-          <i class="fas fa-globe"></i>
-          <h3>Fontes Ativas</h3>
-        </div>
-        <div class="card-content">
-          <div class="metric">
-            <span class="number">{{ stats.sources }}</span>
-            <span class="label">Conectadas</span>
+        <!-- Ferramentas Disponíveis -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Ferramentas</h3>
+            <div class="card-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="plans-grid">
+              <div 
+                v-for="action in config.actions" 
+                :key="action.id" 
+                class="plan-item"
+                @click="action.handler"
+              >
+                <div class="plan-name">{{ action.title }}</div>
+                <div class="plan-price">{{ action.description }}</div>
+                <div class="plan-credits">
+                  <i :class="action.icon"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="actions-panel">
-      <h3>Ferramentas Disponíveis</h3>
-      <div class="action-buttons">
-        <button @click="startSimulation" class="action-btn primary">
-          <i class="fas fa-play"></i>
-          Simulação
-        </button>
-        <button @click="manageSources" class="action-btn">
-          <i class="fas fa-database"></i>
-          Fontes
-        </button>
-        <button @click="viewLogs" class="action-btn">
-          <i class="fas fa-chart-bar"></i>
-          Análises
-        </button>
-        <button @click="exportResults" class="action-btn">
-          <i class="fas fa-download"></i>
-          Extração
-        </button>
-      </div>
-    </div>
-
-    <div class="recent-extractions">
-      <h3>Extrações Recentes</h3>
-      <div class="extraction-list">
-        <div v-for="extraction in recentExtractions" :key="extraction.id" class="extraction-item">
-          <div class="extraction-icon">
-            <i :class="extraction.icon"></i>
+        <!-- Status do Sistema -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Status do Sistema</h3>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
           </div>
-          <div class="extraction-content">
-            <span class="extraction-text">{{ extraction.text }}</span>
-            <span class="extraction-time">{{ extraction.time }}</span>
-          </div>
-          <div class="extraction-status">
-            <span :class="['status', extraction.status]">{{ extraction.statusText }}</span>
+          <div class="card-content">
+            <div class="alerts-list">
+              <div v-for="system in config.systemStatus" :key="system.id" class="alert-item info">
+                <div class="alert-icon">
+                  <i class="fas fa-server"></i>
+                </div>
+                <div class="alert-content">
+                  <div class="alert-title">{{ system.name }}</div>
+                  <div class="alert-message">{{ system.description }}</div>
+                  <div class="alert-time">{{ system.port }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -108,87 +137,31 @@
 </template>
 
 <script>
+import { getServiceConfig } from '../../../../shared/config/status-configs.js'
+
 export default {
   name: 'SkipperHarborView',
   data() {
     return {
-      stats: {
-        searches: 47,
-        products: 2843,
-        sources: 12
-      },
-      recentExtractions: [
-        {
-          id: 1,
-          icon: 'fas fa-shopping-cart',
-          text: 'Extração de produtos eletrônicos - Amazon',
-          time: '5 minutos atrás',
-          status: 'success',
-          statusText: 'Concluído'
-        },
-        {
-          id: 2,
-          icon: 'fas fa-search',
-          text: 'Pesquisa por tênis esportivos - MercadoLivre',
-          time: '12 minutos atrás',
-          status: 'processing',
-          statusText: 'Processando'
-        },
-        {
-          id: 3,
-          icon: 'fas fa-database',
-          text: 'Extração de livros - Saraiva',
-          time: '1 hora atrás',
-          status: 'success',
-          statusText: 'Concluído'
-        },
-        {
-          id: 4,
-          icon: 'fas fa-exclamation-triangle',
-          text: 'Erro na extração - Site indisponível',
-          time: '2 horas atrás',
-          status: 'error',
-          statusText: 'Erro'
-        }
-      ]
+      config: getServiceConfig('skipper')
     }
   },
   methods: {
     refreshData() {
-      // Simula atualização dos dados
-      console.log('Atualizando dados do Skipper...');
-      // Aqui poderia fazer uma chamada real para a API para atualizar os stats
+      console.log('Atualizando dados do Skipper...')
+      // Aqui você faria a chamada para a API do Skipper
+      // e atualizaria os dados em tempo real
     },
     openModule() {
-      // Navega para a view de simulação
-      this.$router.push('/skipper/simulacao');
-    },
-    startSimulation() {
-      console.log('🚀 Iniciando simulação - Navegando para simulação');
-      this.$router.push('/skipper/simulacao');
-    },
-    manageSources() {
-      console.log('⚙️ Configurando fontes - Navegando para fontes');
-      this.$router.push('/skipper/fontes');
-    },
-    viewLogs() {
-      console.log('📊 Visualizando análises - Navegando para análises');
-      this.$router.push('/skipper/analises');
-    },
-    exportResults() {
-      console.log('📥 Exportando resultados - Navegando para extração');
-      this.$router.push('/skipper/extracao');
+      window.open('http://localhost:7722/web/', '_blank')
     }
   }
 }
 </script>
 
 <style scoped>
-.skipper-harbor-view {
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  min-height: 100%;
-  color: #e2e8f0;
+.tollgate-view {
+  height: 100%;
 }
 
 .view-header {
@@ -196,11 +169,10 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #475569;
 }
 
 .view-title {
@@ -238,14 +210,17 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
-  color: #059669;
   font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
 .view-actions {
   display: flex;
-  align-items: center;
   gap: 0.75rem;
 }
 
@@ -254,13 +229,12 @@ export default {
   border: 1px solid rgba(59, 130, 246, 0.2);
   color: #3b82f6;
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
   font-size: 0.875rem;
 }
 
@@ -270,31 +244,27 @@ export default {
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border: 1px solid #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
+  border-color: #3b82f6;
 }
 
 .action-btn.primary:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
-.status-indicator {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 50%;
-  background: #10b981;
-  animation: pulse 2s infinite;
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
 }
 
-.dashboard-cards {
+.service-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
 }
 
-.card {
+.service-card {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
   border-radius: 1rem;
@@ -304,182 +274,279 @@ export default {
 
 .card-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.card-header i {
-  color: #3b82f6;
-  font-size: 1.25rem;
-}
-
 .card-header h3 {
-  margin: 0;
   color: #e2e8f0;
+  margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
 }
 
-.metric {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.card-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
 }
 
-.metric .number {
-  font-size: 2.5rem;
+.balance-display {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.balance-value {
+  font-size: 3rem;
   font-weight: 700;
   color: #3b82f6;
   line-height: 1;
 }
 
-.metric .label {
+.balance-label {
   color: #94a3b8;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
-.actions-panel {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.actions-panel h3 {
-  margin: 0 0 1rem 0;
-  color: #e2e8f0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.action-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.action-btn {
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  color: #374151;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.balance-details {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.action-btn:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
+.detail-item:last-child {
+  border-bottom: none;
 }
 
-.action-btn.primary {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+.detail-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
 }
 
-.action-btn.primary:hover {
-  background: #2563eb;
-}
-
-.recent-extractions {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.recent-extractions h3 {
-  margin: 0 0 1rem 0;
+.detail-value {
   color: #e2e8f0;
-  font-size: 1.125rem;
   font-weight: 600;
+  font-size: 0.875rem;
 }
 
-.extraction-list {
+.transaction-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.extraction-item {
+.transaction-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
   background: rgba(15, 23, 42, 0.3);
   border-radius: 0.5rem;
+  transition: all 0.2s ease;
 }
 
-.extraction-icon {
+.transaction-item:hover {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.transaction-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: #3b82f6;
-  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
   flex-shrink: 0;
 }
 
-.extraction-content {
-  display: flex;
-  flex-direction: column;
+.transaction-icon.success {
+  background: #10b981;
+}
+
+.transaction-icon.warning {
+  background: #f59e0b;
+}
+
+.transaction-icon.error {
+  background: #ef4444;
+}
+
+.transaction-details {
   flex: 1;
 }
 
-.extraction-text {
+.transaction-title {
   color: #e2e8f0;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
+  margin-bottom: 0.25rem;
 }
 
-.extraction-time {
-  color: #94a3b8;
+.transaction-amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.transaction-amount.success {
+  color: #10b981;
+}
+
+.transaction-amount.warning {
+  color: #f59e0b;
+}
+
+.transaction-amount.error {
+  color: #ef4444;
+}
+
+.transaction-time {
+  color: #64748b;
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
 
-.extraction-status {
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.plan-item {
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.plan-item:hover {
+  background: rgba(15, 23, 42, 0.5);
+  transform: translateY(-2px);
+}
+
+.plan-item.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.plan-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.plan-credits {
+  color: #3b82f6;
+  font-size: 1rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.alert-item.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.alert-item.info {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.alert-item.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   flex-shrink: 0;
 }
 
-.status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
+.alert-item.warning .alert-icon {
+  background: #f59e0b;
+}
+
+.alert-item.info .alert-icon {
+  background: #3b82f6;
+}
+
+.alert-item.error .alert-icon {
+  background: #ef4444;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  color: #e2e8f0;
   font-weight: 600;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
 }
 
-.status.success {
-  background: #d1fae5;
-  color: #065f46;
+.alert-message {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 
-.status.processing {
-  background: #fef3c7;
-  color: #92400e;
+.alert-time {
+  color: #64748b;
+  font-size: 0.75rem;
 }
 
-.status.error {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 
