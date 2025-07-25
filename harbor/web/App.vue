@@ -10,7 +10,10 @@
           </div>
           <div class="logo-text-container">
             <h1 class="logo-text">CANONIKA</h1>
-            <span class="logo-subtitle">HARBOR</span>
+            <div class="module-title-with-icon">
+              <div class="module-icon icon-harbor"></div>
+              <span class="logo-subtitle">HARBOR</span>
+            </div>
           </div>
         </div>
         <div class="header-actions">
@@ -35,129 +38,244 @@
       <div class="header-glow"></div>
     </header>
 
-    <div class="main-container">
-      <!-- Sidebar futurista -->
+    <div class="canonika-layout">
+      <!-- Sidebar inspirado no Bootstrap -->
       <nav class="canonika-sidebar" v-if="user">
         <div class="sidebar-header">
-          <div class="nav-icon active">
-            <i class="nav-dot"></i>
-            <span>NAVEGAÇÃO</span>
-          </div>
+          <span class="sidebar-title">NAVEGAÇÃO</span>
         </div>
         <ul class="nav-menu">
-          <li class="nav-item" :class="{ active: currentView === 'dashboard' }">
-            <div class="nav-link" @click="setView('dashboard')">
+          <li class="nav-item">
+            <router-link class="nav-link" to="/">
               <div class="nav-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
-              <span>Dashboard</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'tollgate' }">
-            <div class="nav-link" @click="setView('tollgate')">
-              <div class="nav-icon">
-                <i class="fas fa-coins"></i>
+              <div class="nav-text">
+                <div class="nav-title">Dashboard</div>
+                <div class="service-subtitle">Visão geral do sistema</div>
               </div>
-              <span>Tollgate</span>
-              <span class="service-subtitle">Créditos</span>
-            </div>
+            </router-link>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'quartermaster' }">
-            <div class="nav-link" @click="setView('quartermaster')">
+          <!-- Skipper -->
+          <li class="nav-item">
+            <a class="nav-link d-flex justify-content-between align-items-center" href="#" @click.prevent="toggleSubmenu('skipper')">
               <div class="nav-icon">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-ship"></i>
               </div>
-              <span>Quartermaster</span>
-              <span class="service-subtitle">Usuários</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'skipper' }">
-            <div class="nav-link" @click="setView('skipper')">
-              <div class="nav-icon">
-                <i class="fas fa-chart-line"></i>
+              <div class="nav-text">
+                <div class="nav-title">Skipper</div>
+                <div class="service-subtitle">Navegação e extração de dados</div>
               </div>
-              <span>Skipper</span>
-              <span class="service-subtitle">Análise</span>
-            </div>
+              <i :class="openSubmenus.skipper ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
+            </a>
+            <ul class="nav flex-column collapse submenu-bootstrap" :class="{ show: openSubmenus.skipper }">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/skipper/simulacao">
+                  <div class="nav-icon">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Simulação</div>
+                    <div class="service-subtitle">Testes e simulações</div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/skipper/fontes">
+                  <div class="nav-icon">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Fontes</div>
+                    <div class="service-subtitle">Gerenciamento de dados</div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/skipper/analises">
+                  <div class="nav-icon">
+                    <i class="fas fa-chart-bar"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Análises</div>
+                    <div class="service-subtitle">Relatórios e métricas</div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/skipper/extracao">
+                  <div class="nav-icon">
+                    <i class="fas fa-download"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Extração</div>
+                    <div class="service-subtitle">Coleta de informações</div>
+                  </div>
+                </router-link>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'wayfinder' }">
-            <div class="nav-link" @click="setView('wayfinder')">
-              <div class="nav-icon">
-                <i class="fas fa-route"></i>
-              </div>
-              <span>Wayfinder</span>
-              <span class="service-subtitle">Navegação</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'mapmaker' }">
-            <div class="nav-link" @click="setView('mapmaker')">
-              <div class="nav-icon">
-                <i class="fas fa-map"></i>
-              </div>
-              <span>Mapmaker</span>
-              <span class="service-subtitle">Mapeamento</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'ledger' }">
-            <div class="nav-link" @click="setView('ledger')">
+          <!-- Ledger -->
+          <li class="nav-item">
+            <a class="nav-link d-flex justify-content-between align-items-center" href="#" @click.prevent="toggleSubmenu('ledger')">
               <div class="nav-icon">
                 <i class="fas fa-book"></i>
               </div>
-              <span>Ledger</span>
-              <span class="service-subtitle">Registros</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'seagull' }">
-            <div class="nav-link" @click="setView('seagull')">
-              <div class="nav-icon">
-                <i class="fas fa-eye"></i>
+              <div class="nav-text">
+                <div class="nav-title">Ledger</div>
+                <div class="service-subtitle">Contabilidade e gestão financeira</div>
               </div>
-              <span>Seagull</span>
-              <span class="service-subtitle">Monitoramento</span>
-            </div>
+              <i :class="openSubmenus.ledger ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
+            </a>
+            <ul class="nav flex-column collapse submenu-bootstrap" :class="{ show: openSubmenus.ledger }">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/ledger/lancamentos">
+                  <div class="nav-icon">
+                    <i class="fas fa-plus-circle"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Lançamentos</div>
+                    <div class="service-subtitle">Registro de transações</div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/ledger/relatorios">
+                  <div class="nav-icon">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Relatórios</div>
+                    <div class="service-subtitle">Análises financeiras</div>
+                  </div>
+                </router-link>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'beacon' }">
-            <div class="nav-link" @click="setView('beacon')">
+          <!-- Tollgate -->
+          <li class="nav-item">
+            <a class="nav-link d-flex justify-content-between align-items-center" href="#" @click.prevent="toggleSubmenu('tollgate')">
+              <div class="nav-icon">
+                <i class="fas fa-coins"></i>
+              </div>
+              <div class="nav-text">
+                <div class="nav-title">Tollgate</div>
+                <div class="service-subtitle">Pedágio e controle de acesso</div>
+              </div>
+              <i :class="openSubmenus.tollgate ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
+            </a>
+            <ul class="nav flex-column collapse submenu-bootstrap" :class="{ show: openSubmenus.tollgate }">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/tollgate/pedagios">
+                  <div class="nav-icon">
+                    <i class="fas fa-road"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Pedágios</div>
+                    <div class="service-subtitle">Gestão de cobranças</div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link" to="/tollgate/auditoria">
+                  <div class="nav-icon">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Auditoria</div>
+                    <div class="service-subtitle">Controle e monitoramento</div>
+                  </div>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+          <!-- Quarter -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/quarter">
+              <div class="nav-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="nav-text">
+                <div class="nav-title">Quarter</div>
+                <div class="service-subtitle">Gestão de usuários e permissões</div>
+              </div>
+            </router-link>
+          </li>
+          <!-- Beacon -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/beacon">
               <div class="nav-icon">
                 <i class="fas fa-broadcast-tower"></i>
               </div>
-              <span>Beacon</span>
-              <span class="service-subtitle">Sinalização</span>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'dock' }">
-            <div class="nav-link" @click="setView('dock')">
-              <div class="nav-icon">
-                <i class="fas fa-anchor"></i>
+              <div class="nav-text">
+                <div class="nav-title">Beacon</div>
+                <div class="service-subtitle">Sinalização e comunicação</div>
               </div>
-              <span>Dock</span>
-              <span class="service-subtitle">Conectividade</span>
-            </div>
+            </router-link>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'guardian' }">
-            <div class="nav-link" @click="setView('guardian')">
+          <!-- Echo -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/echo">
               <div class="nav-icon">
-                <i class="fas fa-shield-alt"></i>
+                <i class="fas fa-echo"></i>
               </div>
-              <span>Guardian</span>
-              <span class="service-subtitle">Segurança</span>
-            </div>
+              <div class="nav-text">
+                <div class="nav-title">Echo</div>
+                <div class="service-subtitle">Sistema de eco e ressonância</div>
+              </div>
+            </router-link>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'echo' }">
-            <div class="nav-link" @click="setView('echo')">
+          <!-- Guardian -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/guardian">
               <div class="nav-icon">
-                <i class="fas fa-comments"></i>
+                <i class="fas fa-shield"></i>
               </div>
-              <span>Echo</span>
-              <span class="service-subtitle">Comunicação</span>
-            </div>
+              <div class="nav-text">
+                <div class="nav-title">Guardian</div>
+                <div class="service-subtitle">Proteção e segurança</div>
+              </div>
+            </router-link>
+          </li>
+          <!-- Mapmaker -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/mapmaker">
+              <div class="nav-icon">
+                <i class="fas fa-map"></i>
+              </div>
+              <div class="nav-text">
+                <div class="nav-title">Mapmaker</div>
+                <div class="service-subtitle">Criação e gestão de mapas</div>
+              </div>
+            </router-link>
+          </li>
+          <!-- Seagull -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/seagull">
+              <div class="nav-icon">
+                <i class="fas fa-seagull"></i>
+              </div>
+              <div class="nav-text">
+                <div class="nav-title">Seagull</div>
+                <div class="service-subtitle">Vigilância e monitoramento</div>
+              </div>
+            </router-link>
+          </li>
+          <!-- Wayfinder -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/wayfinder">
+              <div class="nav-icon">
+                <i class="fas fa-compass"></i>
+              </div>
+              <div class="nav-text">
+                <div class="nav-title">Wayfinder</div>
+                <div class="service-subtitle">Navegação e orientação</div>
+              </div>
+            </router-link>
           </li>
         </ul>
       </nav>
-
-      <!-- Main content -->
       <main class="canonika-main">
-        <!-- Login Screen -->
         <div v-if="!user" class="login-container">
           <div class="login-card">
             <div class="login-header">
@@ -208,174 +326,13 @@
             </form>
           </div>
         </div>
-
-        <!-- Dashboard -->
-        <div v-else-if="currentView === 'dashboard'" class="dashboard-container">
-          <div class="dashboard-header">
-            <h1>Dashboard Canonika</h1>
-            <p>Visão geral da plataforma</p>
-          </div>
-          
-          <div class="dashboard-grid">
-            <!-- Status dos Serviços -->
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3>Status dos Serviços</h3>
-                <div class="card-icon">
-                  <i class="fas fa-server"></i>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="service-status-list">
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Tollgate</span>
-                    <span class="service-port">7732</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Quartermaster</span>
-                    <span class="service-port">7725</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Skipper</span>
-                    <span class="service-port">7722</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Wayfinder</span>
-                    <span class="service-port">7723</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Mapmaker</span>
-                    <span class="service-port">7724</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Estatísticas -->
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3>Estatísticas</h3>
-                <div class="card-icon">
-                  <i class="fas fa-chart-bar"></i>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <div class="stat-value">12</div>
-                    <div class="stat-label">Serviços Ativos</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">1,247</div>
-                    <div class="stat-label">Requisições Hoje</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">99.8%</div>
-                    <div class="stat-label">Uptime</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">45ms</div>
-                    <div class="stat-label">Latência Média</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Ações Rápidas -->
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3>Ações Rápidas</h3>
-                <div class="card-icon">
-                  <i class="fas fa-bolt"></i>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="quick-actions">
-                  <button @click="setView('tollgate')" class="quick-action-btn">
-                    <i class="fas fa-coins"></i>
-                    Ver Créditos
-                  </button>
-                  <button @click="setView('quartermaster')" class="quick-action-btn">
-                    <i class="fas fa-users"></i>
-                    Gerenciar Usuários
-                  </button>
-                  <button @click="setView('skipper')" class="quick-action-btn">
-                    <i class="fas fa-chart-line"></i>
-                    Análise de Dados
-                  </button>
-                  <button @click="setView('wayfinder')" class="quick-action-btn">
-                    <i class="fas fa-route"></i>
-                    Navegação
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Atividade Recente -->
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3>Atividade Recente</h3>
-                <div class="card-icon">
-                  <i class="fas fa-clock"></i>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="activity-list">
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Créditos adicionados</div>
-                      <div class="activity-time">2 minutos atrás</div>
-                    </div>
-                  </div>
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-users"></i>
-                    </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Novo usuário registrado</div>
-                      <div class="activity-time">15 minutos atrás</div>
-                    </div>
-                  </div>
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Análise concluída</div>
-                      <div class="activity-time">1 hora atrás</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Service Views -->
-        <div v-else class="service-container">
-          <div class="service-header">
-            <h1>{{ getServiceTitle() }}</h1>
-            <p>{{ getServiceDescription() }}</p>
-          </div>
-          
-          <div class="service-content">
-            <div class="service-iframe-container">
-              <iframe 
-                :src="getServiceUrl()" 
-                class="service-iframe"
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
+        <router-view v-else />
+        
+        <!-- Teste de Hot Reload -->
+        <div class="hot-reload-test" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 1rem; border-radius: 0.5rem; color: white; font-size: 0.8rem; border: 1px solid #475569;">
+          <div>🔄 Hot Reload: {{ new Date().toLocaleTimeString() }}</div>
+          <div>✅ Padding Y Reduzido</div>
+          <div>📏 4px em vez de 0.75rem</div>
         </div>
       </main>
     </div>
@@ -383,17 +340,27 @@
 </template>
 
 <script>
+import { getServiceInfo, getAllServices, hasServiceView } from './services.js'
+
 export default {
   name: 'App',
   data() {
     return {
       user: null,
       loginForm: {
-        email: '',
-        password: ''
+        email: 'admin@canonika.io',
+        password: 'Admin@123'
       },
       error: null,
-      currentView: 'dashboard'
+      currentView: 'dashboard',
+      services: getAllServices(),
+      sidebarCollapsed: false,
+      // Novo: controle de submenus
+      openSubmenus: {
+        skipper: false,
+        ledger: false,
+        tollgate: false
+      }
     }
   },
   methods: {
@@ -406,105 +373,50 @@ export default {
           name: 'Administrador',
           email: this.loginForm.email,
           roles: ['admin']
-        };
-        this.currentView = 'dashboard';
-        this.loginForm = { email: '', password: '' };
+        }
       } catch (e) {
-        this.error = e.message;
+        this.error = 'Erro ao fazer login.';
       }
     },
-    
     logout() {
       this.user = null;
-      this.currentView = 'dashboard';
     },
-    
-    setView(view) {
-      this.currentView = view;
+    toggleSidebar() {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
     },
-    
-    getServiceTitle() {
-      const titles = {
-        'tollgate': 'Tollgate - Sistema de Créditos',
-        'quartermaster': 'Quartermaster - Gestão de Usuários',
-        'skipper': 'Skipper - Análise de Dados',
-        'wayfinder': 'Wayfinder - Navegação Inteligente',
-        'mapmaker': 'Mapmaker - Mapeamento de Dados',
-        'ledger': 'Ledger - Registros e Contabilidade',
-        'seagull': 'Seagull - Monitoramento',
-        'beacon': 'Beacon - Sinalização',
-        'dock': 'Dock - Conectividade',
-        'guardian': 'Guardian - Segurança',
-        'echo': 'Echo - Comunicação'
-      };
-      return titles[this.currentView] || 'Serviço';
+    // Novo: alternar submenus
+    toggleSubmenu(menu) {
+      this.openSubmenus[menu] = !this.openSubmenus[menu];
     },
-    
-    getServiceDescription() {
-      const descriptions = {
-        'tollgate': 'Controle de créditos e consumo da plataforma',
-        'quartermaster': 'Gestão de usuários e permissões',
-        'skipper': 'Análise avançada de dados e insights',
-        'wayfinder': 'Navegação inteligente e roteamento',
-        'mapmaker': 'Mapeamento e visualização de dados',
-        'ledger': 'Registros e contabilidade da plataforma',
-        'seagull': 'Monitoramento e observabilidade',
-        'beacon': 'Sinalização e comunicação',
-        'dock': 'Conectividade e integração',
-        'guardian': 'Segurança e proteção',
-        'echo': 'Comunicação e mensageria'
-      };
-      return descriptions[this.currentView] || 'Descrição do serviço';
-    },
-    
-    getServiceUrl() {
-      const ports = {
-        'tollgate': '7732',
-        'quartermaster': '7725',
-        'skipper': '7722',
-        'wayfinder': '7723',
-        'mapmaker': '7724',
-        'ledger': '7726',
-        'seagull': '7727',
-        'beacon': '7728',
-        'dock': '7729',
-        'guardian': '7730',
-        'echo': '7731'
-      };
-      
-      const port = ports[this.currentView];
-      if (port) {
-        return `http://localhost:${port}/web/`;
-      }
-      return '';
-    }
-  },
-  
-  mounted() {
-    // Verificar se há usuário logado
-    const savedUser = localStorage.getItem('canonika_user');
-    if (savedUser) {
-      this.user = JSON.parse(savedUser);
-    }
-  },
-  
-  watch: {
-    user(newUser) {
-      if (newUser) {
-        localStorage.setItem('canonika_user', JSON.stringify(newUser));
-      } else {
-        localStorage.removeItem('canonika_user');
-      }
+    isActiveRoute(route) {
+      return this.$route.path.startsWith(route);
     }
   }
 }
 </script>
 
 <style>
+/* Reset CSS Universal */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 /* Estilos existentes mantidos e expandidos */
 .canonika-app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
   color: #e2e8f0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -577,6 +489,7 @@ export default {
   letter-spacing: 0.1em;
   line-height: 1;
   margin: 0;
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 .logo-subtitle {
@@ -674,6 +587,36 @@ export default {
   min-height: calc(100vh - 80px);
 }
 
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  position: fixed;
+  top: 90px;
+  left: 20px;
+  z-index: 1001;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.sidebar-toggle.sidebar-collapsed {
+  left: 20px;
+}
+
 /* Sidebar */
 .canonika-sidebar {
   width: 280px;
@@ -681,44 +624,83 @@ export default {
   border-right: 1px solid #475569;
   padding: 2rem 0;
   overflow-y: auto;
+  transition: all 0.3s ease;
+  position: fixed;
+  top: 80px;
+  left: 0;
+  z-index: 1000;
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar-header {
-  padding: 0 2rem 1rem;
-  border-bottom: 1px solid #475569;
-  margin-bottom: 1rem;
+.canonika-sidebar.sidebar-collapsed {
+  transform: translateX(-100%);
 }
 
+/* Main Content */
+.canonika-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 80px);
+}
+
+.canonika-main.sidebar-collapsed {
+  margin-left: 0;
+}
+
+/* Navigation Menu */
 .nav-menu {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1;
 }
 
 .nav-item {
-  margin: 0.25rem 0;
+  margin-bottom: 0.5rem;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  color: #cbd5e1;
+  padding: 1rem 1.5rem;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  margin: 0 1rem;
   position: relative;
+  overflow: hidden;
 }
 
 .nav-link:hover {
   background: rgba(59, 130, 246, 0.1);
   color: #e2e8f0;
+  transform: translateX(5px);
 }
 
 .nav-item.active .nav-link {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border-right: 3px solid #10b981;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateX(5px);
+}
+
+.nav-item.active .nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
 }
 
 .nav-icon {
@@ -728,19 +710,33 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  flex: 0 0 1.5rem;
+}
+
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  gap: 0.125rem;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
 }
 
 .service-subtitle {
   font-size: 0.75rem;
   opacity: 0.7;
-  margin-left: auto;
-}
-
-/* Main Content */
-.canonika-main {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
+  margin: 0;
+  white-space: nowrap;
+  color: inherit;
 }
 
 /* Login */
@@ -752,8 +748,8 @@ export default {
 }
 
 .login-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border: 1px solid #64748b;
   border-radius: 1rem;
   padding: 3rem;
   width: 100%;
@@ -925,8 +921,8 @@ export default {
 }
 
 .dashboard-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border: 1px solid #64748b;
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -963,7 +959,7 @@ export default {
   gap: 0.75rem;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  background: rgba(15, 23, 42, 0.3);
+  background: rgba(30, 41, 59, 0.3);
 }
 
 .status-dot {
@@ -995,7 +991,7 @@ export default {
 .stat-item {
   text-align: center;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
+  background: rgba(30, 41, 59, 0.3);
   border-radius: 0.5rem;
 }
 
@@ -1078,42 +1074,502 @@ export default {
   font-size: 0.75rem;
 }
 
-/* Service Container */
-.service-container {
+/* Service Views */
+.service-view {
   height: 100%;
 }
 
-.service-header {
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
-}
-
-.service-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem;
-}
-
-.service-header p {
-  color: #94a3b8;
-  margin: 0;
-}
-
-.service-content {
-  height: calc(100vh - 200px);
-}
-
-.service-iframe-container {
-  height: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
   border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid #475569;
+  border: 1px solid #64748b;
 }
 
-.service-iframe {
-  width: 100%;
+.view-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+/* Tollgate Styles */
+.balance-display {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.balance-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+}
+
+.balance-label {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.balance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #475569;
+}
+
+.detail-label {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+}
+
+.transaction-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.transaction-icon.credit {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.transaction-icon.debit {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-title {
+  color: #e2e8f0;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.transaction-amount {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.transaction-time {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.plan-item {
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+  text-align: center;
+  border: 1px solid #475569;
+  transition: all 0.2s ease;
+}
+
+.plan-item.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.plan-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.plan-credits {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Quarter Styles */
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.user-email {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.user-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.user-status.online {
+  color: #10b981;
+}
+
+.user-status.offline {
+  color: #64748b;
+}
+
+.user-action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.1);
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.permission-item {
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.permission-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.permission-count {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.permission-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.permission-badge.admin {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.permission-badge.manager {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.permission-badge.user {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+/* Skipper Styles */
+.analysis-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analysis-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+}
+
+.analysis-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.analysis-details {
+  flex: 1;
+}
+
+.analysis-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.analysis-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background: rgba(71, 85, 105, 0.3);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.progress-fill {
   height: 100%;
-  border: none;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 0.25rem;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 0.875rem;
+  min-width: 3rem;
+}
+
+.analysis-time {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+}
+
+.insight-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.insight-icon.positive {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.insight-icon.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.insight-content {
+  flex: 1;
+}
+
+.insight-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.insight-description {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+/* Service Info */
+.service-info {
+  text-align: center;
+  padding: 2rem;
+}
+
+.service-info p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+}
+
+.service-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #10b981;
+  font-weight: 600;
 }
 
 /* Animations */
@@ -1137,36 +1593,165 @@ export default {
   }
 }
 
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
   .canonika-sidebar {
     width: 100%;
-    position: fixed;
-    top: 80px;
-    left: 0;
-    z-index: 1000;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
   }
   
-  .canonika-sidebar.open {
+  .canonika-sidebar:not(.sidebar-collapsed) {
     transform: translateX(0);
   }
   
   .canonika-main {
-    padding: 1rem;
+    margin-left: 0;
   }
   
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-actions {
-    grid-template-columns: 1fr;
+  .sidebar-toggle {
+    display: flex;
   }
 }
+
+.nav-submenu {
+  padding-left: 24px;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid #222;
+  margin-bottom: 4px;
+}
+.submenu-link {
+  font-size: 0.95em;
+  color: #b0b0b0;
+}
+.nav-item.active > .nav-link,
+.nav-item .nav-link.router-link-exact-active {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #fff;
+  border-radius: 6px;
+  border-left: 3px solid #10b981;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.nav-item .nav-link.router-link-exact-active .nav-title {
+  font-weight: bold;
+}
+.nav-item .submenu-toggle {
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 0.9em;
+  color: #888;
+}
+
+.sidebar-bootstrap {
+  background: #212529;
+  color: #fff;
+  min-width: 280px;
+  max-width: 280px;
+  height: 100vh;
+  padding: 1rem 0;
+  border-right: 1px solid #343a40;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #6c757d;
+  margin: 0 1rem 0.5rem 1rem;
+  text-transform: uppercase;
+  padding: 0.5rem 0;
+}
+.nav.flex-column {
+  width: 100%;
+}
+.nav-link {
+  color: #adb5bd;
+  border-radius: 0;
+  padding: 4px 1rem;
+  margin: 0;
+  transition: background 0.15s ease-in-out, color 0.15s ease-in-out;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  border: none;
+  gap: 0.75rem;
+}
+.nav-link.active, .nav-link.router-link-exact-active, .nav-link:hover, .nav-link:focus {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border-left: 3px solid #3b82f6;
+}
+.nav-icon {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.125rem;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
+}
+
+.service-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+  white-space: nowrap;
+  color: inherit;
+  font-weight: 400;
+}
+.submenu-bootstrap {
+  background: none;
+  border: none;
+  margin: 0;
+  padding-left: 1rem;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+
+.submenu-bootstrap .nav-link {
+  padding: 2px 1rem;
+  font-size: 0.875rem;
+}
+
+.submenu-bootstrap .nav-icon {
+  min-width: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.submenu-bootstrap .nav-title {
+  font-size: 0.8rem;
+}
+
+.submenu-bootstrap .service-subtitle {
+  font-size: 0.7rem;
+}
+.submenu-bootstrap:not(.show) {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+}
+.submenu-bootstrap.show {
+  max-height: 500px;
+  opacity: 1;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
 </style>
+
