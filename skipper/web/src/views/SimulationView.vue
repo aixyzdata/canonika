@@ -1,201 +1,244 @@
 <template>
   <div class="simulation-view">
-    <!-- Header -->
-    <div class="page-header">
-      <h1 class="page-title">
-        <i class="fas fa-search"></i>
-        Simulação de Pesquisa
-      </h1>
-      <p class="page-subtitle">
-        Orquestrador de Navegação e Extração de Dados
-      </p>
+    <!-- Header da Simulação -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="canonika-card p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h2 class="mb-2">
+                <i class="fas fa-search me-2"></i>
+                Simulação de Pesquisa
+              </h2>
+              <p class="text-muted mb-0">
+                Pesquise produtos em múltiplas fontes e extraia atributos estruturados
+              </p>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <button 
+                  @click="refreshSources" 
+                  class="btn btn-outline-light"
+                  :disabled="loading"
+                >
+                  <i class="fas fa-sync-alt me-1"></i>
+                  Atualizar Fontes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Formulário de Pesquisa -->
-    <div class="simulation-form">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-cog"></i>
-            Configuração da Pesquisa
-          </h5>
-        </div>
-        <div class="card-body">
-          <form @submit.prevent="startSimulation" class="canonika-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="productName" class="form-label">Nome do Produto</label>
-                <input
-                  type="text"
-                  class="form-input"
-                  id="productName"
-                  v-model="productName"
-                  placeholder="Ex: iPhone 15, Samsung Galaxy, etc."
-                >
-              </div>
-              
-              <div class="form-group">
-                <label for="maxResults" class="form-label">Máximo de Resultados por Fonte</label>
-                <input
-                  type="number"
-                  class="form-input"
-                  id="maxResults"
-                  v-model="maxResults"
-                  min="1"
-                  max="10"
-                >
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="autoSelectSources"
-                    v-model="autoSelectSources"
-                  >
-                  <label class="form-check-label" for="autoSelectSources">
-                    Selecionar automaticamente as melhores fontes
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="canonika-card p-4">
+          <form @submit.prevent="startSimulation">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="productName" class="form-label">
+                    <i class="fas fa-box me-2"></i>
+                    Nome do Produto
                   </label>
+                  <input
+                    v-model="simulationForm.productName"
+                    type="text"
+                    class="form-control"
+                    id="productName"
+                    placeholder="Ex: iPhone 15, Samsung Galaxy, etc."
+                    required
+                    :disabled="simulationRunning"
+                  >
                 </div>
               </div>
-              
-              <div class="form-group">
-                <button
-                  @click="startSimulation"
-                  :disabled="!productName || isRunning"
-                  class="canonika-btn canonika-btn-primary"
-                >
-                  <i class="fas fa-search"></i>
-                  {{ isRunning ? 'Pesquisando...' : '🔍 Pesquisar' }}
-                </button>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">
+                    <i class="fas fa-cog me-2"></i>
+                    Configuração de Fontes
+                  </label>
+                  <div class="d-flex gap-2">
+                    <div class="form-check">
+                      <input
+                        v-model="simulationForm.autoSelectSources"
+                        class="form-check-input"
+                        type="radio"
+                        id="autoSelect"
+                        value="true"
+                        :disabled="simulationRunning"
+                      >
+                      <label class="form-check-label" for="autoSelect">
+                        Seleção Automática
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        v-model="simulationForm.autoSelectSources"
+                        class="form-check-input"
+                        type="radio"
+                        id="manualSelect"
+                        value="false"
+                        :disabled="simulationRunning"
+                      >
+                      <label class="form-check-label" for="manualSelect">
+                        Seleção Manual
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <!-- Seleção Manual de Fontes -->
+            <div v-if="!simulationForm.autoSelectSources" class="row mb-3">
+              <div class="col-12">
+                <label class="form-label">
+                  <i class="fas fa-database me-2"></i>
+                  Fontes Disponíveis
+                </label>
+                <div class="row">
+                  <div 
+                    v-for="source in availableSources" 
+                    :key="source.id"
+                    class="col-md-4 mb-2"
+                  >
+                    <div class="form-check">
+                      <input
+                        v-model="simulationForm.selectedSources"
+                        class="form-check-input"
+                        type="checkbox"
+                        :value="source.id"
+                        :id="`source-${source.id}`"
+                        :disabled="simulationRunning"
+                      >
+                      <label class="form-check-label" :for="`source-${source.id}`">
+                        <i :class="getSourceIcon(source.name)" class="me-1"></i>
+                        {{ source.name }}
+                        <span class="badge bg-secondary ms-1">{{ source.type }}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center">
+              <button 
+                type="submit" 
+                class="btn btn-canonika-primary btn-lg"
+                :disabled="simulationRunning || loading"
+              >
+                <i class="fas fa-play me-2"></i>
+                {{ simulationRunning ? 'Executando...' : 'Iniciar Simulação' }}
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Layout Principal -->
-    <div class="simulation-layout">
-      <!-- Painel de Logs -->
-      <div class="logs-panel">
-        <div class="canonika-card">
-          <div class="card-header">
-            <h6 class="card-title">
-              <i class="fas fa-terminal"></i>
-              Logs em Tempo Real
-            </h6>
+    <!-- Painel de Logs em Tempo Real -->
+    <div v-if="currentSimulation" class="row mb-4">
+      <div class="col-12">
+        <div class="canonika-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">
+              <i class="fas fa-terminal me-2"></i>
+              Logs de Execução
+            </h4>
+            <div class="d-flex gap-2">
+              <span class="badge" :class="getStatusBadgeClass(currentSimulation.status)">
+                {{ currentSimulation.status }}
+              </span>
+              <button @click="clearLogs" class="btn btn-sm btn-outline-light">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="log-container">
-              <div
-                v-for="(log, index) in logs"
-                :key="index"
-                class="log-entry"
-              >
-                {{ log }}
+          
+          <div class="log-container">
+            <div 
+              v-for="log in simulationLogs" 
+              :key="log.timestamp"
+              class="log-entry"
+              :class="getLogEntryClass(log)"
+            >
+              <div class="log-header">
+                <span class="log-timestamp">{{ formatTime(log.timestamp) }}</span>
+                <span class="log-agent">{{ log.agent_type.toUpperCase() }}</span>
+                <span class="log-source">{{ log.source_name }}</span>
+                <span class="log-status" :class="`status-${log.status}`">
+                  {{ log.status }}
+                </span>
               </div>
-              <div v-if="logs.length === 0" class="text-muted text-center">
-                Nenhum log disponível
-              </div>
+              <div class="log-message">{{ log.message }}</div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Resultados -->
-      <div class="results-panel">
-        <div v-if="currentSimulation" class="canonika-card">
-          <div class="card-header">
-            <h6 class="card-title">
-              <i class="fas fa-chart-bar"></i>
-              Resultados da Simulação
-            </h6>
-          </div>
-          <div class="card-body">
-            <!-- Status da Simulação -->
-            <div class="simulation-status">
-              <span class="status-indicator" :class="getStatusClass(currentSimulation.status)">
-                {{ getStatusText(currentSimulation.status) }}
-              </span>
-              <small class="text-muted">
-                ID: {{ currentSimulation.id }}
-              </small>
-            </div>
-
-            <!-- Resultados por Fonte -->
-            <div v-if="currentSimulation.sources_results" class="sources-results">
-              <h6>Resultados por Fonte:</h6>
-              <div class="results-grid">
-                <div
-                  v-for="(result, sourceName) in currentSimulation.sources_results"
-                  :key="sourceName"
-                  class="result-card"
-                >
-                  <div class="canonika-card">
-                    <div class="card-header">
-                      <h6 class="card-title">{{ sourceName }}</h6>
-                    </div>
-                    <div class="card-body">
-                      <div v-if="result.attributes">
-                        <div class="result-item">
-                          <strong>Nome:</strong> {{ result.attributes.nome }}
-                        </div>
-                        <div class="result-item">
-                          <strong>Marca:</strong> {{ result.attributes.marca }}
-                        </div>
-                        <div class="result-item">
-                          <strong>Preço:</strong> {{ result.attributes.preco }}
-                        </div>
-                        <div class="result-item">
-                          <strong>Confiança:</strong>
-                          <span :class="getConfidenceClass(result.confidence)">
-                            {{ (result.confidence * 100).toFixed(1) }}%
-                          </span>
-                        </div>
-                      </div>
+    <!-- Resultados da Simulação -->
+    <div v-if="currentSimulation && currentSimulation.status === 'completed'" class="row">
+      <div class="col-12">
+        <div class="canonika-card p-4">
+          <h4 class="mb-3">
+            <i class="fas fa-chart-bar me-2"></i>
+            Resultados Consolidados
+          </h4>
+          
+          <!-- Produto Consolidado -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5>Produto Final</h5>
+              <div class="consolidated-product">
+                <div class="row">
+                  <div 
+                    v-for="(value, key) in currentSimulation.consolidated_product" 
+                    :key="key"
+                    class="col-md-6 mb-2"
+                  >
+                    <div class="attribute-item">
+                      <span class="attribute-label">{{ formatAttributeName(key) }}:</span>
+                      <span class="attribute-value">{{ value }}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Produto Consolidado -->
-            <div v-if="currentSimulation.consolidated_product" class="consolidated-product">
-              <h6>Produto Consolidado:</h6>
-              <div class="canonika-card">
-                <div class="card-body">
-                  <div class="product-info">
-                    <div class="info-column">
-                      <div class="info-item">
-                        <strong>Nome:</strong> {{ currentSimulation.consolidated_product.nome }}
-                      </div>
-                      <div class="info-item">
-                        <strong>Marca:</strong> {{ currentSimulation.consolidated_product.marca }}
-                      </div>
-                      <div class="info-item">
-                        <strong>Preço:</strong> {{ currentSimulation.consolidated_product.preco }}
+          <!-- Resultados por Fonte -->
+          <div class="row">
+            <div class="col-12">
+              <h5>Resultados por Fonte</h5>
+              <div class="row">
+                <div 
+                  v-for="(result, sourceName) in currentSimulation.results" 
+                  :key="sourceName"
+                  class="col-md-6 mb-3"
+                >
+                  <div class="source-result-card">
+                    <div class="source-header">
+                      <h6>{{ sourceName }}</h6>
+                      <span class="confidence-score">
+                        {{ (result.score_confianca * 100).toFixed(0) }}%
+                      </span>
+                    </div>
+                    <div class="source-attributes">
+                      <div 
+                        v-for="(value, key) in result" 
+                        :key="key"
+                        v-if="key !== 'score_confianca'"
+                        class="attribute-item"
+                      >
+                        <span class="attribute-label">{{ formatAttributeName(key) }}:</span>
+                        <span class="attribute-value">{{ value }}</span>
                       </div>
                     </div>
-                    <div class="info-column">
-                      <div class="info-item">
-                        <strong>Confiança Global:</strong>
-                        <span :class="getConfidenceClass(currentSimulation.consolidated_product.confianca_global)">
-                          {{ (currentSimulation.consolidated_product.confianca_global * 100).toFixed(1) }}%
-                        </span>
-                      </div>
-                      <div class="info-item">
-                        <strong>Fontes Consultadas:</strong> {{ currentSimulation.consolidated_product.fontes_consultadas }}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div v-if="currentSimulation.consolidated_product.descricao" class="product-description">
-                    <strong>Descrição:</strong>
-                    <p>{{ currentSimulation.consolidated_product.descricao }}</p>
                   </div>
                 </div>
               </div>
@@ -214,124 +257,142 @@ export default {
   name: 'SimulationView',
   data() {
     return {
-      productName: '',
-      maxResults: 5,
-      autoSelectSources: true,
-      isRunning: false,
+      loading: false,
+      simulationRunning: false,
+      availableSources: [],
       currentSimulation: null,
-      logs: [],
-      logInterval: null
+      simulationLogs: [],
+      simulationForm: {
+        productName: '',
+        autoSelectSources: true,
+        selectedSources: []
+      },
+      logPollingInterval: null
+    }
+  },
+  async mounted() {
+    await this.loadSources()
+  },
+  beforeUnmount() {
+    if (this.logPollingInterval) {
+      clearInterval(this.logPollingInterval)
     }
   },
   methods: {
-    async startSimulation() {
-      if (!this.productName) {
-        alert('Por favor, insira o nome do produto')
-        return
-      }
-
-      this.isRunning = true
-      this.logs = []
-      this.currentSimulation = null
-
+    async loadSources() {
       try {
-        // Inicia simulação
-        const response = await axios.post('/api/simulation', {
-          product_name: this.productName,
-          auto_select_sources: this.autoSelectSources,
-          max_results_per_source: this.maxResults
-        })
-
-        this.currentSimulation = response.data
-
-        // Inicia polling de logs
-        this.startLogPolling(response.data.id)
-
-        // Inicia polling de resultados
-        this.startResultPolling(response.data.id)
-
+        this.loading = true
+        const response = await axios.get('/api/sources')
+        this.availableSources = response.data
       } catch (error) {
-        console.error('Erro ao iniciar simulação:', error)
-        this.logs.push('❌ Erro ao iniciar simulação')
-        this.isRunning = false
+        console.error('Erro ao carregar fontes:', error)
+      } finally {
+        this.loading = false
       }
     },
 
-    startLogPolling(simulationId) {
-      this.logInterval = setInterval(async () => {
+    async refreshSources() {
+      await this.loadSources()
+    },
+
+    async startSimulation() {
+      try {
+        this.simulationRunning = true
+        this.simulationLogs = []
+        
+        const requestData = {
+          product_name: this.simulationForm.productName,
+          auto_select_sources: this.simulationForm.autoSelectSources,
+          sources: this.simulationForm.autoSelectSources ? null : this.simulationForm.selectedSources
+        }
+
+        const response = await axios.post('/api/simulation', requestData)
+        this.currentSimulation = response.data
+        
+        // Iniciar polling de logs
+        this.startLogPolling()
+        
+      } catch (error) {
+        console.error('Erro ao iniciar simulação:', error)
+        alert('Erro ao iniciar simulação. Verifique o console para mais detalhes.')
+      } finally {
+        this.simulationRunning = false
+      }
+    },
+
+    async startLogPolling() {
+      if (this.logPollingInterval) {
+        clearInterval(this.logPollingInterval)
+      }
+
+      this.logPollingInterval = setInterval(async () => {
+        if (!this.currentSimulation) return
+
         try {
-          const response = await axios.get(`/api/simulation/${simulationId}/logs`)
-          this.logs = response.data.logs
+          // Atualizar status da simulação
+          const simulationResponse = await axios.get(`/api/simulation/${this.currentSimulation.id}`)
+          this.currentSimulation = simulationResponse.data
+
+          // Buscar logs
+          const logsResponse = await axios.get(`/api/simulation/${this.currentSimulation.id}/logs`)
+          this.simulationLogs = logsResponse.data
+
+          // Parar polling se simulação terminou
+          if (this.currentSimulation.status === 'completed' || this.currentSimulation.status === 'failed') {
+            clearInterval(this.logPollingInterval)
+            this.logPollingInterval = null
+          }
         } catch (error) {
           console.error('Erro ao buscar logs:', error)
         }
       }, 1000)
     },
 
-    async startResultPolling(simulationId) {
-      const pollResults = async () => {
-        try {
-          const response = await axios.get(`/api/simulation/${simulationId}`)
-          this.currentSimulation = response.data
-
-          if (response.data.status === 'completed' || response.data.status === 'error') {
-            this.isRunning = false
-            if (this.logInterval) {
-              clearInterval(this.logInterval)
-            }
-          } else {
-            // Continua polling
-            setTimeout(pollResults, 2000)
-          }
-        } catch (error) {
-          console.error('Erro ao buscar resultados:', error)
-          this.isRunning = false
-        }
+    getSourceIcon(sourceName) {
+      const icons = {
+        'Amazon': 'fab fa-amazon',
+        'Mercado Livre': 'fas fa-shopping-cart',
+        'Google Shopping': 'fab fa-google',
+        'default': 'fas fa-globe'
       }
-
-      pollResults()
+      return icons[sourceName] || icons.default
     },
 
-    getStatusClass(status) {
-      switch (status) {
-        case 'running':
-          return 'status-running'
-        case 'completed':
-          return 'status-completed'
-        case 'error':
-          return 'status-error'
-        default:
-          return 'status-unknown'
+    getStatusBadgeClass(status) {
+      const classes = {
+        'running': 'bg-warning',
+        'completed': 'bg-success',
+        'failed': 'bg-danger'
+      }
+      return classes[status] || 'bg-secondary'
+    },
+
+    getLogEntryClass(log) {
+      return {
+        'log-entry': true,
+        [`log-${log.agent_type}`]: true,
+        [`log-status-${log.status}`]: true
       }
     },
 
-    getStatusText(status) {
-      switch (status) {
-        case 'running':
-          return 'Executando'
-        case 'completed':
-          return 'Concluído'
-        case 'error':
-          return 'Erro'
-        default:
-          return 'Desconhecido'
-      }
+    formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString()
     },
 
-    getConfidenceClass(confidence) {
-      if (confidence >= 0.7) {
-        return 'confidence-high'
-      } else if (confidence >= 0.4) {
-        return 'confidence-medium'
-      } else {
-        return 'confidence-low'
+    formatAttributeName(key) {
+      const names = {
+        'nome': 'Nome',
+        'marca': 'Marca',
+        'preco': 'Preço',
+        'descricao': 'Descrição',
+        'categoria': 'Categoria',
+        'disponibilidade': 'Disponibilidade'
       }
-    }
-  },
+      return names[key] || key.charAt(0).toUpperCase() + key.slice(1)
+    },
 
-  beforeUnmount() {
-    if (this.logInterval) {
-      clearInterval(this.logInterval)
+    clearLogs() {
+      this.simulationLogs = []
     }
   }
 }
@@ -339,144 +400,150 @@ export default {
 
 <style scoped>
 .simulation-view {
-  min-height: calc(100vh - 200px);
-  padding: 2rem;
-}
-
-.simulation-form {
-  margin-bottom: 2rem;
-}
-
-.simulation-layout {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
-}
-
-.logs-panel {
-  height: fit-content;
+  padding: 1rem 0;
 }
 
 .log-container {
-  font-family: 'Courier New', monospace;
-  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 15px;
   max-height: 400px;
   overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
 }
 
 .log-entry {
-  font-size: 0.8em;
-  word-break: break-word;
-  padding: 0.25rem 0;
-  border-bottom: 1px solid var(--canonika-light-gray);
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid #666;
 }
 
-.simulation-status {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--canonika-light-gray);
-  border-radius: var(--canonika-border-radius);
+.log-entry.log-search {
+  border-left-color: #007bff;
 }
 
-.status-indicator {
-  padding: 0.5rem 1rem;
-  border-radius: var(--canonika-border-radius);
+.log-entry.log-navigation {
+  border-left-color: #28a745;
+}
+
+.log-entry.log-extraction {
+  border-left-color: #ffc107;
+}
+
+.log-header {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+}
+
+.log-timestamp {
+  color: #888;
+}
+
+.log-agent {
   font-weight: bold;
-  margin-right: 1rem;
+  color: #007bff;
 }
 
-.status-running {
-  background: var(--canonika-green);
-  color: white;
+.log-source {
+  color: #28a745;
 }
 
-.status-completed {
-  background: #28a745;
-  color: white;
+.log-status {
+  font-weight: bold;
 }
 
-.status-error {
-  background: #dc3545;
-  color: white;
+.log-status.status-started {
+  color: #ffc107;
 }
 
-.status-unknown {
-  background: var(--canonika-gray);
-  color: white;
+.log-status.status-completed {
+  color: #28a745;
 }
 
-.sources-results {
-  margin-bottom: 2rem;
+.log-status.status-failed {
+  color: #dc3545;
 }
 
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.result-card {
-  min-height: 200px;
-}
-
-.result-item {
-  margin-bottom: 0.5rem;
-  padding: 0.25rem 0;
+.log-message {
+  color: #e2e8f0;
 }
 
 .consolidated-product {
-  margin-top: 2rem;
+  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  border-radius: 8px;
+  padding: 15px;
 }
 
-.product-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 1rem;
+.source-result-card {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  border-radius: 8px;
+  padding: 15px;
 }
 
-.info-column {
+.source-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.info-item {
-  padding: 0.5rem;
-  background: var(--canonika-light-gray);
-  border-radius: var(--canonika-border-radius);
-}
-
-.product-description {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--canonika-light-gray);
-  border-radius: var(--canonika-border-radius);
-}
-
-.confidence-high {
-  color: #28a745;
+.confidence-score {
+  background: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
 }
 
-.confidence-medium {
-  color: #ffc107;
-  font-weight: bold;
+.attribute-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
-.confidence-low {
-  color: #dc3545;
-  font-weight: bold;
+.attribute-label {
+  font-weight: 600;
+  color: #94a3b8;
 }
 
-@media (max-width: 768px) {
-  .simulation-layout {
-    grid-template-columns: 1fr;
-  }
-  
-  .product-info {
-    grid-template-columns: 1fr;
-  }
+.attribute-value {
+  color: #e2e8f0;
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--canonika-green);
+  color: #e2e8f0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 191, 166, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--canonika-green);
+  border-color: var(--canonika-green);
+}
+
+.form-label {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.form-check-label {
+  color: #e2e8f0;
 }
 </style> 

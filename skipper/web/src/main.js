@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import SimulationView from './views/SimulationView.vue'
 import SourcesView from './views/SourcesView.vue'
+import DashboardView from './views/DashboardView.vue'
 
 // Importar estilos do AG Grid
 import 'ag-grid-community/styles/ag-grid.css'
@@ -10,9 +11,25 @@ import 'ag-grid-community/styles/ag-theme-alpine.css'
 
 // Configuração das rotas
 const routes = [
-  { path: '/', redirect: '/simulation' },
-  { path: '/simulation', component: SimulationView },
-  { path: '/sources', component: SourcesView }
+  {
+    path: '/',
+    redirect: '/simulation'
+  },
+  {
+    path: '/simulation',
+    name: 'Simulation',
+    component: SimulationView
+  },
+  {
+    path: '/sources',
+    name: 'Sources',
+    component: SourcesView
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: DashboardView
+  }
 ]
 
 const router = createRouter({
@@ -20,6 +37,14 @@ const router = createRouter({
   routes
 })
 
+// Criação da aplicação
 const app = createApp(App)
+
+// Configuração global
+app.config.globalProperties.$apiBase = '/api'
+
+// Uso do router
 app.use(router)
+
+// Montagem da aplicação
 app.mount('#app') 

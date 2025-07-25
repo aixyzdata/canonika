@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import asyncio
+from typing import List, Optional, Dict, Any
+import uvicorn
 import json
-import uuid
+import asyncio
 from datetime import datetime
 import logging
 
@@ -12,7 +13,11 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Skipper API", version="1.0.0")
+app = FastAPI(
+    title="Skipper API",
+    description="Orquestrador de navegação e extração de dados na web",
+    version="1.0.0"
+)
 
 # CORS
 app.add_middleware(
@@ -25,9 +30,9 @@ app.add_middleware(
 
 # Modelos Pydantic
 class Source(BaseModel):
-    id: Optional[str] = None
+    id: Optional[int] = None
     name: str
-    type: str  # "manufacturer", "marketplace", "search_engine"
+    type: str  # "fabricante", "marketplace", "buscador"
     base_url: str
     search_prompt: str
     navigation_prompt: str
@@ -39,141 +44,91 @@ class Source(BaseModel):
 
 class SimulationRequest(BaseModel):
     product_name: str
+    sources: Optional[List[int]] = None  # IDs das fontes, se None usa automático
     auto_select_sources: bool = True
-    selected_sources: Optional[List[str]] = None
-    max_results_per_source: int = 5
 
 class SimulationResult(BaseModel):
     id: str
     product_name: str
-    sources_results: Dict[str, Any]
+    sources_used: List[str]
+    results: Dict[str, Any]
     consolidated_product: Dict[str, Any]
-    status: str
+    status: str  # "running", "completed", "failed"
     created_at: datetime
+    completed_at: Optional[datetime] = None
+
+class AgentLog(BaseModel):
+    agent_type: str  # "search", "navigation", "extraction"
+    source_name: str
+    status: str  # "started", "completed", "failed"
+    message: str
+    timestamp: datetime
+    details: Optional[Dict[str, Any]] = None
 
 # Dados mock iniciais
-MOCK_SOURCES = [
+mock_sources = [
     {
-        "id": "1",
-        "name": "DuckDuckGo",
-        "type": "search_engine",
-        "base_url": "https://duckduckgo.com",
-        "search_prompt": "Pesquise por '{product_name}' e retorne os 5 links mais relevantes",
-        "navigation_prompt": "Acesse cada link e extraia o conteúdo HTML limpo",
-        "extraction_prompt": "Extraia os seguintes atributos do produto: nome, marca, preço, descrição, especificações técnicas",
-        "recommendation_tags": ["geral", "buscador"],
-        "is_active": True,
-        "created_at": datetime.now(),
-        "updated_at": datetime.now()
-    },
-    {
-        "id": "2",
+        "id": 1,
         "name": "Amazon",
         "type": "marketplace",
-        "base_url": "https://amazon.com",
-        "search_prompt": "Pesquise por '{product_name}' no marketplace e retorne os 3 produtos mais relevantes",
-        "navigation_prompt": "Acesse cada página de produto e extraia o conteúdo",
-        "extraction_prompt": "Extraia: nome, marca, preço, avaliações, especificações, descrição",
-        "recommendation_tags": ["eletronicos", "livros", "casa"],
+        "base_url": "https://www.amazon.com.br",
+        "search_prompt": "Pesquise por {product} no Amazon Brasil",
+        "navigation_prompt": "Acesse a página do produto e extraia o conteúdo",
+        "extraction_prompt": "Extraia os atributos do produto: nome, marca, preço, descrição",
+        "recommendation_tags": ["eletronicos", "smartphones", "tecnologia"],
         "is_active": True,
         "created_at": datetime.now(),
         "updated_at": datetime.now()
     },
     {
-        "id": "3",
+        "id": 2,
         "name": "Mercado Livre",
         "type": "marketplace",
-        "base_url": "https://mercadolivre.com.br",
-        "search_prompt": "Pesquise por '{product_name}' e retorne os 4 produtos mais relevantes",
-        "navigation_prompt": "Acesse cada anúncio e extraia o conteúdo",
-        "extraction_prompt": "Extraia: título, preço, vendedor, especificações, descrição",
-        "recommendation_tags": ["geral", "brasil"],
+        "base_url": "https://www.mercadolivre.com.br",
+        "search_prompt": "Busque por {product} no Mercado Livre",
+        "navigation_prompt": "Navegue até a página do produto",
+        "extraction_prompt": "Extraia informações do produto: título, preço, especificações",
+        "recommendation_tags": ["geral", "usados", "novos"],
+        "is_active": True,
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
+    },
+    {
+        "id": 3,
+        "name": "Google Shopping",
+        "type": "buscador",
+        "base_url": "https://shopping.google.com",
+        "search_prompt": "Pesquise {product} no Google Shopping",
+        "navigation_prompt": "Acesse os resultados de compra",
+        "extraction_prompt": "Extraia dados dos produtos encontrados",
+        "recommendation_tags": ["comparacao", "precos", "geral"],
         "is_active": True,
         "created_at": datetime.now(),
         "updated_at": datetime.now()
     }
 ]
 
-# Armazenamento em memória (será substituído por PostgreSQL)
-sources_db = {source["id"]: source for source in MOCK_SOURCES}
+# Armazenamento em memória (será substituído por banco de dados)
+sources_db = {source["id"]: source for source in mock_sources}
 simulations_db = {}
-
-# Simulação de agentes CrewAI
-class MockCrewAI:
-    def __init__(self):
-        self.logs = []
-    
-    async def search_agent(self, product_name: str, source: dict) -> List[str]:
-        """Simula o agente de busca"""
-        await asyncio.sleep(1)
-        self.logs.append(f"🔍 Buscando '{product_name}' em {source['name']}")
-        
-        # Mock de links
-        mock_links = [
-            f"https://{source['base_url']}/product1",
-            f"https://{source['base_url']}/product2",
-            f"https://{source['base_url']}/product3"
-        ]
-        
-        self.logs.append(f"✅ Encontrados {len(mock_links)} links em {source['name']}")
-        return mock_links
-    
-    async def navigation_agent(self, links: List[str], source: dict) -> List[str]:
-        """Simula o agente de navegação"""
-        await asyncio.sleep(2)
-        self.logs.append(f"🌐 Navegando em {len(links)} páginas de {source['name']}")
-        
-        # Mock de conteúdo extraído
-        mock_contents = [
-            f"Conteúdo extraído da página 1 de {source['name']}",
-            f"Conteúdo extraído da página 2 de {source['name']}",
-            f"Conteúdo extraído da página 3 de {source['name']}"
-        ]
-        
-        self.logs.append(f"✅ Extraído conteúdo de {len(mock_contents)} páginas")
-        return mock_contents
-    
-    async def extraction_agent(self, contents: List[str], source: dict) -> Dict[str, Any]:
-        """Simula o agente de extração"""
-        await asyncio.sleep(1.5)
-        self.logs.append(f"📊 Extraindo atributos de {source['name']}")
-        
-        # Mock de atributos extraídos
-        extracted_attributes = {
-            "nome": f"Produto Teste {source['name']}",
-            "marca": "Marca Teste",
-            "preco": "R$ 99,90",
-            "descricao": f"Descrição do produto encontrado em {source['name']}",
-            "especificacoes": {
-                "peso": "500g",
-                "dimensoes": "10x20x30cm",
-                "cor": "Azul"
-            },
-            "confianca": 0.85
-        }
-        
-        self.logs.append(f"✅ Extraídos {len(extracted_attributes)} atributos")
-        return extracted_attributes
-
-# Instância global do CrewAI
-crew_ai = MockCrewAI()
+agent_logs = []
 
 @app.get("/")
 async def root():
-    return {"message": "Skipper API - Orquestrador de Navegação e Extração de Dados"}
+    return {"message": "Skipper API - Orquestrador de Navegação e Extração"}
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "skipper"}
+    return {"status": "healthy", "timestamp": datetime.now()}
 
-# Endpoints para fontes
+# Endpoints de Fontes
 @app.get("/api/sources", response_model=List[Source])
 async def get_sources():
     """Lista todas as fontes cadastradas"""
     return list(sources_db.values())
 
 @app.get("/api/sources/{source_id}", response_model=Source)
-async def get_source(source_id: str):
+async def get_source(source_id: int):
     """Obtém uma fonte específica"""
     if source_id not in sources_db:
         raise HTTPException(status_code=404, detail="Fonte não encontrada")
@@ -182,27 +137,29 @@ async def get_source(source_id: str):
 @app.post("/api/sources", response_model=Source)
 async def create_source(source: Source):
     """Cria uma nova fonte"""
-    source_id = str(uuid.uuid4())
-    source.id = source_id
-    source.created_at = datetime.now()
-    source.updated_at = datetime.now()
-    
-    sources_db[source_id] = source.dict()
-    return source
+    source_id = max(sources_db.keys()) + 1 if sources_db else 1
+    source_dict = source.dict()
+    source_dict["id"] = source_id
+    source_dict["created_at"] = datetime.now()
+    source_dict["updated_at"] = datetime.now()
+    sources_db[source_id] = source_dict
+    return source_dict
 
 @app.put("/api/sources/{source_id}", response_model=Source)
-async def update_source(source_id: str, source: Source):
+async def update_source(source_id: int, source: Source):
     """Atualiza uma fonte existente"""
     if source_id not in sources_db:
         raise HTTPException(status_code=404, detail="Fonte não encontrada")
     
-    source.id = source_id
-    source.updated_at = datetime.now()
-    sources_db[source_id] = source.dict()
-    return source
+    source_dict = source.dict()
+    source_dict["id"] = source_id
+    source_dict["updated_at"] = datetime.now()
+    source_dict["created_at"] = sources_db[source_id]["created_at"]
+    sources_db[source_id] = source_dict
+    return source_dict
 
 @app.delete("/api/sources/{source_id}")
-async def delete_source(source_id: str):
+async def delete_source(source_id: int):
     """Remove uma fonte"""
     if source_id not in sources_db:
         raise HTTPException(status_code=404, detail="Fonte não encontrada")
@@ -210,51 +167,41 @@ async def delete_source(source_id: str):
     del sources_db[source_id]
     return {"message": "Fonte removida com sucesso"}
 
-# Endpoints para simulação
+# Endpoints de Simulação
 @app.post("/api/simulation", response_model=SimulationResult)
 async def start_simulation(request: SimulationRequest, background_tasks: BackgroundTasks):
-    """Inicia uma simulação de pesquisa"""
-    simulation_id = str(uuid.uuid4())
+    """Inicia uma nova simulação de pesquisa"""
+    simulation_id = f"sim_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
-    # Limpa logs anteriores
-    crew_ai.logs.clear()
-    
-    # Determina fontes a usar
+    # Determinar fontes a usar
     if request.auto_select_sources:
-        selected_sources = [s for s in sources_db.values() if s["is_active"]]
+        # Seleção automática baseada em tags (mock)
+        selected_sources = [1, 2, 3]  # Amazon, Mercado Livre, Google
     else:
-        selected_sources = [s for s in sources_db.values() 
-                          if s["id"] in (request.selected_sources or [])]
+        selected_sources = request.sources or [1, 2, 3]
     
-    if not selected_sources:
-        raise HTTPException(status_code=400, detail="Nenhuma fonte válida selecionada")
+    sources_used = [sources_db[sid]["name"] for sid in selected_sources if sid in sources_db]
     
-    # Cria resultado inicial
-    simulation_result = SimulationResult(
+    simulation = SimulationResult(
         id=simulation_id,
         product_name=request.product_name,
-        sources_results={},
+        sources_used=sources_used,
+        results={},
         consolidated_product={},
         status="running",
         created_at=datetime.now()
     )
     
-    simulations_db[simulation_id] = simulation_result.dict()
+    simulations_db[simulation_id] = simulation.dict()
     
-    # Executa simulação em background
-    background_tasks.add_task(
-        run_simulation,
-        simulation_id,
-        request.product_name,
-        selected_sources,
-        request.max_results_per_source
-    )
+    # Iniciar simulação em background
+    background_tasks.add_task(run_simulation, simulation_id, request.product_name, selected_sources)
     
-    return simulation_result
+    return simulation
 
 @app.get("/api/simulation/{simulation_id}", response_model=SimulationResult)
 async def get_simulation(simulation_id: str):
-    """Obtém o resultado de uma simulação"""
+    """Obtém o status e resultados de uma simulação"""
     if simulation_id not in simulations_db:
         raise HTTPException(status_code=404, detail="Simulação não encontrada")
     return simulations_db[simulation_id]
@@ -265,90 +212,120 @@ async def get_simulation_logs(simulation_id: str):
     if simulation_id not in simulations_db:
         raise HTTPException(status_code=404, detail="Simulação não encontrada")
     
-    return {
-        "simulation_id": simulation_id,
-        "logs": crew_ai.logs
-    }
+    # Filtrar logs da simulação
+    simulation_logs = [log for log in agent_logs if log.get("simulation_id") == simulation_id]
+    return simulation_logs
 
-async def run_simulation(simulation_id: str, product_name: str, sources: List[dict], max_results: int):
-    """Executa a simulação completa"""
+# Função de simulação (mock)
+async def run_simulation(simulation_id: str, product_name: str, source_ids: List[int]):
+    """Executa a simulação em background"""
+    logger.info(f"Iniciando simulação {simulation_id} para produto: {product_name}")
+    
     try:
-        crew_ai.logs.append(f"🚀 Iniciando simulação para '{product_name}'")
-        
-        sources_results = {}
-        all_attributes = []
-        
-        for source in sources:
-            crew_ai.logs.append(f"📋 Processando fonte: {source['name']}")
+        # Simular execução dos agentes
+        for source_id in source_ids:
+            if source_id not in sources_db:
+                continue
+                
+            source = sources_db[source_id]
             
-            # Agente de busca
-            links = await crew_ai.search_agent(product_name, source)
+            # Log do agente de busca
+            await log_agent_activity(simulation_id, "search", source["name"], "started", 
+                                   f"Iniciando busca por '{product_name}' em {source['name']}")
             
-            # Agente de navegação
-            contents = await crew_ai.navigation_agent(links, source)
+            await asyncio.sleep(2)  # Simular tempo de busca
             
-            # Agente de extração
-            attributes = await crew_ai.extraction_agent(contents, source)
+            await log_agent_activity(simulation_id, "search", source["name"], "completed", 
+                                   f"Busca concluída - 5 links encontrados")
             
-            sources_results[source['name']] = {
-                "source": source,
-                "links": links,
-                "contents": contents,
-                "attributes": attributes,
-                "confidence": attributes.get("confianca", 0.5)
+            # Log do agente de navegação
+            await log_agent_activity(simulation_id, "navigation", source["name"], "started", 
+                                   f"Navegando para páginas de produtos")
+            
+            await asyncio.sleep(3)  # Simular tempo de navegação
+            
+            await log_agent_activity(simulation_id, "navigation", source["name"], "completed", 
+                                   f"Navegação concluída - conteúdo extraído")
+            
+            # Log do agente de extração
+            await log_agent_activity(simulation_id, "extraction", source["name"], "started", 
+                                   f"Extraindo atributos do produto")
+            
+            await asyncio.sleep(2)  # Simular tempo de extração
+            
+            # Resultado mock
+            mock_result = {
+                "nome": f"{product_name} - {source['name']}",
+                "marca": "Marca Exemplo",
+                "preco": "R$ 299,90",
+                "descricao": f"Produto {product_name} encontrado em {source['name']}",
+                "categoria": "Eletrônicos",
+                "disponibilidade": "Em estoque",
+                "score_confianca": 0.85
             }
             
-            all_attributes.append(attributes)
+            simulations_db[simulation_id]["results"][source["name"]] = mock_result
+            
+            await log_agent_activity(simulation_id, "extraction", source["name"], "completed", 
+                                   f"Extração concluída - {len(mock_result)} atributos extraídos")
         
-        # Consolidação dos resultados
-        consolidated_product = consolidate_attributes(all_attributes)
-        
-        # Atualiza resultado
-        simulations_db[simulation_id]["sources_results"] = sources_results
-        simulations_db[simulation_id]["consolidated_product"] = consolidated_product
+        # Consolidar resultados
+        consolidated = consolidate_results(simulations_db[simulation_id]["results"])
+        simulations_db[simulation_id]["consolidated_product"] = consolidated
         simulations_db[simulation_id]["status"] = "completed"
+        simulations_db[simulation_id]["completed_at"] = datetime.now()
         
-        crew_ai.logs.append("✅ Simulação concluída com sucesso!")
+        logger.info(f"Simulação {simulation_id} concluída com sucesso")
         
     except Exception as e:
         logger.error(f"Erro na simulação {simulation_id}: {str(e)}")
-        simulations_db[simulation_id]["status"] = "error"
-        crew_ai.logs.append(f"❌ Erro na simulação: {str(e)}")
+        simulations_db[simulation_id]["status"] = "failed"
+        await log_agent_activity(simulation_id, "system", "system", "failed", f"Erro: {str(e)}")
 
-def consolidate_attributes(attributes_list: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Consolida atributos de múltiplas fontes"""
-    if not attributes_list:
+async def log_agent_activity(simulation_id: str, agent_type: str, source_name: str, 
+                           status: str, message: str, details: Optional[Dict] = None):
+    """Registra atividade dos agentes"""
+    log_entry = {
+        "simulation_id": simulation_id,
+        "agent_type": agent_type,
+        "source_name": source_name,
+        "status": status,
+        "message": message,
+        "timestamp": datetime.now(),
+        "details": details
+    }
+    agent_logs.append(log_entry)
+    logger.info(f"[{agent_type.upper()}] {source_name}: {message}")
+
+def consolidate_results(results: Dict[str, Any]) -> Dict[str, Any]:
+    """Consolida resultados de múltiplas fontes"""
+    if not results:
         return {}
     
-    # Atributos fixos
+    # Lógica simples de consolidação (mock)
     consolidated = {
         "nome": "",
         "marca": "",
         "preco": "",
         "descricao": "",
-        "especificacoes": {},
-        "confianca_global": 0.0,
-        "fontes_consultadas": len(attributes_list)
+        "categoria": "",
+        "disponibilidade": "",
+        "score_global": 0.0,
+        "fontes_consultadas": list(results.keys())
     }
     
-    # Soma de confianças
-    total_confidence = 0
+    # Encontrar o resultado com maior score
+    best_result = max(results.values(), key=lambda x: x.get("score_confianca", 0))
     
-    for attrs in attributes_list:
-        total_confidence += attrs.get("confianca", 0.5)
-        
-        # Atribui valores baseado na maior confiança
-        if attrs.get("confianca", 0) > consolidated.get("confianca_global", 0):
-            consolidated["nome"] = attrs.get("nome", "")
-            consolidated["marca"] = attrs.get("marca", "")
-            consolidated["preco"] = attrs.get("preco", "")
-            consolidated["descricao"] = attrs.get("descricao", "")
-            consolidated["especificacoes"] = attrs.get("especificacoes", {})
+    for key in ["nome", "marca", "preco", "descricao", "categoria", "disponibilidade"]:
+        if key in best_result:
+            consolidated[key] = best_result[key]
     
-    consolidated["confianca_global"] = total_confidence / len(attributes_list)
+    # Calcular score global
+    scores = [r.get("score_confianca", 0) for r in results.values()]
+    consolidated["score_global"] = sum(scores) / len(scores) if scores else 0.0
     
     return consolidated
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 
