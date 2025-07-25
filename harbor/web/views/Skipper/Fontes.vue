@@ -20,21 +20,38 @@
     </div>
 
     <!-- Lista de Fontes -->
-    <div class="sources-list">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h6 class="card-title">
-            <i class="fas fa-list"></i>
-            Fontes Cadastradas
-          </h6>
+    <div class="sources-section">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="fas fa-database"></i>
+          <h2>Fontes Cadastradas</h2>
         </div>
-        <div class="card-body">
-          <div v-if="sources.length === 0" class="empty-state">
+        <div class="section-stats">
+          <span class="stat-badge">
+            <i class="fas fa-check-circle"></i>
+            {{ sources.filter(s => s.is_active).length }} Ativas
+          </span>
+          <span class="stat-badge">
+            <i class="fas fa-pause-circle"></i>
+            {{ sources.filter(s => !s.is_active).length }} Inativas
+          </span>
+        </div>
+      </div>
+      
+      <div class="sources-container">
+        <div v-if="sources.length === 0" class="empty-state">
+          <div class="empty-icon">
             <i class="fas fa-database"></i>
-            <p>Nenhuma fonte cadastrada</p>
           </div>
-          
-          <div v-else class="sources-grid">
+          <h3>Nenhuma fonte cadastrada</h3>
+          <p>Adicione sua primeira fonte de dados para começar</p>
+          <button @click="showAddModal = true" class="canonika-btn canonika-btn-primary">
+            <i class="fas fa-plus"></i>
+            Adicionar Primeira Fonte
+          </button>
+        </div>
+        
+        <div v-else class="sources-grid">
             <div
               v-for="source in sources"
               :key="source.id"
@@ -429,6 +446,101 @@ export default {
 .canonika-btn-outline:hover {
   background: #475569;
   color: white;
+}
+
+.sources-section {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-bottom: 1px solid #475569;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-title i {
+  font-size: 1.5rem;
+  color: #3b82f6;
+}
+
+.section-title h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.section-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(71, 85, 105, 0.3);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stat-badge i {
+  color: #10b981;
+}
+
+.stat-badge:last-child i {
+  color: #f59e0b;
+}
+
+.sources-container {
+  padding: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-icon {
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #94a3b8;
+  margin: 0 0 2rem 0;
 }
 
 .sources-grid {
