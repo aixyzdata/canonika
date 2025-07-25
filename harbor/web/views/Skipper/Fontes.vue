@@ -52,95 +52,94 @@
         </div>
         
         <div v-else class="sources-grid">
-            <div
-              v-for="source in sources"
-              :key="source.id"
-              class="source-card"
-            >
-              <div class="source-card-header">
-                <div class="source-icon">
-                  <i :class="getSourceIcon(source.name)"></i>
-                </div>
-                <div class="source-status">
-                  <div class="status-indicator" :class="{ active: source.is_active }"></div>
+          <div
+            v-for="source in sources"
+            :key="source.id"
+            class="source-card"
+          >
+            <div class="source-card-header">
+              <div class="source-icon">
+                <i :class="getSourceIcon(source.name)"></i>
+              </div>
+              <div class="source-status">
+                <div class="status-indicator" :class="{ active: source.is_active }"></div>
+              </div>
+            </div>
+            
+            <div class="source-card-content">
+              <div class="source-title-section">
+                <h3 class="source-title">{{ source.name }}</h3>
+                <div class="source-badges">
+                  <span class="status-badge" :class="getTypeBadgeClass(source.type)">
+                    {{ getTypeText(source.type) }}
+                  </span>
+                  <span v-if="source.is_active" class="status-badge status-active">
+                    Ativo
+                  </span>
+                  <span v-else class="status-badge status-inactive">
+                    Inativo
+                  </span>
                 </div>
               </div>
               
-              <div class="source-card-content">
-                <div class="source-title-section">
-                  <h3 class="source-title">{{ source.name }}</h3>
-                  <div class="source-badges">
-                    <span class="status-badge" :class="getTypeBadgeClass(source.type)">
-                      {{ getTypeText(source.type) }}
-                    </span>
-                    <span v-if="source.is_active" class="status-badge status-active">
-                      Ativo
-                    </span>
-                    <span v-else class="status-badge status-inactive">
-                      Inativo
-                    </span>
-                  </div>
+              <div class="source-url">
+                <i class="fas fa-link"></i>
+                <span>{{ source.base_url }}</span>
+              </div>
+              
+              <div class="source-tags">
+                <div class="tags-label">
+                  <i class="fas fa-tags"></i>
+                  <span>Tags de Recomendação</span>
                 </div>
-                
-                <div class="source-url">
-                  <i class="fas fa-link"></i>
-                  <span>{{ source.base_url }}</span>
-                </div>
-                
-                <div class="source-tags">
-                  <div class="tags-label">
-                    <i class="fas fa-tags"></i>
-                    <span>Tags de Recomendação</span>
-                  </div>
-                  <div class="tags-container">
-                    <span
-                      v-for="tag in source.recommendation_tags"
-                      :key="tag"
-                      class="tag-badge"
-                    >
-                      {{ tag }}
-                    </span>
-                  </div>
-                </div>
-                
-                <div class="source-stats">
-                  <div class="stat-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Última verificação: 2h atrás</span>
-                  </div>
-                  <div class="stat-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Disponibilidade: 98%</span>
-                  </div>
+                <div class="tags-container">
+                  <span
+                    v-for="tag in source.recommendation_tags"
+                    :key="tag"
+                    class="tag-badge"
+                  >
+                    {{ tag }}
+                  </span>
                 </div>
               </div>
               
-              <div class="source-card-actions">
-                <button
-                  @click="editSource(source)"
-                  class="action-btn primary"
-                  title="Editar fonte"
-                >
-                  <i class="fas fa-edit"></i>
-                  <span>Editar</span>
-                </button>
-                <button
-                  @click="testSource(source)"
-                  class="action-btn"
-                  title="Testar conexão"
-                >
-                  <i class="fas fa-play"></i>
-                  <span>Testar</span>
-                </button>
-                <button
-                  @click="deleteSource(source.id)"
-                  class="action-btn danger"
-                  title="Excluir fonte"
-                >
-                  <i class="fas fa-trash"></i>
-                  <span>Excluir</span>
-                </button>
+              <div class="source-stats">
+                <div class="stat-item">
+                  <i class="fas fa-clock"></i>
+                  <span>Última verificação: 2h atrás</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Disponibilidade: 98%</span>
+                </div>
               </div>
+            </div>
+            
+            <div class="source-card-actions">
+              <button
+                @click="editSource(source)"
+                class="action-btn primary"
+                title="Editar fonte"
+              >
+                <i class="fas fa-edit"></i>
+                <span>Editar</span>
+              </button>
+              <button
+                @click="testSource(source)"
+                class="action-btn"
+                title="Testar conexão"
+              >
+                <i class="fas fa-play"></i>
+                <span>Testar</span>
+              </button>
+              <button
+                @click="deleteSource(source.id)"
+                class="action-btn danger"
+                title="Excluir fonte"
+              >
+                <i class="fas fa-trash"></i>
+                <span>Excluir</span>
+              </button>
             </div>
           </div>
         </div>
@@ -390,62 +389,39 @@ export default {
 <style scoped>
 .fontes-view {
   padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
 .page-title {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #e2e8f0;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.page-title i {
+  color: #3b82f6;
 }
 
 .page-subtitle {
+  font-size: 1.125rem;
   color: #94a3b8;
   margin: 0;
 }
 
 .add-source-section {
-  margin-bottom: 2rem;
-}
-
-.canonika-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.canonika-btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-.canonika-btn-primary:hover {
-  background: #2563eb;
-}
-
-.canonika-btn-outline {
-  background: transparent;
-  color: #94a3b8;
-  border: 1px solid #475569;
-}
-
-.canonika-btn-outline:hover {
-  background: #475569;
-  color: white;
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
 .sources-section {
@@ -725,21 +701,6 @@ export default {
   font-size: 0.875rem;
 }
 
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
-}
-
-.tag-badge {
-  background: #475569;
-  color: #e2e8f0;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-}
-
 .source-card-actions {
   display: flex;
   gap: 0.75rem;
@@ -787,24 +748,45 @@ export default {
   border-color: #ef4444;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  color: #64748b;
+.canonika-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+.canonika-btn-primary {
+  background: #3b82f6;
+  color: white;
 }
 
-/* Modal Styles */
+.canonika-btn-primary:hover {
+  background: #2563eb;
+}
+
+.canonika-btn-outline {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #475569;
+}
+
+.canonika-btn-outline:hover {
+  background: #475569;
+  color: white;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -915,5 +897,20 @@ export default {
   gap: 1rem;
   justify-content: flex-end;
   margin-top: 1rem;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.tag-badge {
+  background: #475569;
+  color: #e2e8f0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
 }
 </style> 
