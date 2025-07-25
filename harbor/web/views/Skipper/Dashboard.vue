@@ -18,8 +18,8 @@
           Atualizar
         </button>
         <button @click="openModule" class="action-btn primary">
-          <i class="fas fa-external-link-alt"></i>
-          Acessar
+          <i class="fas fa-play"></i>
+          Simulação
         </button>
       </div>
     </div>
@@ -70,19 +70,19 @@
       <div class="action-buttons">
         <button @click="startSimulation" class="action-btn primary">
           <i class="fas fa-play"></i>
-          Iniciar Simulação
+          Simulação
         </button>
         <button @click="manageSources" class="action-btn">
-          <i class="fas fa-cog"></i>
-          Configurar Fontes
+          <i class="fas fa-database"></i>
+          Fontes
         </button>
         <button @click="viewLogs" class="action-btn">
-          <i class="fas fa-file-alt"></i>
-          Ver Logs
+          <i class="fas fa-chart-bar"></i>
+          Análises
         </button>
         <button @click="exportResults" class="action-btn">
           <i class="fas fa-download"></i>
-          Exportar Resultados
+          Extração
         </button>
       </div>
     </div>
@@ -160,21 +160,24 @@ export default {
       // Aqui poderia fazer uma chamada real para a API para atualizar os stats
     },
     openModule() {
-      window.open('http://localhost:7722/web/', '_blank');
+      // Navega para a view de simulação
+      this.$router.push('/skipper/simulacao');
     },
     startSimulation() {
-      console.log('🚀 Iniciando simulação - Redirecionando para:', 'http://localhost:7722/web/#/simulation');
-      window.open('http://localhost:7722/web/#/simulation', '_blank');
+      console.log('🚀 Iniciando simulação - Navegando para simulação');
+      this.$router.push('/skipper/simulacao');
     },
     manageSources() {
-      window.open('http://localhost:7722/web/#/sources', '_blank');
+      console.log('⚙️ Configurando fontes - Navegando para fontes');
+      this.$router.push('/skipper/fontes');
     },
     viewLogs() {
-      // Como não há uma view específica de logs ainda, vamos para simulação
-      window.open('http://localhost:7722/web/#/simulation', '_blank');
+      console.log('📊 Visualizando análises - Navegando para análises');
+      this.$router.push('/skipper/analises');
     },
     exportResults() {
-      alert('Funcionalidade de exportação em desenvolvimento...');
+      console.log('📥 Exportando resultados - Navegando para extração');
+      this.$router.push('/skipper/extracao');
     }
   }
 }
