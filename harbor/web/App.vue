@@ -261,8 +261,8 @@
         <!-- Teste de Hot Reload -->
         <div class="hot-reload-test" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 1rem; border-radius: 0.5rem; color: white; font-size: 0.8rem; border: 1px solid #475569;">
           <div>🔄 Hot Reload: {{ new Date().toLocaleTimeString() }}</div>
-          <div>✅ Sidebar Apenas Logado</div>
-          <div>🎯 Fundo Original Restaurado</div>
+          <div>✅ Login Persistente</div>
+          <div>🎯 localStorage Implementado</div>
         </div>
       </main>
     </div>
@@ -292,22 +292,55 @@ export default {
       }
     }
   },
+  mounted() {
+    // Carregar estado de autenticação ao iniciar
+    this.loadAuthState();
+  },
   methods: {
     async login() {
       this.error = null;
       try {
+        // Simular login bem-sucedido
         this.user = {
           id: 'admin-001',
           name: 'Administrador',
           email: this.loginForm.email,
           roles: ['admin']
         }
+        
+        // Salvar estado de autenticação
+        this.saveAuthState();
       } catch (e) {
         this.error = 'Erro ao fazer login.';
       }
     },
     logout() {
       this.user = null;
+      // Limpar estado de autenticação
+      this.clearAuthState();
+    },
+    saveAuthState() {
+      if (this.user) {
+        localStorage.setItem('canonika_user', JSON.stringify(this.user));
+        localStorage.setItem('canonika_authenticated', 'true');
+      }
+    },
+    loadAuthState() {
+      const authenticated = localStorage.getItem('canonika_authenticated');
+      const userData = localStorage.getItem('canonika_user');
+      
+      if (authenticated === 'true' && userData) {
+        try {
+          this.user = JSON.parse(userData);
+        } catch (e) {
+          // Se houver erro ao parsear, limpar dados corrompidos
+          this.clearAuthState();
+        }
+      }
+    },
+    clearAuthState() {
+      localStorage.removeItem('canonika_user');
+      localStorage.removeItem('canonika_authenticated');
     },
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed;
