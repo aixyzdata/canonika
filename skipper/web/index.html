@@ -1,12 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skipper</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skipper - Orquestrador de Navegação e Extração de Dados</title>
+    <style>
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-running {
+            color: #ffc107;
+        }
+        
+        .status-completed {
+            color: #28a745;
+        }
+        
+        .status-error {
+            color: #dc3545;
+        }
+        
+        .confidence-high {
+            color: #28a745;
+        }
+        
+        .confidence-medium {
+            color: #ffc107;
+        }
+        
+        .confidence-low {
+            color: #dc3545;
+        }
+    </style>
 </head>
 <body>
-  <div id="app"></div>
-  <script type="module" src="/main.js"></script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html> 

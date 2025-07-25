@@ -121,7 +121,9 @@ services:
       - rabbitmq
 
   skipper:
-    build: ./skipper
+    build:
+      context: .
+      dockerfile: ./skipper/Dockerfile
     container_name: canonika_skipper
     ports:
       - "7722:80"
