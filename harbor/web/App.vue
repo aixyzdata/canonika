@@ -55,41 +55,82 @@
           <ul class="nav flex-column">
             <li class="nav-item">
               <router-link class="nav-link" to="/" @click="handleNavClick">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
+                <div class="nav-icon">
+                  <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Dashboard</div>
+                  <div class="service-subtitle">Visão Geral</div>
+                </div>
               </router-link>
             </li>
             
             <!-- Skipper -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('skipper')">
-                <i class="fas fa-ship"></i>
-                <span>Skipper</span>
+                <div class="nav-icon">
+                  <i class="fas fa-ship"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Skipper</div>
+                  <div class="service-subtitle">Orquestrador de Navegação</div>
+                </div>
                 <i :class="openSubmenus.skipper ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
               <ul class="nav flex-column submenu" :class="{ show: openSubmenus.skipper }">
                 <li class="nav-item">
+                  <router-link class="nav-link" to="/skipper/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
                   <router-link class="nav-link" to="/skipper/simulacao" @click="handleNavClick">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Simulação</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Simulação</div>
+                      <div class="service-subtitle">Testes e simulações</div>
+                    </div>
                   </router-link>
                 </li>
                 <li class="nav-item">
                   <router-link class="nav-link" to="/skipper/fontes" @click="handleNavClick">
-                    <i class="fas fa-database"></i>
-                    <span>Fontes</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-database"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Fontes</div>
+                      <div class="service-subtitle">Gerenciamento de dados</div>
+                    </div>
                   </router-link>
                 </li>
                 <li class="nav-item">
                   <router-link class="nav-link" to="/skipper/analises" @click="handleNavClick">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Análises</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Análises</div>
+                      <div class="service-subtitle">Relatórios e métricas</div>
+                    </div>
                   </router-link>
                 </li>
                 <li class="nav-item">
                   <router-link class="nav-link" to="/skipper/extracao" @click="handleNavClick">
-                    <i class="fas fa-download"></i>
-                    <span>Extração</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-download"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Extração</div>
+                      <div class="service-subtitle">Coleta de informações</div>
+                    </div>
                   </router-link>
                 </li>
               </ul>
@@ -98,21 +139,47 @@
             <!-- Ledger -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('ledger')">
-                <i class="fas fa-book"></i>
-                <span>Ledger</span>
+                <div class="nav-icon">
+                  <i class="fas fa-book"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Ledger</div>
+                  <div class="service-subtitle">Contabilidade e Gestão</div>
+                </div>
                 <i :class="openSubmenus.ledger ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
               <ul class="nav flex-column submenu" :class="{ show: openSubmenus.ledger }">
                 <li class="nav-item">
+                  <router-link class="nav-link" to="/ledger/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
                   <router-link class="nav-link" to="/ledger/lancamentos" @click="handleNavClick">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Lançamentos</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Lançamentos</div>
+                      <div class="service-subtitle">Registro de transações</div>
+                    </div>
                   </router-link>
                 </li>
                 <li class="nav-item">
                   <router-link class="nav-link" to="/ledger/relatorios" @click="handleNavClick">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Relatórios</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Relatórios</div>
+                      <div class="service-subtitle">Análises financeiras</div>
+                    </div>
                   </router-link>
                 </li>
               </ul>
@@ -121,73 +188,227 @@
             <!-- Tollgate -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('tollgate')">
-                <i class="fas fa-coins"></i>
-                <span>Tollgate</span>
+                <div class="nav-icon">
+                  <i class="fas fa-coins"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Tollgate</div>
+                  <div class="service-subtitle">Pedágio e Controle</div>
+                </div>
                 <i :class="openSubmenus.tollgate ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
               <ul class="nav flex-column submenu" :class="{ show: openSubmenus.tollgate }">
                 <li class="nav-item">
+                  <router-link class="nav-link" to="/tollgate/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
                   <router-link class="nav-link" to="/tollgate/pedagios" @click="handleNavClick">
-                    <i class="fas fa-road"></i>
-                    <span>Pedágios</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-road"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Pedágios</div>
+                      <div class="service-subtitle">Gestão de cobranças</div>
+                    </div>
                   </router-link>
                 </li>
                 <li class="nav-item">
                   <router-link class="nav-link" to="/tollgate/auditoria" @click="handleNavClick">
-                    <i class="fas fa-search"></i>
-                    <span>Auditoria</span>
+                    <div class="nav-icon">
+                      <i class="fas fa-search"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Auditoria</div>
+                      <div class="service-subtitle">Controle e monitoramento</div>
+                    </div>
                   </router-link>
                 </li>
               </ul>
             </li>
             
+            <!-- Quarter -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/quarter" @click="handleNavClick">
-                <i class="fas fa-users-cog"></i>
-                <span>Quarter</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('quarter')">
+                <div class="nav-icon">
+                  <i class="fas fa-users-cog"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Quarter</div>
+                  <div class="service-subtitle">Gestão de Usuários</div>
+                </div>
+                <i :class="openSubmenus.quarter ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.quarter }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/quarter/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Beacon -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/beacon" @click="handleNavClick">
-                <i class="fas fa-broadcast-tower"></i>
-                <span>Beacon</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('beacon')">
+                <div class="nav-icon"><i class="fas fa-broadcast-tower"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Beacon</div>
+                  <div class="service-subtitle">Sinalização e Comunicação</div>
+                </div>
+                <i :class="openSubmenus.beacon ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.beacon }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/beacon/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Echo -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/echo" @click="handleNavClick">
-                <i class="fas fa-wave-square"></i>
-                <span>Echo</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('echo')">
+                <div class="nav-icon"><i class="fas fa-wave-square"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Echo</div>
+                  <div class="service-subtitle">Chat e Comunicação</div>
+                </div>
+                <i :class="openSubmenus.echo ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.echo }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/echo/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Guardian -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/guardian" @click="handleNavClick">
-                <i class="fas fa-shield-alt"></i>
-                <span>Guardian</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('guardian')">
+                <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Guardian</div>
+                  <div class="service-subtitle">Segurança e Proteção</div>
+                </div>
+                <i :class="openSubmenus.guardian ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.guardian }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/guardian/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Mapmaker -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/mapmaker" @click="handleNavClick">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Mapmaker</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('mapmaker')">
+                <div class="nav-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Mapmaker</div>
+                  <div class="service-subtitle">Criação de Mapas</div>
+                </div>
+                <i :class="openSubmenus.mapmaker ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.mapmaker }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/mapmaker/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Seagull -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/seagull" @click="handleNavClick">
-                <i class="fas fa-eye"></i>
-                <span>Seagull</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('seagull')">
+                <div class="nav-icon"><i class="fas fa-eye"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Seagull</div>
+                  <div class="service-subtitle">Vigilância e Monitoramento</div>
+                </div>
+                <i :class="openSubmenus.seagull ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.seagull }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/seagull/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
+            <!-- Wayfinder -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/wayfinder" @click="handleNavClick">
-                <i class="fas fa-route"></i>
-                <span>Wayfinder</span>
-              </router-link>
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('wayfinder')">
+                <div class="nav-icon"><i class="fas fa-route"></i></div>
+                <div class="nav-text">
+                  <div class="nav-title">Wayfinder</div>
+                  <div class="service-subtitle">Navegação e Orientação</div>
+                </div>
+                <i :class="openSubmenus.wayfinder ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.wayfinder }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/wayfinder/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -256,13 +477,13 @@
             </form>
           </div>
         </div>
-        <router-view v-else />
+        <router-view v-if="user" />
         
         <!-- Teste de Hot Reload -->
         <div class="hot-reload-test" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 1rem; border-radius: 0.5rem; color: white; font-size: 0.8rem; border: 1px solid #475569;">
           <div>🔄 Hot Reload: {{ new Date().toLocaleTimeString() }}</div>
-          <div>✅ Login Persistente</div>
-          <div>🎯 localStorage Implementado</div>
+          <div>✅ Todos os serviços implementados</div>
+          <div>🎯 Status views funcionando</div>
         </div>
       </main>
     </div>
@@ -288,7 +509,14 @@ export default {
       openSubmenus: {
         skipper: false,
         ledger: false,
-        tollgate: false
+        tollgate: false,
+        quarter: false,
+        beacon: false,
+        echo: false,
+        guardian: false,
+        mapmaker: false,
+        seagull: false,
+        wayfinder: false
       }
     }
   },
@@ -349,6 +577,13 @@ export default {
         this.openSubmenus.skipper = false;
         this.openSubmenus.ledger = false;
         this.openSubmenus.tollgate = false;
+        this.openSubmenus.quarter = false;
+        this.openSubmenus.beacon = false;
+        this.openSubmenus.echo = false;
+        this.openSubmenus.guardian = false;
+        this.openSubmenus.mapmaker = false;
+        this.openSubmenus.seagull = false;
+        this.openSubmenus.wayfinder = false;
       }
     },
     handleNavClick() {
@@ -665,7 +900,14 @@ html, body {
   background-color: #3b82f6;
 }
 
-.nav-link i {
+.nav-icon {
+  width: 1.5rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  flex: 0 0 1.5rem;
+}
+
+.nav-icon i {
   width: 1.25rem;
   text-align: center;
   font-size: 1rem;
@@ -748,6 +990,35 @@ html, body {
 .user-role {
   font-size: 0.75rem;
   color: #6c757d;
+}
+
+/* Nav Text Styles */
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  gap: 0.125rem;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
+}
+
+.service-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.collapsed .nav-text {
+  display: none;
 }
 
 /* Main Content */
