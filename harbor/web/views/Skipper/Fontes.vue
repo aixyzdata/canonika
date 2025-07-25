@@ -40,56 +40,89 @@
               :key="source.id"
               class="source-card"
             >
-              <div class="canonika-card">
-                <div class="card-header">
-                  <div class="source-header">
-                    <h6 class="source-title">{{ source.name }}</h6>
-                    <div class="source-badges">
-                      <span class="status-badge" :class="getTypeBadgeClass(source.type)">
-                        {{ getTypeText(source.type) }}
-                      </span>
-                      <span v-if="source.is_active" class="status-badge status-active">
-                        Ativo
-                      </span>
-                      <span v-else class="status-badge status-inactive">
-                        Inativo
-                      </span>
-                    </div>
+              <div class="source-card-header">
+                <div class="source-icon">
+                  <i :class="getSourceIcon(source.name)"></i>
+                </div>
+                <div class="source-status">
+                  <div class="status-indicator" :class="{ active: source.is_active }"></div>
+                </div>
+              </div>
+              
+              <div class="source-card-content">
+                <div class="source-title-section">
+                  <h3 class="source-title">{{ source.name }}</h3>
+                  <div class="source-badges">
+                    <span class="status-badge" :class="getTypeBadgeClass(source.type)">
+                      {{ getTypeText(source.type) }}
+                    </span>
+                    <span v-if="source.is_active" class="status-badge status-active">
+                      Ativo
+                    </span>
+                    <span v-else class="status-badge status-inactive">
+                      Inativo
+                    </span>
                   </div>
                 </div>
-                <div class="card-body">
-                  <div class="source-info">
-                    <div class="info-item">
-                      <strong>URL:</strong> {{ source.base_url }}
-                    </div>
-                    <div class="info-item">
-                      <strong>Tags:</strong>
-                      <div class="tags-container">
-                        <span
-                          v-for="tag in source.recommendation_tags"
-                          :key="tag"
-                          class="tag-badge"
-                        >
-                          {{ tag }}
-                        </span>
-                      </div>
-                    </div>
+                
+                <div class="source-url">
+                  <i class="fas fa-link"></i>
+                  <span>{{ source.base_url }}</span>
+                </div>
+                
+                <div class="source-tags">
+                  <div class="tags-label">
+                    <i class="fas fa-tags"></i>
+                    <span>Tags de Recomendação</span>
                   </div>
-                  <div class="source-actions">
-                    <button
-                      @click="editSource(source)"
-                      class="action-btn"
+                  <div class="tags-container">
+                    <span
+                      v-for="tag in source.recommendation_tags"
+                      :key="tag"
+                      class="tag-badge"
                     >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      @click="deleteSource(source.id)"
-                      class="action-btn danger"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
+                      {{ tag }}
+                    </span>
                   </div>
                 </div>
+                
+                <div class="source-stats">
+                  <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Última verificação: 2h atrás</span>
+                  </div>
+                  <div class="stat-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Disponibilidade: 98%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="source-card-actions">
+                <button
+                  @click="editSource(source)"
+                  class="action-btn primary"
+                  title="Editar fonte"
+                >
+                  <i class="fas fa-edit"></i>
+                  <span>Editar</span>
+                </button>
+                <button
+                  @click="testSource(source)"
+                  class="action-btn"
+                  title="Testar conexão"
+                >
+                  <i class="fas fa-play"></i>
+                  <span>Testar</span>
+                </button>
+                <button
+                  @click="deleteSource(source.id)"
+                  class="action-btn danger"
+                  title="Excluir fonte"
+                >
+                  <i class="fas fa-trash"></i>
+                  <span>Excluir</span>
+                </button>
               </div>
             </div>
           </div>
@@ -242,6 +275,17 @@ export default {
     }
   },
   methods: {
+    getSourceIcon(sourceName) {
+      const icons = {
+        'Amazon': 'fab fa-amazon',
+        'Mercado Livre': 'fas fa-shopping-cart',
+        'Americanas': 'fas fa-store',
+        'Casas Bahia': 'fas fa-home',
+        'Google Shopping': 'fab fa-google',
+        'default': 'fas fa-globe'
+      };
+      return icons[sourceName] || icons.default;
+    },
     getTypeBadgeClass(type) {
       const classes = {
         marketplace: 'badge-marketplace',
@@ -276,6 +320,11 @@ export default {
         this.sources = this.sources.filter(s => s.id !== sourceId);
         console.log(`Fonte ${sourceId} excluída`);
       }
+    },
+    testSource(source) {
+      console.log(`Testando conexão com: ${source.name}`);
+      // Aqui seria implementada a lógica de teste de conexão
+      alert(`Testando conexão com ${source.name}...`);
     },
     saveSource() {
       if (this.editingSource) {
@@ -384,33 +433,78 @@ export default {
 
 .sources-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
 }
 
 .source-card {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
 }
 
 .source-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #3b82f6;
 }
 
-.source-header {
+.source-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.source-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.source-status {
+  position: relative;
+}
+
+.status-indicator {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: all 0.3s ease;
+}
+
+.status-indicator.active {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.source-card-content {
+  padding: 1.5rem;
+}
+
+.source-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
 .source-title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #e2e8f0;
   margin: 0;
+  flex: 1;
 }
 
 .source-badges {
@@ -460,18 +554,63 @@ export default {
   color: white;
 }
 
-.source-info {
-  margin-bottom: 1rem;
-}
-
-.info-item {
-  margin-bottom: 0.75rem;
+.source-url {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  color: #94a3b8;
   font-size: 0.875rem;
 }
 
-.info-item strong {
+.source-url i {
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+.source-tags {
+  margin-bottom: 1.5rem;
+}
+
+.tags-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
   color: #e2e8f0;
-  margin-right: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tags-label i {
+  color: #3b82f6;
+}
+
+.source-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(71, 85, 105, 0.3);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.stat-item i {
+  color: #10b981;
+  font-size: 0.875rem;
 }
 
 .tags-container {
@@ -489,29 +628,46 @@ export default {
   font-size: 0.75rem;
 }
 
-.source-actions {
+.source-card-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-top: 1px solid #475569;
 }
 
 .action-btn {
-  width: 2rem;
-  height: 2rem;
+  flex: 1;
+  padding: 0.75rem 1rem;
   border: 1px solid #475569;
   background: transparent;
   color: #94a3b8;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .action-btn:hover {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: #3b82f6;
+  color: white;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
 .action-btn.danger:hover {
