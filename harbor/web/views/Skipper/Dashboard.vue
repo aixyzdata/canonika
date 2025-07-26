@@ -23,18 +23,18 @@
         </button>
       </div>
     </div>
-    
+
     <div class="view-content">
       <div class="service-cards">
         <!-- Pesquisas Realizadas -->
         <div class="service-card">
-          <div class="card-header">
+        <div class="card-header">
             <h3>Pesquisas Realizadas</h3>
             <div class="card-icon">
-              <i class="fas fa-search"></i>
+          <i class="fas fa-search"></i>
             </div>
-          </div>
-          <div class="card-content">
+        </div>
+        <div class="card-content">
             <div class="balance-display">
               <div class="balance-value">{{ config.metrics[0].value }}</div>
               <div class="balance-label">{{ config.metrics[0].label }}</div>
@@ -52,19 +52,19 @@
                 <span class="detail-label">Taxa de Sucesso:</span>
                 <span class="detail-value">{{ config.metrics[3].value }}</span>
               </div>
-            </div>
           </div>
         </div>
+      </div>
 
         <!-- Extrações Recentes -->
         <div class="service-card">
-          <div class="card-header">
+        <div class="card-header">
             <h3>Extrações Recentes</h3>
             <div class="card-icon">
               <i class="fas fa-history"></i>
             </div>
-          </div>
-          <div class="card-content">
+        </div>
+        <div class="card-content">
             <div class="transaction-list">
               <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
                 <div class="transaction-icon success">
@@ -78,17 +78,17 @@
                   <div class="transaction-time">{{ activity.time }}</div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
+      </div>
 
         <!-- Ferramentas Disponíveis -->
         <div class="service-card">
-          <div class="card-header">
+        <div class="card-header">
             <h3>Ferramentas</h3>
             <div class="card-icon">
               <i class="fas fa-tools"></i>
-            </div>
+        </div>
           </div>
           <div class="card-content">
             <div class="plans-grid">
@@ -102,11 +102,11 @@
                 <div class="plan-price">{{ action.description }}</div>
                 <div class="plan-credits">
                   <i :class="action.icon"></i>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
+      </div>
+    </div>
+      </div>
+    </div>
 
         <!-- Status do Sistema -->
         <div class="service-card">
@@ -128,7 +128,7 @@
                   <div class="alert-time">{{ system.port }}</div>
                 </div>
               </div>
-            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -539,14 +539,14 @@ export default {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
-  }
-  
+}
+
   .service-cards {
     grid-template-columns: 1fr;
-  }
-  
+}
+
   .plans-grid {
     grid-template-columns: 1fr;
-  }
+}
 }
 </style> 

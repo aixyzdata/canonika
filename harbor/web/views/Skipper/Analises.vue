@@ -1,129 +1,146 @@
 <template>
-  <div class="analises-view">
-    <!-- Header -->
-    <div class="page-header">
-      <h1 class="page-title">
+  <div class="tollgate-view">
+    <!-- Header Padronizado -->
+    <div class="view-header">
+      <div class="view-title">
         <i class="fas fa-chart-bar"></i>
-        Análises e Relatórios
-      </h1>
-      <p class="page-subtitle">
-        Relatórios e insights sobre extrações e pesquisas
-      </p>
+        <div class="title-content">
+          <h1>Análises e Relatórios</h1>
+          <p>Relatórios e insights sobre extrações e pesquisas</p>
+        </div>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>ONLINE</span>
+      </div>
+      <div class="view-actions">
+        <button @click="refreshData()" class="action-btn">
+          <i class="fas fa-sync-alt"></i>
+          Atualizar
+        </button>
+        <button @click="exportReport()" class="action-btn primary">
+          <i class="fas fa-download"></i>
+          Exportar Relatório
+        </button>
+      </div>
     </div>
 
-    <!-- Dashboard de Métricas -->
-    <div class="metrics-dashboard">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-chart-line"></i>
-            Métricas Gerais
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="metrics-grid">
-            <div class="metric-item">
-              <div class="metric-icon">
-                <i class="fas fa-search"></i>
-              </div>
-              <div class="metric-content">
-                <span class="metric-number">{{ metrics.totalSearches }}</span>
-                <span class="metric-label">Pesquisas Realizadas</span>
-              </div>
+    <!-- Conteúdo Principal -->
+    <div class="view-content">
+      <!-- Dashboard de Métricas -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Métricas Gerais</h3>
+            <div class="card-icon">
+              <i class="fas fa-chart-line"></i>
             </div>
-            
-            <div class="metric-item">
-              <div class="metric-icon">
-                <i class="fas fa-database"></i>
+          </div>
+          <div class="card-content">
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-search"></i>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-number">{{ metrics.totalSearches }}</span>
+                  <span class="metric-label">Pesquisas Realizadas</span>
+                </div>
               </div>
-              <div class="metric-content">
-                <span class="metric-number">{{ metrics.totalProducts }}</span>
-                <span class="metric-label">Produtos Extraídos</span>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-database"></i>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-number">{{ metrics.totalProducts }}</span>
+                  <span class="metric-label">Produtos Extraídos</span>
+                </div>
               </div>
-            </div>
-            
-            <div class="metric-item">
-              <div class="metric-icon">
-                <i class="fas fa-globe"></i>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-globe"></i>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-number">{{ metrics.activeSources }}</span>
+                  <span class="metric-label">Fontes Ativas</span>
+                </div>
               </div>
-              <div class="metric-content">
-                <span class="metric-number">{{ metrics.activeSources }}</span>
-                <span class="metric-label">Fontes Ativas</span>
-              </div>
-            </div>
-            
-            <div class="metric-item">
-              <div class="metric-icon">
-                <i class="fas fa-clock"></i>
-              </div>
-              <div class="metric-content">
-                <span class="metric-number">{{ metrics.avgTime }}</span>
-                <span class="metric-label">Tempo Médio (s)</span>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="metric-content">
+                  <span class="metric-number">{{ metrics.avgTime }}</span>
+                  <span class="metric-label">Tempo Médio (s)</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Gráficos e Relatórios -->
-    <div class="reports-section">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-chart-pie"></i>
-            Relatórios por Período
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="period-selector">
-            <button 
-              v-for="period in periods" 
-              :key="period.value"
-              @click="selectPeriod(period.value)"
-              :class="['period-btn', { active: selectedPeriod === period.value }]"
-            >
-              {{ period.label }}
-            </button>
+      <!-- Gráficos e Relatórios -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Relatórios por Período</h3>
+            <div class="card-icon">
+              <i class="fas fa-chart-pie"></i>
+            </div>
           </div>
-          
-          <div class="chart-container">
-            <div class="chart-placeholder">
-              <i class="fas fa-chart-bar"></i>
-              <p>Gráfico de atividades - {{ selectedPeriodLabel }}</p>
+          <div class="card-content">
+            <div class="period-selector">
+              <button 
+                v-for="period in periods" 
+                :key="period.value"
+                @click="selectPeriod(period.value)"
+                :class="['period-btn', { active: selectedPeriod === period.value }]"
+              >
+                {{ period.label }}
+              </button>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>Gráfico de atividades - {{ selectedPeriodLabel }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Lista de Relatórios -->
-    <div class="reports-list">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-file-alt"></i>
-            Relatórios Disponíveis
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="reports-grid">
-            <div v-for="report in reports" :key="report.id" class="report-item">
-              <div class="report-icon">
-                <i :class="report.icon"></i>
-              </div>
-              <div class="report-content">
-                <h6 class="report-title">{{ report.title }}</h6>
-                <p class="report-description">{{ report.description }}</p>
-                <span class="report-date">{{ report.date }}</span>
-              </div>
-              <div class="report-actions">
-                <button @click="viewReport(report)" class="action-btn">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button @click="downloadReport(report)" class="action-btn">
-                  <i class="fas fa-download"></i>
-                </button>
+      <!-- Lista de Relatórios -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Relatórios Disponíveis</h3>
+            <div class="card-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="reports-grid">
+              <div v-for="report in reports" :key="report.id" class="report-item">
+                <div class="report-icon">
+                  <i :class="report.icon"></i>
+                </div>
+                <div class="report-content">
+                  <h6 class="report-title">{{ report.title }}</h6>
+                  <p class="report-description">{{ report.description }}</p>
+                  <span class="report-date">{{ report.date }}</span>
+                </div>
+                <div class="report-actions">
+                  <button @click="viewReport(report)" class="action-btn" title="Visualizar">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button @click="downloadReport(report)" class="action-btn" title="Baixar">
+                    <i class="fas fa-download"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -195,6 +212,14 @@ export default {
     },
     downloadReport(report) {
       console.log(`Baixando relatório: ${report.title}`);
+    },
+    refreshData() {
+      console.log('Atualizando dados...');
+      // Implementar lógica de atualização dos dados
+    },
+    exportReport() {
+      console.log('Exportando relatório...');
+      // Implementar lógica de exportação do relatório
     }
   },
   mounted() {
@@ -204,33 +229,146 @@ export default {
 </script>
 
 <style scoped>
-.analises-view {
-  padding: 2rem;
+.tollgate-view {
+  /* height: 100vh; */
+  /* padding: 2rem; */
+  /* background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); */
+  /* color: #e2e8f0; */
 }
 
-.page-header {
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 1rem;
+  border: 1px solid #475569;
 }
 
-.page-title {
+.view-title {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem;
+  gap: 0.75rem;
 }
 
-.page-subtitle {
+.view-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.title-content p {
   color: #94a3b8;
   margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.metrics-dashboard {
+.view-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
   margin-bottom: 2rem;
 }
 
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.card-content {
+  color: #94a3b8;
+}
+
+/* Métricas */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -275,14 +413,12 @@ export default {
   color: #94a3b8;
 }
 
-.reports-section {
-  margin-bottom: 2rem;
-}
-
+/* Períodos */
 .period-selector {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .period-btn {
@@ -293,6 +429,13 @@ export default {
   border-radius: 0.25rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.period-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #3b82f6;
 }
 
 .period-btn.active {
@@ -306,6 +449,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
 }
 
 .chart-placeholder {
@@ -316,8 +462,15 @@ export default {
 .chart-placeholder i {
   font-size: 3rem;
   margin-bottom: 1rem;
+  color: #3b82f6;
 }
 
+.chart-placeholder p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Relatórios */
 .reports-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -338,6 +491,7 @@ export default {
 .report-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: #3b82f6;
 }
 
 .report-icon {
@@ -350,6 +504,7 @@ export default {
   justify-content: center;
   color: white;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .report-content {
@@ -367,6 +522,7 @@ export default {
   font-size: 0.875rem;
   color: #94a3b8;
   margin: 0 0 0.25rem;
+  line-height: 1.4;
 }
 
 .report-date {
@@ -377,11 +533,13 @@ export default {
 .report-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-.action-btn {
+.report-actions .action-btn {
   width: 2rem;
   height: 2rem;
+  padding: 0;
   border: 1px solid #475569;
   background: transparent;
   color: #94a3b8;
@@ -391,11 +549,37 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.875rem;
 }
 
-.action-btn:hover {
+.report-actions .action-btn:hover {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .period-selector {
+    justify-content: center;
+  }
 }
 </style> 

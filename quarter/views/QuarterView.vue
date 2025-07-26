@@ -76,9 +76,9 @@
                     {{ activity.description }}
                   </div>
                   <div class="transaction-time">{{ activity.time }}</div>
-                </div>
-              </div>
-            </div>
+          </div>
+        </div>
+          </div>
           </div>
         </div>
 
@@ -88,7 +88,7 @@
             <h3>Ferramentas</h3>
             <div class="card-icon">
               <i class="fas fa-tools"></i>
-            </div>
+          </div>
           </div>
           <div class="card-content">
             <div class="plans-grid">
@@ -102,33 +102,33 @@
                 <div class="plan-price">{{ action.description }}</div>
                 <div class="plan-credits">
                   <i :class="action.icon"></i>
-                </div>
-              </div>
+        </div>
+      </div>
             </div>
           </div>
         </div>
-
+        
         <!-- Status do Sistema -->
         <div class="service-card">
           <div class="card-header">
             <h3>Status do Sistema</h3>
             <div class="card-icon">
               <i class="fas fa-server"></i>
-            </div>
-          </div>
+        </div>
+      </div>
           <div class="card-content">
             <div class="alerts-list">
               <div v-for="system in config.systemStatus" :key="system.id" class="alert-item info">
                 <div class="alert-icon">
                   <i class="fas fa-server"></i>
-                </div>
+    </div>
                 <div class="alert-content">
                   <div class="alert-title">{{ system.name }}</div>
                   <div class="alert-message">{{ system.description }}</div>
                   <div class="alert-time">{{ system.port }}</div>
-                </div>
-              </div>
-            </div>
+          </div>
+          </div>
+          </div>
           </div>
         </div>
       </div>
@@ -543,8 +543,8 @@ export default {
   
   .service-cards {
     grid-template-columns: 1fr;
-  }
-  
+}
+
   .plans-grid {
     grid-template-columns: 1fr;
   }

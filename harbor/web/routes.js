@@ -6,6 +6,20 @@ export default [
     component: () => import('./views/DashboardView.vue')
   },
   
+  // Diver - Primeiro item do menu
+  {
+    path: '/diver',
+    name: 'Diver',
+    component: () => import('./views/Diver/DiverView.vue')
+  },
+  
+  // Fisher - Pesca de dados
+  {
+    path: '/fisher',
+    name: 'Fisher',
+    component: () => import('./views/Fisher/FisherView.vue')
+  },
+  
   // Skipper
   {
     path: '/skipper',

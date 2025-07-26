@@ -65,6 +65,32 @@
               </router-link>
             </li>
             
+            <!-- Diver -->
+            <li class="nav-item">
+              <router-link class="nav-link" to="/diver" @click="handleNavClick">
+                <div class="nav-icon">
+                  <i class="fas fa-search"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Diver</div>
+                  <div class="service-subtitle">Consulta Canônica</div>
+                </div>
+              </router-link>
+            </li>
+            
+            <!-- Fisher -->
+            <li class="nav-item">
+              <router-link class="nav-link" to="/fisher" @click="handleNavClick">
+                <div class="nav-icon">
+                  <i class="fas fa-fish"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Fisher</div>
+                  <div class="service-subtitle">Pesca de Dados</div>
+                </div>
+              </router-link>
+            </li>
+            
             <!-- Skipper -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('skipper')">

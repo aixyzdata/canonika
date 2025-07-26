@@ -85,10 +85,10 @@
               <div class="canonika-system-name">{{ system.name }}</div>
               <div class="canonika-system-description">{{ system.description }}</div>
               <div v-if="system.port" class="canonika-system-port">{{ system.port }}</div>
-            </div>
           </div>
         </div>
       </div>
+    </div>
 
       <!-- Card de Configurações -->
       <div v-if="configurations.length > 0" class="canonika-system-card">

@@ -1,188 +1,208 @@
 <template>
-  <div class="extracao-view">
-    <!-- Header -->
-    <div class="page-header">
-      <h1 class="page-title">
+  <div class="tollgate-view">
+    <!-- Header Padronizado -->
+    <div class="view-header">
+      <div class="view-title">
         <i class="fas fa-download"></i>
-        Extração de Dados
-      </h1>
-      <p class="page-subtitle">
-        Histórico e gerenciamento de extrações realizadas
-      </p>
+        <div class="title-content">
+          <h1>Extração de Dados</h1>
+          <p>Histórico e gerenciamento de extrações realizadas</p>
+        </div>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>ONLINE</span>
+      </div>
+      <div class="view-actions">
+        <button @click="refreshData()" class="action-btn">
+          <i class="fas fa-sync-alt"></i>
+          Atualizar
+        </button>
+        <button @click="exportData()" class="action-btn primary">
+          <i class="fas fa-download"></i>
+          Exportar Dados
+        </button>
+      </div>
     </div>
 
-    <!-- Estatísticas de Extração -->
-    <div class="extraction-stats">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-chart-pie"></i>
-            Estatísticas de Extração
-          </h5>
+    <!-- Conteúdo Principal -->
+    <div class="view-content">
+      <!-- Estatísticas de Extração -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Estatísticas de Extração</h3>
+            <div class="card-icon">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-download"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ stats.totalExtractions }}</span>
+                  <span class="stat-label">Total de Extrações</span>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ stats.successfulExtractions }}</span>
+                  <span class="stat-label">Extrações Bem-sucedidas</span>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ stats.avgDuration }}</span>
+                  <span class="stat-label">Duração Média (min)</span>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ stats.totalDataSize }}</span>
+                  <span class="stat-label">Dados Extraídos (MB)</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-icon">
+      </div>
+
+      <!-- Filtros e Controles -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Filtros e Controles</h3>
+            <div class="card-icon">
+              <i class="fas fa-filter"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="controls-row">
+              <div class="control-group">
+                <label class="control-label">Status</label>
+                <select v-model="selectedStatus" class="control-select">
+                  <option value="">Todos</option>
+                  <option value="completed">Concluídas</option>
+                  <option value="running">Em Execução</option>
+                  <option value="failed">Falhadas</option>
+                  <option value="pending">Pendentes</option>
+                </select>
+              </div>
+              
+              <div class="control-group">
+                <label class="control-label">Fonte</label>
+                <select v-model="selectedSource" class="control-select">
+                  <option value="">Todas</option>
+                  <option v-for="source in sources" :key="source.id" :value="source.id">
+                    {{ source.name }}
+                  </option>
+                </select>
+              </div>
+              
+              <div class="control-group">
+                <label class="control-label">Período</label>
+                <select v-model="selectedPeriod" class="control-select">
+                  <option value="today">Hoje</option>
+                  <option value="week">Esta Semana</option>
+                  <option value="month">Este Mês</option>
+                  <option value="year">Este Ano</option>
+                </select>
+              </div>
+              
+              <div class="control-group">
+                <button @click="refreshExtractions" class="control-btn">
+                  <i class="fas fa-sync-alt"></i>
+                  Atualizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Extrações -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Histórico de Extrações</h3>
+            <div class="card-icon">
+              <i class="fas fa-list"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div v-if="extractions.length === 0" class="empty-state">
+              <div class="empty-icon">
                 <i class="fas fa-download"></i>
               </div>
-              <div class="stat-content">
-                <span class="stat-number">{{ stats.totalExtractions }}</span>
-                <span class="stat-label">Total de Extrações</span>
-              </div>
+              <h3>Nenhuma extração encontrada</h3>
+              <p>Não há extrações para exibir com os filtros atuais</p>
             </div>
             
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <div class="stat-content">
-                <span class="stat-number">{{ stats.successfulExtractions }}</span>
-                <span class="stat-label">Extrações Bem-sucedidas</span>
-              </div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-              </div>
-              <div class="stat-content">
-                <span class="stat-number">{{ stats.avgDuration }}</span>
-                <span class="stat-label">Duração Média (min)</span>
-              </div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="fas fa-database"></i>
-              </div>
-              <div class="stat-content">
-                <span class="stat-number">{{ stats.totalDataSize }}</span>
-                <span class="stat-label">Dados Extraídos (MB)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtros e Controles -->
-    <div class="extraction-controls">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-filter"></i>
-            Filtros e Controles
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="controls-row">
-            <div class="control-group">
-              <label class="control-label">Status</label>
-              <select v-model="selectedStatus" class="control-select">
-                <option value="">Todos</option>
-                <option value="completed">Concluídas</option>
-                <option value="running">Em Execução</option>
-                <option value="failed">Falhadas</option>
-                <option value="pending">Pendentes</option>
-              </select>
-            </div>
-            
-            <div class="control-group">
-              <label class="control-label">Fonte</label>
-              <select v-model="selectedSource" class="control-select">
-                <option value="">Todas</option>
-                <option v-for="source in sources" :key="source.id" :value="source.id">
-                  {{ source.name }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="control-group">
-              <label class="control-label">Período</label>
-              <select v-model="selectedPeriod" class="control-select">
-                <option value="today">Hoje</option>
-                <option value="week">Esta Semana</option>
-                <option value="month">Este Mês</option>
-                <option value="year">Este Ano</option>
-              </select>
-            </div>
-            
-            <div class="control-group">
-              <button @click="refreshExtractions" class="control-btn">
-                <i class="fas fa-sync-alt"></i>
-                Atualizar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lista de Extrações -->
-    <div class="extractions-list">
-      <div class="canonika-card">
-        <div class="card-header">
-          <h5 class="card-title">
-            <i class="fas fa-list"></i>
-            Histórico de Extrações
-          </h5>
-        </div>
-        <div class="card-body">
-          <div v-if="extractions.length === 0" class="empty-state">
-            <i class="fas fa-download"></i>
-            <p>Nenhuma extração encontrada</p>
-          </div>
-          
-          <div v-else class="extractions-grid">
-            <div v-for="extraction in filteredExtractions" :key="extraction.id" class="extraction-item">
-              <div class="extraction-header">
-                <div class="extraction-icon">
-                  <i :class="getStatusIcon(extraction.status)"></i>
+            <div v-else class="extractions-grid">
+              <div v-for="extraction in filteredExtractions" :key="extraction.id" class="extraction-item">
+                <div class="extraction-header">
+                  <div class="extraction-icon">
+                    <i :class="getStatusIcon(extraction.status)"></i>
+                  </div>
+                  <div class="extraction-info">
+                    <h6 class="extraction-title">{{ extraction.title }}</h6>
+                    <span class="extraction-source">{{ extraction.source }}</span>
+                  </div>
+                  <div class="extraction-status">
+                    <span :class="['status-badge', `status-${extraction.status}`]">
+                      {{ getStatusText(extraction.status) }}
+                    </span>
+                  </div>
                 </div>
-                <div class="extraction-info">
-                  <h6 class="extraction-title">{{ extraction.title }}</h6>
-                  <span class="extraction-source">{{ extraction.source }}</span>
+                
+                <div class="extraction-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Início:</span>
+                    <span class="detail-value">{{ extraction.startTime }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Duração:</span>
+                    <span class="detail-value">{{ extraction.duration }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Produtos:</span>
+                    <span class="detail-value">{{ extraction.productsCount }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Tamanho:</span>
+                    <span class="detail-value">{{ extraction.dataSize }}</span>
+                  </div>
                 </div>
-                <div class="extraction-status">
-                  <span :class="['status-badge', `status-${extraction.status}`]">
-                    {{ getStatusText(extraction.status) }}
-                  </span>
+                
+                <div class="extraction-actions">
+                  <button @click="viewExtraction(extraction)" class="action-btn" title="Visualizar">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button @click="downloadExtraction(extraction)" class="action-btn" title="Baixar">
+                    <i class="fas fa-download"></i>
+                  </button>
+                  <button v-if="extraction.status === 'running'" @click="stopExtraction(extraction)" class="action-btn danger" title="Parar">
+                    <i class="fas fa-stop"></i>
+                  </button>
+                  <button v-if="extraction.status === 'failed'" @click="retryExtraction(extraction)" class="action-btn" title="Tentar Novamente">
+                    <i class="fas fa-redo"></i>
+                  </button>
                 </div>
-              </div>
-              
-              <div class="extraction-details">
-                <div class="detail-item">
-                  <span class="detail-label">Início:</span>
-                  <span class="detail-value">{{ extraction.startTime }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Duração:</span>
-                  <span class="detail-value">{{ extraction.duration }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Produtos:</span>
-                  <span class="detail-value">{{ extraction.productsCount }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Tamanho:</span>
-                  <span class="detail-value">{{ extraction.dataSize }}</span>
-                </div>
-              </div>
-              
-              <div class="extraction-actions">
-                <button @click="viewExtraction(extraction)" class="action-btn">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button @click="downloadExtraction(extraction)" class="action-btn">
-                  <i class="fas fa-download"></i>
-                </button>
-                <button v-if="extraction.status === 'running'" @click="stopExtraction(extraction)" class="action-btn danger">
-                  <i class="fas fa-stop"></i>
-                </button>
-                <button v-if="extraction.status === 'failed'" @click="retryExtraction(extraction)" class="action-btn">
-                  <i class="fas fa-redo"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -272,6 +292,12 @@ export default {
     }
   },
   methods: {
+    refreshData() {
+      console.log('Atualizando dados de extração...');
+    },
+    exportData() {
+      console.log('Exportando dados de extração...');
+    },
     getStatusIcon(status) {
       const icons = {
         completed: 'fas fa-check-circle',
@@ -317,33 +343,151 @@ export default {
 </script>
 
 <style scoped>
-.extracao-view {
-  padding: 2rem;
+.tollgate-view {
+  /* height: 100vh; */
+  /* padding: 2rem; */
+  /* background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); */
+  /* color: #e2e8f0; */
 }
 
-.page-header {
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 1rem;
+  border: 1px solid #475569;
 }
 
-.page-title {
+.view-title {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem;
+  gap: 0.75rem;
 }
 
-.page-subtitle {
+.view-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.title-content p {
   color: #94a3b8;
   margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.extraction-stats {
+.view-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.action-btn.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
   margin-bottom: 2rem;
 }
 
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.card-content {
+  color: #94a3b8;
+}
+
+/* Estatísticas */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -388,10 +532,7 @@ export default {
   color: #94a3b8;
 }
 
-.extraction-controls {
-  margin-bottom: 2rem;
-}
-
+/* Controles */
 .controls-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -412,7 +553,7 @@ export default {
 }
 
 .control-select {
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #475569;
   background: #1e293b;
   color: #e2e8f0;
@@ -420,8 +561,14 @@ export default {
   font-size: 0.875rem;
 }
 
+.control-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
 .control-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid #3b82f6;
   background: #3b82f6;
   color: white;
@@ -431,26 +578,44 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
 }
 
 .control-btn:hover {
   background: #2563eb;
   border-color: #2563eb;
+  transform: translateY(-1px);
 }
 
-.extractions-list {
-  margin-bottom: 2rem;
-}
-
+/* Extrações */
 .empty-state {
   text-align: center;
-  padding: 3rem;
-  color: #64748b;
+  padding: 4rem 2rem;
 }
 
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+.empty-icon {
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #94a3b8;
+  margin: 0;
 }
 
 .extractions-grid {
@@ -470,6 +635,7 @@ export default {
 .extraction-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: #3b82f6;
 }
 
 .extraction-header {
@@ -489,6 +655,7 @@ export default {
   justify-content: center;
   color: white;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .extraction-info {
@@ -561,9 +728,10 @@ export default {
   gap: 0.5rem;
 }
 
-.action-btn {
+.extraction-actions .action-btn {
   width: 2rem;
   height: 2rem;
+  padding: 0;
   border: 1px solid #475569;
   background: transparent;
   color: #94a3b8;
@@ -573,16 +741,42 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.875rem;
 }
 
-.action-btn:hover {
+.extraction-actions .action-btn:hover {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
+  transform: translateY(-1px);
 }
 
-.action-btn.danger:hover {
+.extraction-actions .action-btn.danger:hover {
   background: #ef4444;
   border-color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .controls-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .extraction-details {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 

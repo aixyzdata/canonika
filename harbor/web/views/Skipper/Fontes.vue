@@ -1,145 +1,197 @@
 <template>
-  <div class="fontes-view">
-    <!-- Header -->
-    <div class="page-header">
-      <h1 class="page-title">
+  <div class="tollgate-view">
+    <!-- Header Padronizado -->
+    <div class="view-header">
+      <div class="view-title">
         <i class="fas fa-database"></i>
-        Gerenciamento de Fontes
-      </h1>
-      <p class="page-subtitle">
-        Configure as fontes de pesquisa para extração de dados
-      </p>
-    </div>
-
-    <!-- Botão Adicionar -->
-    <div class="add-source-section">
-      <button @click="showAddModal = true" class="canonika-btn canonika-btn-primary">
-        <i class="fas fa-plus"></i>
-        Adicionar Nova Fonte
-      </button>
-    </div>
-
-    <!-- Lista de Fontes -->
-    <div class="sources-section">
-      <div class="section-header">
-        <div class="section-title">
-          <i class="fas fa-database"></i>
-          <h2>Fontes Cadastradas</h2>
-        </div>
-        <div class="section-stats">
-          <span class="stat-badge">
-            <i class="fas fa-check-circle"></i>
-            {{ sources.filter(s => s.is_active).length }} Ativas
-          </span>
-          <span class="stat-badge">
-            <i class="fas fa-pause-circle"></i>
-            {{ sources.filter(s => !s.is_active).length }} Inativas
-          </span>
+        <div class="title-content">
+          <h1>Gerenciamento de Fontes</h1>
+          <p>Configure as fontes de pesquisa para extração de dados</p>
         </div>
       </div>
-      
-      <div class="sources-container">
-        <div v-if="sources.length === 0" class="empty-state">
-          <div class="empty-icon">
-            <i class="fas fa-database"></i>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>ONLINE</span>
+      </div>
+      <div class="view-actions">
+        <button @click="refreshData()" class="action-btn">
+          <i class="fas fa-sync-alt"></i>
+          Atualizar
+        </button>
+        <button @click="showAddModal = true" class="action-btn primary">
+          <i class="fas fa-plus"></i>
+          Adicionar Fonte
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="view-content">
+      <!-- Estatísticas -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Estatísticas das Fontes</h3>
+            <div class="card-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
           </div>
-          <h3>Nenhuma fonte cadastrada</h3>
-          <p>Adicione sua primeira fonte de dados para começar</p>
-          <button @click="showAddModal = true" class="canonika-btn canonika-btn-primary">
-            <i class="fas fa-plus"></i>
-            Adicionar Primeira Fonte
-          </button>
-        </div>
-        
-        <div v-else class="sources-grid">
-          <div
-            v-for="source in sources"
-            :key="source.id"
-            class="source-card"
-          >
-            <div class="source-card-header">
-              <div class="source-icon">
-                <i :class="getSourceIcon(source.name)"></i>
-              </div>
-              <div class="source-status">
-                <div class="status-indicator" :class="{ active: source.is_active }"></div>
-              </div>
-            </div>
-            
-            <div class="source-card-content">
-              <div class="source-title-section">
-                <h3 class="source-title">{{ source.name }}</h3>
-                <div class="source-badges">
-                  <span class="status-badge" :class="getTypeBadgeClass(source.type)">
-                    {{ getTypeText(source.type) }}
-                  </span>
-                  <span v-if="source.is_active" class="status-badge status-active">
-                    Ativo
-                  </span>
-                  <span v-else class="status-badge status-inactive">
-                    Inativo
-                  </span>
-                </div>
-              </div>
-              
-              <div class="source-url">
-                <i class="fas fa-link"></i>
-                <span>{{ source.base_url }}</span>
-              </div>
-              
-              <div class="source-tags">
-                <div class="tags-label">
-                  <i class="fas fa-tags"></i>
-                  <span>Tags de Recomendação</span>
-                </div>
-                <div class="tags-container">
-                  <span
-                    v-for="tag in source.recommendation_tags"
-                    :key="tag"
-                    class="tag-badge"
-                  >
-                    {{ tag }}
-                  </span>
-                </div>
-              </div>
-              
-              <div class="source-stats">
-                <div class="stat-item">
-                  <i class="fas fa-clock"></i>
-                  <span>Última verificação: 2h atrás</span>
-                </div>
-                <div class="stat-item">
+          <div class="card-content">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon">
                   <i class="fas fa-check-circle"></i>
-                  <span>Disponibilidade: 98%</span>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ sources.filter(s => s.is_active).length }}</span>
+                  <span class="stat-label">Fontes Ativas</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ sources.filter(s => !s.is_active).length }}</span>
+                  <span class="stat-label">Fontes Inativas</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-globe"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ sources.length }}</span>
+                  <span class="stat-label">Total de Fontes</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-number">{{ sources.length > 0 ? Math.round((sources.filter(s => s.is_active).length / sources.length) * 100) : 0 }}%</span>
+                  <span class="stat-label">Taxa de Ativação</span>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Fontes -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Fontes Cadastradas</h3>
+            <div class="card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div v-if="sources.length === 0" class="empty-state">
+              <div class="empty-icon">
+                <i class="fas fa-database"></i>
+              </div>
+              <h3>Nenhuma fonte cadastrada</h3>
+              <p>Adicione sua primeira fonte de dados para começar</p>
+              <button @click="showAddModal = true" class="action-btn primary">
+                <i class="fas fa-plus"></i>
+                Adicionar Primeira Fonte
+              </button>
+            </div>
             
-            <div class="source-card-actions">
-              <button
-                @click="editSource(source)"
-                class="action-btn primary"
-                title="Editar fonte"
+            <div v-else class="sources-grid">
+              <div
+                v-for="source in sources"
+                :key="source.id"
+                class="source-card"
               >
-                <i class="fas fa-edit"></i>
-                <span>Editar</span>
-              </button>
-              <button
-                @click="testSource(source)"
-                class="action-btn"
-                title="Testar conexão"
-              >
-                <i class="fas fa-play"></i>
-                <span>Testar</span>
-              </button>
-              <button
-                @click="deleteSource(source.id)"
-                class="action-btn danger"
-                title="Excluir fonte"
-              >
-                <i class="fas fa-trash"></i>
-                <span>Excluir</span>
-              </button>
+                <div class="source-card-header">
+                  <div class="source-icon">
+                    <i :class="getSourceIcon(source.name)"></i>
+                  </div>
+                  <div class="source-status">
+                    <div class="status-indicator" :class="{ active: source.is_active }"></div>
+                  </div>
+                </div>
+                
+                <div class="source-card-content">
+                  <div class="source-title-section">
+                    <h3 class="source-title">{{ source.name }}</h3>
+                    <div class="source-badges">
+                      <span class="status-badge" :class="getTypeBadgeClass(source.type)">
+                        {{ getTypeText(source.type) }}
+                      </span>
+                      <span v-if="source.is_active" class="status-badge status-active">
+                        Ativo
+                      </span>
+                      <span v-else class="status-badge status-inactive">
+                        Inativo
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="source-url">
+                    <i class="fas fa-link"></i>
+                    <span>{{ source.base_url }}</span>
+                  </div>
+                  
+                  <div class="source-tags">
+                    <div class="tags-label">
+                      <i class="fas fa-tags"></i>
+                      <span>Tags de Recomendação</span>
+                    </div>
+                    <div class="tags-container">
+                      <span
+                        v-for="tag in source.recommendation_tags"
+                        :key="tag"
+                        class="tag-badge"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="source-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-clock"></i>
+                      <span>Última verificação: 2h atrás</span>
+                    </div>
+                    <div class="stat-item">
+                      <i class="fas fa-check-circle"></i>
+                      <span>Disponibilidade: 98%</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="source-card-actions">
+                  <button
+                    @click="editSource(source)"
+                    class="action-btn primary"
+                    title="Editar fonte"
+                  >
+                    <i class="fas fa-edit"></i>
+                    <span>Editar</span>
+                  </button>
+                  <button
+                    @click="testSource(source)"
+                    class="action-btn"
+                    title="Testar conexão"
+                  >
+                    <i class="fas fa-play"></i>
+                    <span>Testar</span>
+                  </button>
+                  <button
+                    @click="deleteSource(source.id)"
+                    class="action-btn danger"
+                    title="Excluir fonte"
+                  >
+                    <i class="fas fa-trash"></i>
+                    <span>Excluir</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -218,10 +270,10 @@
             </div>
             
             <div class="form-actions">
-              <button type="button" @click="closeModal" class="canonika-btn canonika-btn-outline">
+              <button type="button" @click="closeModal" class="action-btn">
                 Cancelar
               </button>
-              <button type="submit" class="canonika-btn canonika-btn-primary">
+              <button type="submit" class="action-btn primary">
                 {{ editingSource ? 'Atualizar' : 'Adicionar' }}
               </button>
             </div>
@@ -291,6 +343,10 @@ export default {
     }
   },
   methods: {
+    refreshData() {
+      console.log('Atualizando dados das fontes...');
+      // Implementar chamadas para a API
+    },
     getSourceIcon(sourceName) {
       const icons = {
         'Amazon': 'fab fa-amazon',
@@ -387,108 +443,196 @@ export default {
 </script>
 
 <style scoped>
-.fontes-view {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.tollgate-view {
+  /* height: 100vh; */
+  /* padding: 2rem; */
+  /* background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); */
+  /* color: #e2e8f0; */
 }
 
-.page-header {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.page-title i {
-  color: #3b82f6;
-}
-
-.page-subtitle {
-  font-size: 1.125rem;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.add-source-section {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.sources-section {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  overflow: hidden;
-  margin-bottom: 2rem;
-}
-
-.section-header {
+.view-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem;
-  background: rgba(15, 23, 42, 0.5);
-  border-bottom: 1px solid #475569;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 1rem;
+  border: 1px solid #475569;
 }
 
-.section-title {
+.view-title {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-.section-title i {
-  font-size: 1.5rem;
+.view-title i {
   color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
-.section-title h2 {
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  line-height: 1.2;
+}
+
+.title-content p {
+  color: #94a3b8;
   margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.section-stats {
-  display: flex;
-  gap: 1rem;
-}
-
-.stat-badge {
+.view-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
   padding: 0.5rem 1rem;
-  background: rgba(71, 85, 105, 0.3);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.action-btn.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.card-content {
+  color: #94a3b8;
+}
+
+/* Estatísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
   border-radius: 0.5rem;
-  color: #94a3b8;
+}
+
+.stat-icon {
+  width: 3rem;
+  height: 3rem;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.stat-label {
   font-size: 0.875rem;
-  font-weight: 500;
+  color: #94a3b8;
 }
 
-.stat-badge i {
-  color: #10b981;
-}
-
-.stat-badge:last-child i {
-  color: #f59e0b;
-}
-
-.sources-container {
-  padding: 2rem;
-}
-
+/* Fontes */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -678,6 +822,21 @@ export default {
   color: #3b82f6;
 }
 
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.tag-badge {
+  background: #475569;
+  color: #e2e8f0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
 .source-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -685,7 +844,7 @@ export default {
   margin-bottom: 1.5rem;
 }
 
-.stat-item {
+.source-stats .stat-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -696,7 +855,7 @@ export default {
   color: #94a3b8;
 }
 
-.stat-item i {
+.source-stats .stat-item i {
   color: #10b981;
   font-size: 0.875rem;
 }
@@ -709,7 +868,7 @@ export default {
   border-top: 1px solid #475569;
 }
 
-.action-btn {
+.source-card-actions .action-btn {
   flex: 1;
   padding: 0.75rem 1rem;
   border: 1px solid #475569;
@@ -726,61 +885,29 @@ export default {
   font-weight: 500;
 }
 
-.action-btn:hover {
+.source-card-actions .action-btn:hover {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
   transform: translateY(-1px);
 }
 
-.action-btn.primary {
+.source-card-actions .action-btn.primary {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   border-color: #3b82f6;
   color: white;
 }
 
-.action-btn.primary:hover {
+.source-card-actions .action-btn.primary:hover {
   background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
-.action-btn.danger:hover {
+.source-card-actions .action-btn.danger:hover {
   background: #ef4444;
   border-color: #ef4444;
 }
 
-.canonika-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.canonika-btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-.canonika-btn-primary:hover {
-  background: #2563eb;
-}
-
-.canonika-btn-outline {
-  background: transparent;
-  color: #94a3b8;
-  border: 1px solid #475569;
-}
-
-.canonika-btn-outline:hover {
-  background: #475569;
-  color: white;
-}
-
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -899,18 +1026,23 @@ export default {
   margin-top: 1rem;
 }
 
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
-}
-
-.tag-badge {
-  background: #475569;
-  color: #e2e8f0;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
+@media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .sources-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 
