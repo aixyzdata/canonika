@@ -1389,6 +1389,282 @@ export const serviceConfigs = {
   },
 
   // ========================================
+  // DIVER - CONSULTA CANÔNICA
+  // ========================================
+  diver: {
+    serviceName: 'Diver',
+    serviceDescription: 'Sistema de Consulta Canônica de Produtos e Empresas',
+    serviceIcon: 'fas fa-search',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'total-consultas',
+        title: 'Consultas Realizadas',
+        value: '1.247',
+        label: 'Este Mês',
+        icon: 'fas fa-search'
+      },
+      {
+        id: 'produtos-encontrados',
+        title: 'Produtos Encontrados',
+        value: '892',
+        label: 'Fichas Técnicas',
+        icon: 'fas fa-box'
+      },
+      {
+        id: 'empresas-cadastradas',
+        title: 'Empresas Cadastradas',
+        value: '156',
+        label: 'Dados Canônicos',
+        icon: 'fas fa-building'
+      },
+      {
+        id: 'taxa-sucesso',
+        title: 'Taxa de Sucesso',
+        value: '94%',
+        label: 'Consultas Bem-sucedidas',
+        icon: 'fas fa-chart-line'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Consulta Realizada',
+        description: 'iPhone 15 Pro - Ficha técnica encontrada',
+        time: '2 minutos atrás',
+        icon: 'fas fa-search'
+      },
+      {
+        id: 2,
+        title: 'Empresa Cadastrada',
+        description: 'Apple Inc. - Dados canônicos salvos',
+        time: '5 minutos atrás',
+        icon: 'fas fa-building'
+      },
+      {
+        id: 3,
+        title: 'NFe Processada',
+        description: 'Nota fiscal com 12 produtos processados',
+        time: '1 hora atrás',
+        icon: 'fas fa-file-invoice'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Diver',
+        description: 'Serviço principal de consulta',
+        status: 'online',
+        port: 'Port 7723'
+      },
+      {
+        id: 'wayfinder',
+        name: 'Wayfinder',
+        description: 'Base de dados canônica',
+        status: 'online',
+        port: 'Port 3717'
+      },
+      {
+        id: 'skipper',
+        name: 'Skipper',
+        description: 'Enriquecimento de dados',
+        status: 'online',
+        port: 'Port 3703'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'cache-timeout',
+        name: 'Timeout de Cache',
+        value: '24 horas'
+      },
+      {
+        id: 'max-results',
+        name: 'Máximo de Resultados',
+        value: '50 por consulta'
+      },
+      {
+        id: 'auto-enrichment',
+        name: 'Enriquecimento Automático',
+        value: 'Ativado'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'consulta-produto',
+        title: 'Consultar Produto',
+        description: 'Buscar por EAN ou descrição',
+        icon: 'fas fa-search',
+        handler: () => console.log('Consultar produto')
+      },
+      {
+        id: 'upload-nfe',
+        title: 'Upload NFe',
+        description: 'Processar nota fiscal',
+        icon: 'fas fa-file-upload',
+        handler: () => console.log('Upload NFe')
+      },
+      {
+        id: 'historico-consultas',
+        title: 'Histórico',
+        description: 'Ver consultas anteriores',
+        icon: 'fas fa-history',
+        handler: () => console.log('Histórico')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Consultar Produto',
+      icon: 'fas fa-search',
+      handler: () => console.log('Consultar produto')
+    }
+  },
+
+  // ========================================
+  // FISHER - PESCA DE DADOS
+  // ========================================
+  fisher: {
+    serviceName: 'Fisher',
+    serviceDescription: 'Sistema de Pesca de Dados em Fontes Externas',
+    serviceIcon: 'fas fa-fish',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'missoes-executadas',
+        title: 'Missões Executadas',
+        value: '47',
+        label: 'Este Mês',
+        icon: 'fas fa-rocket'
+      },
+      {
+        id: 'dados-processados',
+        title: 'Dados Processados',
+        value: '2.3M',
+        label: 'Registros Extraídos',
+        icon: 'fas fa-database'
+      },
+      {
+        id: 'fontes-ativas',
+        title: 'Fontes Ativas',
+        value: '8',
+        label: 'Fontes Configuradas',
+        icon: 'fas fa-link'
+      },
+      {
+        id: 'taxa-sucesso',
+        title: 'Taxa de Sucesso',
+        value: '96%',
+        label: 'Missões Bem-sucedidas',
+        icon: 'fas fa-chart-line'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Missão Concluída',
+        description: 'Receita Federal - 15.2K registros processados',
+        time: '5 minutos atrás',
+        icon: 'fas fa-check'
+      },
+      {
+        id: 2,
+        title: 'Nova Fonte Adicionada',
+        description: 'Open Food Facts configurada',
+        time: '1 hora atrás',
+        icon: 'fas fa-plus'
+      },
+      {
+        id: 3,
+        title: 'Dados Normalizados',
+        description: '2.1M registros convertidos para formato canônico',
+        time: '2 horas atrás',
+        icon: 'fas fa-cogs'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Fisher',
+        description: 'Serviço principal de pesca',
+        status: 'online',
+        port: 'Port 7724'
+      },
+      {
+        id: 'database',
+        name: 'PostgreSQL',
+        description: 'Banco de dados de resultados',
+        status: 'online',
+        port: 'Port 5432'
+      },
+      {
+        id: 'storage',
+        name: 'Sistema de Storage',
+        description: 'Armazenamento de dados brutos',
+        status: 'online',
+        port: 'Port 7725'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'update-frequency',
+        name: 'Frequência de Atualização',
+        value: 'Diária'
+      },
+      {
+        id: 'retry-policy',
+        name: 'Política de Retry',
+        value: '3 tentativas'
+      },
+      {
+        id: 'data-retention',
+        name: 'Retenção de Dados',
+        value: '90 dias'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'executar-missao',
+        title: 'Executar Missão',
+        description: 'Iniciar nova pesca de dados',
+        icon: 'fas fa-rocket',
+        handler: () => console.log('Executar missão')
+      },
+      {
+        id: 'gerenciar-fontes',
+        title: 'Gerenciar Fontes',
+        description: 'Configurar fontes de dados',
+        icon: 'fas fa-cog',
+        handler: () => console.log('Gerenciar fontes')
+      },
+      {
+        id: 'ver-historico',
+        title: 'Ver Histórico',
+        description: 'Histórico de missões',
+        icon: 'fas fa-history',
+        handler: () => console.log('Ver histórico')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Executar Missão',
+      icon: 'fas fa-rocket',
+      handler: () => console.log('Executar missão')
+    }
+  },
+
+  // ========================================
   // WAYFINDER - NAVEGAÇÃO
   // ========================================
   wayfinder: {

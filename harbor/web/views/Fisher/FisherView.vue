@@ -1,465 +1,649 @@
 <template>
-  <div class="fisher-container">
-    <!-- Header -->
-    <div class="fisher-header">
-      <div class="header-content">
-        <div class="header-icon">
-          <i class="fas fa-fish"></i>
+  <div class="tollgate-view">
+    <div class="view-header">
+      <div class="view-title">
+        <i class="fas fa-fish"></i>
+        <div class="title-content">
+          <h1>{{ config.serviceName }}</h1>
+          <p>{{ config.serviceDescription }}</p>
         </div>
-        <div class="header-text">
-          <h1>🎣 Fisher</h1>
-          <p>Tripulante de Pesca de Dados</p>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>{{ config.statusText }}</span>
+      </div>
+      <div class="view-actions">
+        <button @click="refreshData" class="action-btn">
+          <i class="fas fa-sync-alt"></i>
+          Atualizar
+        </button>
+        <button @click="openMissao" class="action-btn primary">
+          <i class="fas fa-rocket"></i>
+          Executar Missão
+        </button>
+      </div>
+    </div>
+
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Missões Executadas -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Missões Executadas</h3>
+            <div class="card-icon">
+              <i class="fas fa-rocket"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">{{ config.metrics[0].value }}</div>
+              <div class="balance-label">{{ config.metrics[0].label }}</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Dados Processados:</span>
+                <span class="detail-value">{{ config.metrics[1].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Fontes Ativas:</span>
+                <span class="detail-value">{{ config.metrics[2].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Taxa de Sucesso:</span>
+                <span class="detail-value">{{ config.metrics[3].value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atividades Recentes -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Atividades Recentes</h3>
+            <div class="card-icon">
+              <i class="fas fa-history"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="transaction-list">
+              <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
+                <div class="transaction-icon success">
+                  <i :class="activity.icon"></i>
+                </div>
+                <div class="transaction-details">
+                  <div class="transaction-title">{{ activity.title }}</div>
+                  <div class="transaction-amount success">
+                    {{ activity.description }}
+                  </div>
+                  <div class="transaction-time">{{ activity.time }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ferramentas Disponíveis -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Ferramentas</h3>
+            <div class="card-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="plans-grid">
+              <div 
+                v-for="action in config.actions" 
+                :key="action.id" 
+                class="plan-item"
+                @click="action.handler"
+              >
+                <div class="plan-name">{{ action.title }}</div>
+                <div class="plan-price">{{ action.description }}</div>
+                <div class="plan-credits">
+                  <i :class="action.icon"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status do Sistema -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Status do Sistema</h3>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="alerts-list">
+              <div v-for="system in config.systemStatus" :key="system.id" class="alert-item info">
+                <div class="alert-icon">
+                  <i class="fas fa-server"></i>
+                </div>
+                <div class="alert-content">
+                  <div class="alert-title">{{ system.name }}</div>
+                  <div class="alert-message">{{ system.description }}</div>
+                  <div class="alert-time">{{ system.port }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Tabs de Navegação -->
-    <div class="fisher-tabs">
-      <button 
-        @click="activeTab = 'missions'" 
-        :class="['tab-btn', { active: activeTab === 'missions' }]"
-      >
-        <i class="fas fa-rocket"></i>
-        Missões
-      </button>
-      <button 
-        @click="activeTab = 'sources'" 
-        :class="['tab-btn', { active: activeTab === 'sources' }]"
-      >
-        <i class="fas fa-database"></i>
-        Fontes
-      </button>
-      <button 
-        @click="activeTab = 'history'" 
-        :class="['tab-btn', { active: activeTab === 'history' }]"
-      >
-        <i class="fas fa-history"></i>
-        Histórico
-      </button>
-    </div>
-
-    <!-- Conteúdo das Tabs -->
-    <div class="fisher-content">
-      
-      <!-- Tab Missões -->
-      <div v-if="activeTab === 'missions'" class="tab-content">
-        <div class="missions-section">
-          <h3>🚀 Executar Missão de Pesca</h3>
-          <p class="section-description">
-            Execute missões para baixar e processar dados de fontes externas
-          </p>
-          
-          <form @submit.prevent="executeMission" class="mission-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="source">Fonte de Dados</label>
-                <select
-                  id="source"
-                  v-model="missionForm.source"
-                  class="form-control"
-                  :disabled="isLoading"
-                >
-                  <option value="">Selecione uma fonte...</option>
-                  <option value="receita-federal">Receita Federal - CNPJs</option>
-                  <option value="open-food-facts">Open Food Facts</option>
-                </select>
-              </div>
+    <!-- Modal de Missão -->
+    <div v-if="showMissaoModal" class="modal-overlay" @click="closeMissaoModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>🎣 Executar Missão de Pesca</h3>
+          <button @click="closeMissaoModal" class="modal-close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="executarMissao" class="missao-form">
+            <div class="form-group">
+              <label for="source">Fonte de Dados</label>
+              <select
+                id="source"
+                v-model="missaoForm.source"
+                class="form-control"
+                :disabled="isLoading"
+              >
+                <option value="">Selecione uma fonte</option>
+                <option value="receita-federal">Receita Federal - CNPJs</option>
+                <option value="open-food-facts">Open Food Facts</option>
+              </select>
             </div>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label for="missionType">Tipo de Missão</label>
-                <select
-                  id="missionType"
-                  v-model="missionForm.missionType"
-                  class="form-control"
-                  :disabled="isLoading"
-                >
-                  <option value="incremental">Incremental (Apenas atualizações)</option>
-                  <option value="full">Completa (Todos os dados)</option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="mission_type">Tipo de Missão</label>
+              <select
+                id="mission_type"
+                v-model="missaoForm.mission_type"
+                class="form-control"
+                :disabled="isLoading"
+              >
+                <option value="incremental">Incremental (Apenas atualizações)</option>
+                <option value="full">Completa (Todos os dados)</option>
+              </select>
             </div>
             
             <div class="form-actions">
               <button 
                 type="submit" 
                 class="btn btn-primary"
-                :disabled="!missionForm.source || isLoading"
+                :disabled="!missaoForm.source || isLoading"
               >
                 <i class="fas fa-rocket"></i>
                 {{ isLoading ? 'Executando...' : '🚀 Executar Missão' }}
               </button>
             </div>
           </form>
-        </div>
-      </div>
 
-      <!-- Tab Fontes -->
-      <div v-if="activeTab === 'sources'" class="tab-content">
-        <div class="sources-section">
-          <h3>📊 Fontes de Dados Disponíveis</h3>
-          <p class="section-description">
-            Fontes externas suportadas para pesca de dados
-          </p>
-          
-          <div class="sources-grid">
-            <div v-for="source in sources" :key="source.id" class="source-card">
-              <div class="source-header">
-                <h4>{{ source.name }}</h4>
-                <span class="source-frequency">{{ source.update_frequency }}</span>
-              </div>
-              
-              <div class="source-description">
-                <p>{{ source.description }}</p>
-              </div>
-              
-              <div class="source-details">
-                <div class="detail-row">
-                  <span class="detail-label">Última Atualização:</span>
-                  <span class="detail-value">{{ formatDate(source.last_update) }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Frequência:</span>
-                  <span class="detail-value">{{ source.update_frequency }}</span>
-                </div>
-              </div>
-              
-              <div class="source-actions">
-                <button @click="executeMissionForSource(source.id)" class="btn btn-secondary">
-                  <i class="fas fa-download"></i>
-                  Baixar Dados
-                </button>
-              </div>
+          <div v-if="missaoResult" class="result-section">
+            <h4>📋 Resultado da Missão</h4>
+            <div class="result-content">
+              <pre>{{ JSON.stringify(missaoResult, null, 2) }}</pre>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Tab Histórico -->
-      <div v-if="activeTab === 'history'" class="tab-content">
-        <div class="history-section">
-          <h3>📋 Histórico de Execuções</h3>
-          <p class="section-description">
-            Registro das últimas missões executadas
-          </p>
-          
-          <div class="history-list">
-            <div v-for="execution in executionHistory" :key="execution.start_time" class="execution-card">
-              <div class="execution-header">
-                <h4>{{ execution.source }}</h4>
-                <span :class="['status-badge', execution.status]">{{ execution.status }}</span>
-              </div>
-              
-              <div class="execution-details">
-                <div class="detail-row">
-                  <span class="detail-label">Tipo:</span>
-                  <span class="detail-value">{{ execution.mission_type }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Início:</span>
-                  <span class="detail-value">{{ formatDate(execution.start_time) }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Duração:</span>
-                  <span class="detail-value">{{ execution.duration_seconds.toFixed(2) }}s</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Registros:</span>
-                  <span class="detail-value">{{ execution.records_processed }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Arquivos:</span>
-                  <span class="detail-value">{{ execution.files_downloaded }}</span>
-                </div>
-              </div>
-              
-              <div v-if="execution.errors && execution.errors.length > 0" class="execution-errors">
-                <h5>Erros:</h5>
-                <ul>
-                  <li v-for="error in execution.errors" :key="error">{{ error }}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Resultado da Missão -->
-    <div v-if="missionResult" class="fisher-results">
-      <div class="results-header">
-        <h3>📊 Resultado da Missão</h3>
-        <button @click="clearMissionResult" class="btn btn-secondary">
-          <i class="fas fa-times"></i>
-          Fechar
-        </button>
-      </div>
-
-      <div class="result-content">
-        <div class="result-section">
-          <h4>Informações Gerais</h4>
-          <div class="result-details">
-            <div class="detail-row">
-              <span class="detail-label">Status:</span>
-              <span :class="['status-badge', missionResult.status]">{{ missionResult.status }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Fonte:</span>
-              <span class="detail-value">{{ missionResult.source }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Tipo:</span>
-              <span class="detail-value">{{ missionResult.mission_type }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="missionResult.results" class="result-section">
-          <h4>Resultados Detalhados</h4>
-          <div class="result-details">
-            <div class="detail-row">
-              <span class="detail-label">Arquivos Baixados:</span>
-              <span class="detail-value">{{ missionResult.results.files_downloaded }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Registros Processados:</span>
-              <span class="detail-value">{{ missionResult.results.records_processed }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Arquivos de Saída:</span>
-              <span class="detail-value">{{ missionResult.results.output_files.length }}</span>
-            </div>
-          </div>
-
-          <div v-if="missionResult.results.output_files.length > 0" class="output-files">
-            <h5>Arquivos Gerados:</h5>
-            <ul>
-              <li v-for="file in missionResult.results.output_files" :key="file">{{ file }}</li>
-            </ul>
-          </div>
-        </div>
-
-        <div v-if="missionResult.error" class="error-section">
-          <div class="error-card">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h4>Erro na Missão</h4>
-            <p>{{ missionResult.error }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading -->
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p>🎣 Pesca de dados em andamento...</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { getServiceConfig } from '../../../../shared/config/status-configs.js'
+
 export default {
-  name: 'FisherView',
+  name: 'FisherHarborView',
   data() {
     return {
-      activeTab: 'missions',
-      isLoading: false,
-      missionForm: {
+      config: getServiceConfig('fisher'),
+      showMissaoModal: false,
+      missaoForm: {
         source: '',
-        missionType: 'incremental'
+        mission_type: 'incremental'
       },
-      sources: [],
-      executionHistory: [],
-      missionResult: null,
-      apiBaseUrl: 'http://localhost:7724'
+      isLoading: false,
+      missaoResult: null
     }
   },
-  async mounted() {
-    await this.loadSources()
-    await this.loadExecutionHistory()
-  },
   methods: {
-    async executeMission() {
-      if (!this.missionForm.source) return;
+    refreshData() {
+      console.log('Atualizando dados do Fisher...')
+      // Aqui você faria a chamada para a API do Fisher
+      // e atualizaria os dados em tempo real
+    },
+    openMissao() {
+      this.showMissaoModal = true
+    },
+    closeMissaoModal() {
+      this.showMissaoModal = false
+      this.missaoResult = null
+    },
+    async executarMissao() {
+      if (!this.missaoForm.source) return
       
-      this.isLoading = true;
-      this.missionResult = null;
+      this.isLoading = true
+      this.missaoResult = null
       
       try {
-        const response = await fetch(`${this.apiBaseUrl}/fisher/mission`, {
+        const response = await fetch('http://localhost:7724/fisher/mission', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            source: this.missionForm.source,
-            mission_type: this.missionForm.missionType
-          })
-        });
+          body: JSON.stringify(this.missaoForm)
+        })
         
-        if (!response.ok) {
-          throw new Error(`Erro na API: ${response.status}`);
+        if (response.ok) {
+          this.missaoResult = await response.json()
+        } else {
+          console.error('Erro na missão:', response.statusText)
         }
-        
-        this.missionResult = await response.json();
-        
-        // Recarregar histórico após missão
-        await this.loadExecutionHistory();
-        
       } catch (error) {
-        console.error('Erro na missão:', error);
-        this.missionResult = {
-          status: 'error',
-          error: `Erro na missão: ${error.message}`
-        };
+        console.error('Erro ao executar missão:', error)
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
-    },
-
-    async executeMissionForSource(sourceId) {
-      this.missionForm.source = sourceId;
-      await this.executeMission();
-    },
-
-    async loadSources() {
-      try {
-        const response = await fetch(`${this.apiBaseUrl}/fisher/sources`);
-        if (response.ok) {
-          const data = await response.json();
-          this.sources = data.sources;
-        }
-      } catch (error) {
-        console.error('Erro carregando fontes:', error);
-      }
-    },
-
-    async loadExecutionHistory() {
-      try {
-        const response = await fetch(`${this.apiBaseUrl}/fisher/history`);
-        if (response.ok) {
-          this.executionHistory = await response.json();
-        }
-      } catch (error) {
-        console.error('Erro carregando histórico:', error);
-      }
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      return new Date(dateString).toLocaleString('pt-BR');
-    },
-
-    clearMissionResult() {
-      this.missionResult = null;
     }
   }
 }
 </script>
 
 <style scoped>
-.fisher-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Inter', sans-serif;
+.tollgate-view {
+  height: 100%;
 }
 
-.fisher-header {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-  border-radius: 1rem;
-  padding: 2rem;
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
-  color: white;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 1rem;
+  border: 1px solid #475569;
 }
 
-.header-content {
+.view-title {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-.header-icon {
-  font-size: 3rem;
-  opacity: 0.9;
+.view-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
-.header-text h1 {
-  margin: 0;
-  font-size: 2.5rem;
+.title-content {
+  flex: 1;
+}
+
+.title-content h1 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
-.header-text p {
-  margin: 0.5rem 0 0 0;
-  opacity: 0.9;
-  font-size: 1.1rem;
+.title-content p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.fisher-tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.tab-btn {
+.view-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: rgba(15, 23, 42, 0.5);
-  color: #e2e8f0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.tab-btn:hover {
-  background: rgba(15, 23, 42, 0.7);
-  transform: translateY(-2px);
-}
-
-.tab-btn.active {
-  background: #10b981;
-  color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.fisher-content {
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 1rem;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-.tab-content {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.missions-section h3,
-.sources-section h3,
-.history-section h3 {
-  margin: 0 0 1rem 0;
-  color: #e2e8f0;
-  font-size: 1.5rem;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
-.section-description {
-  color: #94a3b8;
-  margin-bottom: 2rem;
-  font-size: 1rem;
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
-.form-row {
+.view-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.view-content {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.balance-display {
+  text-align: center;
   margin-bottom: 1.5rem;
+}
+
+.balance-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #3b82f6;
+  line-height: 1;
+}
+
+.balance-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.balance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #475569;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.transaction-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.transaction-icon.success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.transaction-amount {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.transaction-amount.success {
+  color: #10b981;
+}
+
+.transaction-time {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.plans-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.plan-item {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.plan-item:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.plan-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+.plan-price {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  flex: 1;
+}
+
+.plan-credits {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #475569;
+}
+
+.alert-item.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.alert-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.alert-message {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.alert-time {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #475569;
+}
+
+.modal-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.missao-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .form-group {
@@ -470,353 +654,96 @@ export default {
 
 .form-group label {
   color: #e2e8f0;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .form-control {
-  background: rgba(15, 23, 42, 0.5) !important;
-  border: 1px solid #475569 !important;
-  color: #e2e8f0 !important;
-  padding: 0.75rem !important;
-  border-radius: 0.5rem !important;
-  font-size: 0.875rem !important;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #e2e8f0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .form-control:focus {
-  outline: none !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
-  background: rgba(15, 23, 42, 0.7) !important;
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.form-actions {
-  margin-top: 2rem;
+.form-control::placeholder {
+  color: #64748b;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: #10b981;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.btn-primary:disabled {
+.form-control:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  background: rgba(15, 23, 42, 0.5);
-  color: #e2e8f0;
-}
-
-.btn-secondary:hover {
-  background: rgba(15, 23, 42, 0.7);
-}
-
-.sources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
-}
-
-.source-card {
-  background: rgba(15, 23, 42, 0.7);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  border: 1px solid #475569;
-}
-
-.source-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.source-header h4 {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.source-frequency {
-  background: #10b981;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.source-description {
-  margin-bottom: 1.5rem;
-}
-
-.source-description p {
-  color: #94a3b8;
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.source-details {
-  margin-bottom: 1.5rem;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.detail-label {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.detail-value {
-  color: #e2e8f0;
-  font-size: 0.9rem;
-}
-
-.source-actions {
+.form-actions {
   display: flex;
   justify-content: flex-end;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.execution-card {
-  background: rgba(15, 23, 42, 0.7);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  border: 1px solid #475569;
-}
-
-.execution-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #475569;
-}
-
-.execution-header h4 {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.status-badge.success {
-  background: #10b981;
-  color: white;
-}
-
-.status-badge.error {
-  background: #ef4444;
-  color: white;
-}
-
-.status-badge.skipped {
-  background: #f59e0b;
-  color: white;
-}
-
-.execution-details {
-  margin-bottom: 1rem;
-}
-
-.execution-errors {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 0.5rem;
-  padding: 1rem;
   margin-top: 1rem;
 }
 
-.execution-errors h5 {
-  margin: 0 0 0.5rem 0;
-  color: #fca5a5;
-  font-size: 0.9rem;
-}
-
-.execution-errors ul {
-  margin: 0;
-  padding-left: 1rem;
-  color: #fca5a5;
-  font-size: 0.8rem;
-}
-
-.fisher-results {
-  background: rgba(15, 23, 42, 0.5);
-  border-radius: 1rem;
-  padding: 2rem;
-}
-
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.results-header h3 {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 1.5rem;
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
 }
 
-.result-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #475569;
 }
 
 .result-section h4 {
   color: #e2e8f0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.result-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.output-files {
-  margin-top: 1rem;
-}
-
-.output-files h5 {
-  color: #e2e8f0;
+  margin: 0 0 1rem 0;
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
 }
 
-.output-files ul {
-  margin: 0;
-  padding-left: 1rem;
-  color: #94a3b8;
-  font-size: 0.9rem;
+.result-content {
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
 }
 
-.error-section {
-  margin-top: 2rem;
-}
-
-.error-card {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  text-align: center;
-  color: #fca5a5;
-}
-
-.error-card i {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.error-card h4 {
-  margin: 0 0 0.5rem 0;
-  color: #fca5a5;
-}
-
-.error-card p {
-  margin: 0;
-  color: #fca5a5;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.loading-content {
-  text-align: center;
+.result-content pre {
   color: #e2e8f0;
-}
-
-.loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 3px solid #475569;
-  border-top: 3px solid #10b981;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  .fisher-container {
-    padding: 1rem;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .fisher-tabs {
-    flex-direction: column;
-  }
-  
-  .sources-grid {
-    grid-template-columns: 1fr;
-  }
+  font-size: 0.75rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style> 
