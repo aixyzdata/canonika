@@ -1,130 +1,115 @@
 <template>
-  <div class="tollgate-view">
-    <div class="view-header">
-      <div class="view-title">
-        <i class="fas fa-fish"></i>
-        <div class="title-content">
-          <h1>{{ config.serviceName }}</h1>
-          <p>{{ config.serviceDescription }}</p>
-        </div>
-      </div>
-      <div class="view-status">
-        <div class="status-indicator online"></div>
-        <span>{{ config.statusText }}</span>
-      </div>
-      <div class="view-actions">
-        <button @click="refreshData" class="action-btn">
-          <i class="fas fa-sync-alt"></i>
-          Atualizar
-        </button>
-        <button @click="openMissao" class="action-btn primary">
-          <i class="fas fa-rocket"></i>
-          Executar Missão
-        </button>
-      </div>
-    </div>
-
-    <div class="view-content">
-      <div class="service-cards">
-        <!-- Missões Executadas -->
-        <div class="service-card">
-          <div class="card-header">
-            <h3>Missões Executadas</h3>
-            <div class="card-icon">
-              <i class="fas fa-rocket"></i>
-            </div>
+  <CanonikaViewTemplate
+    title="Fisher"
+    description="Tripulante de Pesca de Dados"
+    header-icon="fas fa-fish"
+    status-text="ONLINE"
+    :primary-action="{
+      text: 'Executar Missão',
+      icon: 'fas fa-rocket',
+      handler: openMissao
+    }"
+    @refresh="refreshData"
+  >
+    <div class="service-cards">
+      <!-- Missões Executadas -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Missões Executadas</h3>
+          <div class="card-icon">
+            <i class="fas fa-rocket"></i>
           </div>
-          <div class="card-content">
-            <div class="balance-display">
-              <div class="balance-value">{{ config.metrics[0].value }}</div>
-              <div class="balance-label">{{ config.metrics[0].label }}</div>
+        </div>
+        <div class="card-content">
+          <div class="balance-display">
+            <div class="balance-value">{{ config.metrics[0].value }}</div>
+            <div class="balance-label">{{ config.metrics[0].label }}</div>
+          </div>
+          <div class="balance-details">
+            <div class="detail-item">
+              <span class="detail-label">Dados Processados:</span>
+              <span class="detail-value">{{ config.metrics[1].value }}</span>
             </div>
-            <div class="balance-details">
-              <div class="detail-item">
-                <span class="detail-label">Dados Processados:</span>
-                <span class="detail-value">{{ config.metrics[1].value }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Fontes Ativas:</span>
-                <span class="detail-value">{{ config.metrics[2].value }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Taxa de Sucesso:</span>
-                <span class="detail-value">{{ config.metrics[3].value }}</span>
-              </div>
+            <div class="detail-item">
+              <span class="detail-label">Fontes Ativas:</span>
+              <span class="detail-value">{{ config.metrics[2].value }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Taxa de Sucesso:</span>
+              <span class="detail-value">{{ config.metrics[3].value }}</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Atividades Recentes -->
-        <div class="service-card">
-          <div class="card-header">
-            <h3>Atividades Recentes</h3>
-            <div class="card-icon">
-              <i class="fas fa-history"></i>
-            </div>
+      <!-- Atividades Recentes -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Atividades Recentes</h3>
+          <div class="card-icon">
+            <i class="fas fa-history"></i>
           </div>
-          <div class="card-content">
-            <div class="transaction-list">
-              <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
-                <div class="transaction-icon success">
-                  <i :class="activity.icon"></i>
+        </div>
+        <div class="card-content">
+          <div class="transaction-list">
+            <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
+              <div class="transaction-icon success">
+                <i :class="activity.icon"></i>
+              </div>
+              <div class="transaction-details">
+                <div class="transaction-title">{{ activity.title }}</div>
+                <div class="transaction-amount success">
+                  {{ activity.description }}
                 </div>
-                <div class="transaction-details">
-                  <div class="transaction-title">{{ activity.title }}</div>
-                  <div class="transaction-amount success">
-                    {{ activity.description }}
-                  </div>
-                  <div class="transaction-time">{{ activity.time }}</div>
-                </div>
+                <div class="transaction-time">{{ activity.time }}</div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Ferramentas Disponíveis -->
-        <div class="service-card">
-          <div class="card-header">
-            <h3>Ferramentas</h3>
-            <div class="card-icon">
-              <i class="fas fa-tools"></i>
-            </div>
+      <!-- Ferramentas Disponíveis -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Ferramentas</h3>
+          <div class="card-icon">
+            <i class="fas fa-tools"></i>
           </div>
-          <div class="card-content">
-            <div class="plans-grid">
-              <div 
-                v-for="action in config.actions" 
-                :key="action.id" 
-                class="plan-item"
-                @click="action.handler"
-              >
-                <div class="plan-name">{{ action.name }}</div>
-                <div class="plan-price">{{ action.description }}</div>
-                <div class="plan-credits">{{ action.status }}</div>
-              </div>
+        </div>
+        <div class="card-content">
+          <div class="plans-grid">
+            <div 
+              v-for="action in config.actions" 
+              :key="action.id" 
+              class="plan-item"
+              @click="action.handler"
+            >
+              <div class="plan-name">{{ action.name }}</div>
+              <div class="plan-price">{{ action.description }}</div>
+              <div class="plan-credits">{{ action.status }}</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Status do Sistema -->
-        <div class="service-card">
-          <div class="card-header">
-            <h3>Status do Sistema</h3>
-            <div class="card-icon">
-              <i class="fas fa-server"></i>
-            </div>
+      <!-- Status do Sistema -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Status do Sistema</h3>
+          <div class="card-icon">
+            <i class="fas fa-server"></i>
           </div>
-          <div class="card-content">
-            <div class="alerts-list">
-              <div v-for="status in config.systemStatus" :key="status.id" class="alert-item info">
-                <div class="alert-icon">
-                  <i class="fas fa-check"></i>
-                </div>
-                <div class="alert-content">
-                  <div class="alert-title">{{ status.name }}</div>
-                  <div class="alert-message">{{ status.description }}</div>
-                  <div class="alert-time">{{ status.port }}</div>
-                </div>
+        </div>
+        <div class="card-content">
+          <div class="alerts-list">
+            <div v-for="status in config.systemStatus" :key="status.id" class="alert-item info">
+              <div class="alert-icon">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">{{ status.name }}</div>
+                <div class="alert-message">{{ status.description }}</div>
+                <div class="alert-time">{{ status.port }}</div>
               </div>
             </div>
           </div>
@@ -188,14 +173,18 @@
         </div>
       </div>
     </div>
-  </div>
+  </CanonikaViewTemplate>
 </template>
 
 <script>
 import { serviceConfigs } from '../../../../shared/config/status-configs.js'
+import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
 
 export default {
   name: 'FisherView',
+  components: {
+    CanonikaViewTemplate
+  },
   data() {
     return {
       config: serviceConfigs.fisher,
@@ -248,61 +237,6 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos específicos do Fisher */
-.tollgate-view .view-title i {
-  color: #10b981; /* Green para Fisher */
-}
-
-.action-btn {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #10b981;
-}
-
-.action-btn:hover {
-  background: rgba(16, 185, 129, 0.2);
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border-color: #10b981;
-}
-
-.action-btn.primary:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-
-.balance-value {
-  color: #10b981;
-}
-
-.transaction-icon.success {
-  background: #10b981;
-}
-
-.transaction-amount.success {
-  color: #10b981;
-}
-
-.plan-item.active {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.plan-credits {
-  color: #10b981;
-}
-
-.alert-item.info .alert-icon {
-  background: #10b981;
-}
-
-.alert-item.info {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
 /* Modal styles */
 .modal-overlay {
   position: fixed;
@@ -388,8 +322,8 @@ export default {
 
 .form-control:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-control:disabled {
@@ -416,13 +350,13 @@ export default {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-1px);
 }
 
