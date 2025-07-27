@@ -10,14 +10,14 @@ export default [
   {
     path: '/diver',
     name: 'Diver',
-    component: () => import('./views/Diver/DiverView.vue')
+    component: () => import('../../diver/web/src/views/DiverView.vue')
   },
   
   // Fisher - Pesca de dados
   {
     path: '/fisher',
     name: 'Fisher',
-    component: () => import('./views/Fisher/FisherView.vue')
+    component: () => import('../../fisher/web/src/views/FisherView.vue')
   },
   
   // Skipper
@@ -142,6 +142,28 @@ export default [
     path: '/guardian/status',
     name: 'GuardianStatus',
     component: () => import('./views/Guardian/Dashboard.vue')
+  },
+  
+  // Ledger
+  {
+    path: '/ledger',
+    name: 'Ledger',
+    component: () => import('./views/Ledger/Dashboard.vue')
+  },
+  {
+    path: '/ledger/status',
+    name: 'LedgerStatus',
+    component: () => import('./views/Ledger/Dashboard.vue')
+  },
+  {
+    path: '/ledger/lancamentos',
+    name: 'LedgerLancamentos',
+    component: () => import('./views/Ledger/Lancamentos.vue')
+  },
+  {
+    path: '/ledger/relatorios',
+    name: 'LedgerRelatorios',
+    component: () => import('./views/Ledger/Relatorios.vue')
   },
   
   // Mapmaker
