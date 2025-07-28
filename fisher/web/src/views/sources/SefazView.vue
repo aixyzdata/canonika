@@ -219,6 +219,109 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal de Progresso de Download -->
+      <div v-if="showDownloadModal" class="download-modal">
+        <div class="modal-overlay" @click="closeDownloadModal"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>
+              <i class="fas fa-download"></i>
+              Download de Arquivos CNPJ
+            </h3>
+            <button @click="closeDownloadModal" class="modal-close">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="download-summary">
+              <div class="summary-item">
+                <span class="summary-label">Total:</span>
+                <span class="summary-value">{{ downloadQueue.length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Concluídos:</span>
+                <span class="summary-value success">{{ completedDownloads }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Em Progresso:</span>
+                <span class="summary-value info">{{ activeDownloads }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Falhas:</span>
+                <span class="summary-value error">{{ failedDownloads }}</span>
+              </div>
+            </div>
+
+            <div class="download-queue">
+              <div v-for="item in downloadQueue" :key="item.id" class="download-item" :class="item.status">
+                <div class="download-header">
+                  <div class="download-info">
+                    <div class="filename">{{ item.filename }}</div>
+                    <div class="filesize">{{ item.size }}</div>
+                  </div>
+                  <div class="download-status">
+                    <span class="status-badge" :class="item.status">
+                      {{ getDownloadStatusText(item.status) }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="download-progress">
+                  <div class="progress-bar">
+                    <div 
+                      class="progress-fill" 
+                      :style="{ width: item.progress + '%' }"
+                      :class="item.status"
+                    ></div>
+                  </div>
+                  <div class="progress-details">
+                    <span class="progress-text">{{ item.progress }}%</span>
+                    <span class="progress-speed" v-if="item.speed">{{ item.speed }}</span>
+                    <span class="progress-time" v-if="item.eta">{{ item.eta }}</span>
+                  </div>
+                </div>
+                
+                <div class="download-message" v-if="item.message">
+                  {{ item.message }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button 
+              @click="pauseDownloads" 
+              class="btn-action"
+              :disabled="!isDownloading"
+            >
+              <i class="fas fa-pause"></i> Pausar
+            </button>
+            <button 
+              @click="resumeDownloads" 
+              class="btn-action"
+              :disabled="!isPaused"
+            >
+              <i class="fas fa-play"></i> Retomar
+            </button>
+            <button 
+              @click="cancelDownloads" 
+              class="btn-action danger"
+              :disabled="!isDownloading && !isPaused"
+            >
+              <i class="fas fa-stop"></i> Cancelar
+            </button>
+            <button 
+              @click="closeDownloadModal" 
+              class="btn-action"
+              :disabled="isDownloading"
+            >
+              <i class="fas fa-check"></i> Fechar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </CanonikaViewTemplate>
 </template>
@@ -228,6 +331,11 @@ export default {
   name: 'SefazView',
   data() {
     return {
+      showDownloadModal: false,
+      isDownloading: false,
+      isPaused: false,
+      downloadQueue: [],
+      downloadInterval: null,
       sourceStatus: {
         status: 'ONLINE',
         description: 'Conexão ativa com Receita Federal',
@@ -575,6 +683,15 @@ export default {
       const availableFiles = this.cnpjFiles.filter(file => file.status === 'available')
       const selectedCount = availableFiles.filter(file => file.selected).length
       return selectedCount > 0 && selectedCount < availableFiles.length
+    },
+    completedDownloads() {
+      return this.downloadQueue.filter(item => item.status === 'completed').length
+    },
+    activeDownloads() {
+      return this.downloadQueue.filter(item => item.status === 'downloading').length
+    },
+    failedDownloads() {
+      return this.downloadQueue.filter(item => item.status === 'error').length
     }
   },
   methods: {
@@ -594,12 +711,133 @@ export default {
     downloadSelected() {
       const selectedFiles = this.cnpjFiles.filter(file => file.selected)
       console.log('Downloading selected files:', selectedFiles.map(f => f.filename))
-      // Implementar download dos arquivos selecionados
+      this.startDownload(selectedFiles)
     },
     downloadAllMissing() {
       const missingFiles = this.cnpjFiles.filter(file => file.status === 'available')
       console.log('Downloading all missing files:', missingFiles.map(f => f.filename))
-      // Implementar download de todos os arquivos faltantes
+      this.startDownload(missingFiles)
+    },
+    startDownload(files) {
+      // Preparar fila de download
+      this.downloadQueue = files.map((file, index) => ({
+        id: file.id,
+        filename: file.filename,
+        size: file.size,
+        status: 'pending',
+        progress: 0,
+        speed: null,
+        eta: null,
+        message: null,
+        startTime: null
+      }))
+      
+      this.showDownloadModal = true
+      this.isDownloading = true
+      this.isPaused = false
+      
+      // Simular download sequencial
+      this.processDownloadQueue()
+    },
+    processDownloadQueue() {
+      if (this.isPaused) return
+      
+      const pendingItem = this.downloadQueue.find(item => item.status === 'pending')
+      if (!pendingItem) {
+        this.isDownloading = false
+        return
+      }
+      
+      // Iniciar download do item
+      pendingItem.status = 'downloading'
+      pendingItem.startTime = Date.now()
+      pendingItem.message = 'Iniciando download...'
+      
+      // Simular progresso do download
+      this.simulateDownload(pendingItem)
+    },
+    simulateDownload(item) {
+      if (this.isPaused) return
+      
+      const updateProgress = () => {
+        if (this.isPaused) return
+        
+        if (item.progress < 100) {
+          // Simular progresso aleatório
+          const increment = Math.random() * 5 + 1
+          item.progress = Math.min(100, item.progress + increment)
+          
+          // Calcular velocidade e ETA
+          const elapsed = (Date.now() - item.startTime) / 1000
+          const remaining = (100 - item.progress) / (item.progress / elapsed)
+          
+          item.speed = this.formatSpeed(item.progress / elapsed)
+          item.eta = this.formatTime(remaining)
+          item.message = `Baixando... ${item.progress.toFixed(1)}%`
+          
+          if (item.progress < 100) {
+            setTimeout(updateProgress, 200)
+          } else {
+            // Download concluído
+            item.status = 'completed'
+            item.message = 'Download concluído com sucesso!'
+            item.speed = null
+            item.eta = null
+            
+            // Atualizar status do arquivo na lista principal
+            const fileIndex = this.cnpjFiles.findIndex(f => f.id === item.id)
+            if (fileIndex !== -1) {
+              this.cnpjFiles[fileIndex].status = 'downloaded'
+            }
+            
+            // Processar próximo item
+            setTimeout(() => this.processDownloadQueue(), 500)
+          }
+        }
+      }
+      
+      updateProgress()
+    },
+    formatSpeed(progressPerSecond) {
+      const mbPerSecond = (progressPerSecond * 2.1) / 100 // 2.1GB = 100%
+      return `${mbPerSecond.toFixed(1)} MB/s`
+    },
+    formatTime(seconds) {
+      if (seconds < 60) {
+        return `${Math.ceil(seconds)}s`
+      } else if (seconds < 3600) {
+        return `${Math.ceil(seconds / 60)}m`
+      } else {
+        return `${Math.ceil(seconds / 3600)}h`
+      }
+    },
+    pauseDownloads() {
+      this.isPaused = true
+      this.isDownloading = false
+    },
+    resumeDownloads() {
+      this.isPaused = false
+      this.isDownloading = true
+      this.processDownloadQueue()
+    },
+    cancelDownloads() {
+      this.isDownloading = false
+      this.isPaused = false
+      
+      // Marcar todos os downloads como cancelados
+      this.downloadQueue.forEach(item => {
+        if (item.status === 'downloading' || item.status === 'pending') {
+          item.status = 'cancelled'
+          item.message = 'Download cancelado'
+        }
+      })
+    },
+    closeDownloadModal() {
+      if (!this.isDownloading) {
+        this.showDownloadModal = false
+        this.downloadQueue = []
+        this.updateFileStats()
+      }
     },
     toggleSelectAll() {
       const availableFiles = this.cnpjFiles.filter(file => file.status === 'available')
@@ -611,7 +849,7 @@ export default {
     },
     downloadFile(file) {
       console.log('Downloading file:', file.filename)
-      // Implementar download individual
+      this.startDownload([file])
     },
     viewFile(file) {
       console.log('Viewing file:', file.filename)
@@ -627,6 +865,16 @@ export default {
         'downloaded': 'BAIXADO',
         'downloading': 'BAIXANDO',
         'error': 'ERRO'
+      }
+      return statusMap[status] || status
+    },
+    getDownloadStatusText(status) {
+      const statusMap = {
+        'pending': 'AGUARDANDO',
+        'downloading': 'BAIXANDO',
+        'completed': 'CONCLUÍDO',
+        'error': 'ERRO',
+        'cancelled': 'CANCELADO'
       }
       return statusMap[status] || status
     },
@@ -659,6 +907,266 @@ export default {
 </script>
 
 <style scoped>
+.download-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+  position: relative;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  color: white;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #475569;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.modal-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.modal-close:hover {
+  color: #e2e8f0;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.download-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+  border: 1px solid #475569;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.summary-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.summary-value.success {
+  color: #22c55e;
+}
+
+.summary-value.info {
+  color: #3b82f6;
+}
+
+.summary-value.error {
+  color: #ef4444;
+}
+
+.download-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.download-item {
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+  border: 1px solid #475569;
+}
+
+.download-item.downloading {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.download-item.completed {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.download-item.error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.download-item.cancelled {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.download-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.download-info {
+  flex: 1;
+}
+
+.filename {
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.25rem;
+  font-family: 'Courier New', monospace;
+}
+
+.filesize {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.download-status {
+  margin-left: 1rem;
+}
+
+.download-progress {
+  margin-bottom: 0.75rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(71, 85, 105, 0.5);
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.completed {
+  background: #22c55e;
+}
+
+.progress-fill.error {
+  background: #ef4444;
+}
+
+.progress-fill.cancelled {
+  background: #f59e0b;
+}
+
+.progress-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.progress-text {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.progress-speed {
+  color: #3b82f6;
+}
+
+.progress-time {
+  color: #94a3b8;
+}
+
+.download-message {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #475569;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.modal-footer .btn-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-footer .btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-footer .btn-action.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.modal-footer .btn-action.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
 .cnpj-controls {
   margin-bottom: 1.5rem;
 }
@@ -846,6 +1354,21 @@ export default {
 .status-badge.error {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
+}
+
+.status-badge.completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.status-badge.pending {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+}
+
+.status-badge.cancelled {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
 }
 
 .table-cell.updated {
