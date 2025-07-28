@@ -11,86 +11,39 @@
     }"
     @refresh="refreshData"
   >
-    <div class="sefaz-grid-layout">
-      <!-- Grid Superior: Status da Fonte e Processamento -->
-      <div class="top-grid">
-        <!-- Status da Fonte -->
-        <div class="service-card status-card">
-          <div class="card-header">
-            <h3>Status da Fonte</h3>
-            <div class="card-icon">
-              <i class="fas fa-signal"></i>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="balance-display">
-              <div class="balance-value">{{ sourceStatus.status }}</div>
-              <div class="balance-label">{{ sourceStatus.description }}</div>
-            </div>
-            <div class="balance-details">
-              <div class="detail-item">
-                <span class="detail-label">Última Sincronização:</span>
-                <span class="detail-value">{{ sourceStatus.lastSync }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Arquivos Baixados:</span>
-                <span class="detail-value">{{ sourceStatus.downloadedFiles }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Taxa de Sucesso:</span>
-                <span class="detail-value">{{ sourceStatus.successRate }}</span>
-              </div>
-            </div>
+    <div class="service-cards">
+      <!-- Status da Fonte -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Status da Fonte</h3>
+          <div class="card-icon">
+            <i class="fas fa-signal"></i>
           </div>
         </div>
-
-        <!-- Processamento de Dados CNPJ -->
-        <div class="service-card processing-card">
-          <div class="card-header">
-            <h3>Processamento de Dados CNPJ</h3>
-            <div class="card-icon">
-              <i class="fas fa-database"></i>
-            </div>
+        <div class="card-content">
+          <div class="balance-display">
+            <div class="balance-value">{{ sourceStatus.status }}</div>
+            <div class="balance-label">{{ sourceStatus.description }}</div>
           </div>
-          <div class="card-content">
-            <div class="processing-controls">
-              <div class="control-buttons">
-                <button @click="setupDatabase" class="btn-action">
-                  <i class="fas fa-database"></i> Configurar Banco
-                </button>
-                <button @click="processAllFiles" class="btn-action" :disabled="!hasDownloadedFiles">
-                  <i class="fas fa-cogs"></i> Processar Todos
-                </button>
-                <button @click="refreshProcessingStatus" class="btn-action">
-                  <i class="fas fa-refresh"></i> Atualizar Status
-                </button>
-              </div>
-              
-              <div class="processing-stats">
-                <div class="stat-item">
-                  <span class="stat-label">Arquivos Processados:</span>
-                  <span class="stat-value success">{{ processingStats.processed }}</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Em Processamento:</span>
-                  <span class="stat-value warning">{{ processingStats.processing || 0 }}</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Pendentes:</span>
-                  <span class="stat-value info">{{ processingStats.pending }}</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Com Erro:</span>
-                  <span class="stat-value error">{{ processingStats.error || 0 }}</span>
-                </div>
-              </div>
+          <div class="balance-details">
+            <div class="detail-item">
+              <span class="detail-label">Última Sincronização:</span>
+              <span class="detail-value">{{ sourceStatus.lastSync }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Arquivos Baixados:</span>
+              <span class="detail-value">{{ sourceStatus.downloadedFiles }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Taxa de Sucesso:</span>
+              <span class="detail-value">{{ sourceStatus.successRate }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Grid Inferior: Controle de Arquivos CNPJ (Ocupa toda a largura) -->
-      <div class="service-card files-card">
+      <!-- Controle de Arquivos CNPJ -->
+      <div class="service-card">
         <div class="card-header">
           <h3>Controle de Arquivos CNPJ</h3>
           <div class="card-icon">
@@ -131,88 +84,93 @@
             </div>
           </div>
 
-          <!-- Tabela com Scroll -->
-          <div class="cnpj-files-table-container">
-            <table class="cnpj-files-table">
-              <thead>
-                <tr>
-                  <th class="checkbox-col">
-                    <input 
-                      type="checkbox" 
-                      :checked="allSelected" 
-                      @change="toggleSelectAll"
-                      :indeterminate="someSelected"
-                    >
-                  </th>
-                  <th>Mês/Ano</th>
-                  <th>Arquivo</th>
-                  <th>Tamanho</th>
-                  <th>Status</th>
-                  <th>Processamento</th>
-                  <th>Última Atualização</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="file in cnpjFiles" :key="file.id" :class="file.status">
-                  <td class="checkbox-col">
-                    <input 
-                      type="checkbox" 
-                      v-model="file.selected"
-                      :disabled="file.status === 'downloaded'"
-                    >
-                  </td>
-                  <td class="month-col">{{ file.monthYear }}</td>
-                  <td class="filename-col">{{ file.filename }}</td>
-                  <td class="size-col">{{ file.size }}</td>
-                  <td class="status-col">
-                    <span class="status-badge" :class="file.status">
-                      {{ getStatusText(file.status) }}
-                    </span>
-                  </td>
-                  <td class="processing-col">
-                    <span class="status-badge" :class="file.processingStatus || 'pending'">
-                      {{ getProcessingStatusText(file.processingStatus) }}
-                    </span>
-                  </td>
-                  <td class="updated-col">{{ file.lastUpdated }}</td>
-                  <td class="actions-col">
-                    <button 
-                      v-if="file.status === 'available'" 
-                      @click="downloadFile(file)"
-                      class="btn-small"
-                      title="Baixar arquivo"
-                    >
-                      <i class="fas fa-download"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
-                      @click="processFile(file)"
-                      class="btn-small"
-                      title="Processar arquivo"
-                    >
-                      <i class="fas fa-cogs"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded'" 
-                      @click="viewFile(file)"
-                      class="btn-small"
-                      title="Visualizar arquivo"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded'" 
-                      @click="deleteFile(file)"
-                      class="btn-small danger"
-                      title="Excluir arquivo"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="cnpj-files-grid">
+            <div v-for="file in cnpjFiles" :key="file.id" class="file-card" :class="file.status">
+              <div class="file-card-header">
+                <div class="file-checkbox">
+                  <input 
+                    type="checkbox" 
+                    v-model="file.selected"
+                    :disabled="file.status === 'downloaded'"
+                  >
+                </div>
+                <div class="file-status">
+                  <span class="status-badge" :class="file.status">
+                    {{ getStatusText(file.status) }}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="file-card-content">
+                <div class="file-info">
+                  <div class="file-name">
+                    <i class="fas fa-file-archive"></i>
+                    {{ file.filename }}
+                  </div>
+                  <div class="file-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Mês/Ano:</span>
+                      <span class="detail-value">{{ file.monthYear }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Tamanho:</span>
+                      <span class="detail-value">{{ file.size }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Processamento:</span>
+                      <span class="detail-value">
+                        <span class="status-badge" :class="file.processingStatus || 'pending'">
+                          {{ getProcessingStatusText(file.processingStatus) }}
+                        </span>
+                      </span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Atualizado:</span>
+                      <span class="detail-value">{{ file.lastUpdated }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="file-actions">
+                  <button 
+                    v-if="file.status === 'available'" 
+                    @click="downloadFile(file)"
+                    class="btn-action btn-small"
+                    title="Baixar arquivo"
+                  >
+                    <i class="fas fa-download"></i>
+                    Baixar
+                  </button>
+                  <button 
+                    v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
+                    @click="processFile(file)"
+                    class="btn-action btn-small"
+                    title="Processar arquivo"
+                  >
+                    <i class="fas fa-cogs"></i>
+                    Processar
+                  </button>
+                  <button 
+                    v-if="file.status === 'downloaded'" 
+                    @click="viewFile(file)"
+                    class="btn-action btn-small"
+                    title="Visualizar arquivo"
+                  >
+                    <i class="fas fa-eye"></i>
+                    Ver
+                  </button>
+                  <button 
+                    v-if="file.status === 'downloaded'" 
+                    @click="deleteFile(file)"
+                    class="btn-action btn-small danger"
+                    title="Excluir arquivo"
+                  >
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
             
             <div v-if="cnpjFiles.length === 0" class="empty-state">
               <div class="empty-icon">
@@ -226,7 +184,129 @@
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Processamento de Dados -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Processamento de Dados CNPJ</h3>
+          <div class="card-icon">
+            <i class="fas fa-database"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="processing-controls">
+            <div class="control-buttons">
+              <button @click="setupDatabase" class="btn-action">
+                <i class="fas fa-database"></i> Configurar Banco
+              </button>
+              <button @click="processAllFiles" class="btn-action" :disabled="!hasDownloadedFiles">
+                <i class="fas fa-cogs"></i> Processar Todos
+              </button>
+              <button @click="refreshProcessingStatus" class="btn-action">
+                <i class="fas fa-sync"></i> Atualizar Status
+              </button>
+            </div>
+            
+            <div class="processing-stats">
+              <div class="stat-item">
+                <span class="stat-label">Arquivos Baixados:</span>
+                <span class="stat-value">{{ processingStats.downloaded }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Processados:</span>
+                <span class="stat-value success">{{ processingStats.processed }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Pendentes:</span>
+                <span class="stat-value warning">{{ processingStats.pending }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Registros no BD:</span>
+                <span class="stat-value info">{{ processingStats.totalRecords }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="processing-log">
+            <h4>Log de Processamento</h4>
+            <div class="log-entries">
+              <div v-for="log in processingLogs" :key="log.id" class="log-entry" :class="log.level">
+                <div class="log-timestamp">{{ log.timestamp }}</div>
+                <div class="log-message">{{ log.message }}</div>
+                <div class="log-level">{{ log.level }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas de Dados -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Métricas de Dados</h3>
+          <div class="card-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="metrics-grid">
+            <div v-for="metric in dataMetrics" :key="metric.id" class="metric-item">
+              <div class="metric-icon">
+                <i :class="metric.icon"></i>
+              </div>
+              <div class="metric-details">
+                <div class="metric-value">{{ metric.value }}</div>
+                <div class="metric-label">{{ metric.label }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configurações -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Configurações</h3>
+          <div class="card-icon">
+            <i class="fas fa-cog"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="config-list">
+            <div v-for="config in configurations" :key="config.id" class="config-item">
+              <div class="config-label">{{ config.name }}</div>
+              <div class="config-value">{{ config.value }}</div>
+              <div class="config-status" :class="config.status">
+                {{ config.statusText }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logs Recentes -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Logs Recentes</h3>
+          <div class="card-icon">
+            <i class="fas fa-list-alt"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="logs-list">
+            <div v-for="log in recentLogs" :key="log.id" :class="`log-item ${log.level}`">
+              <div class="log-icon">
+                <i :class="log.icon"></i>
+              </div>
+              <div class="log-content">
+                <div class="log-title">{{ log.title }}</div>
+                <div class="log-message">{{ log.message }}</div>
+                <div class="log-time">{{ log.timestamp }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Modal de Progresso de Download -->
       <div v-if="showDownloadModal" class="download-modal">
@@ -1822,32 +1902,42 @@ export default {
 }
 
 /* Layout Grid para SEFAZ */
-.sefaz-grid-layout {
+.service-cards {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   height: 100%;
 }
 
-.top-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.status-card,
-.processing-card {
+.service-cards .service-card:nth-child(1),
+.service-cards .service-card:nth-child(2) {
   min-height: 200px;
+  flex: 0 0 auto;
 }
 
-.files-card {
+.service-cards .service-card:nth-child(3) {
   flex: 1;
   min-height: 400px;
 }
 
-/* Tabela com Scroll */
-.cnpj-files-table-container {
+/* Grid para os dois primeiros cards */
+.service-cards .service-card:nth-child(1),
+.service-cards .service-card:nth-child(2) {
+  display: inline-block;
+  width: calc(50% - 0.5rem);
+  vertical-align: top;
+}
+
+.service-cards .service-card:nth-child(1) {
+  margin-right: 0.5rem;
+}
+
+.service-cards .service-card:nth-child(2) {
+  margin-left: 0.5rem;
+}
+
+/* Tabela com Scroll para o terceiro card */
+.cnpj-files-grid {
   max-height: 400px;
   overflow: auto;
   border: 1px solid #475569;
@@ -1950,38 +2040,31 @@ export default {
 }
 
 /* Scroll personalizado */
-.cnpj-files-table-container::-webkit-scrollbar {
+.cnpj-files-grid::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.cnpj-files-table-container::-webkit-scrollbar-track {
+.cnpj-files-grid::-webkit-scrollbar-track {
   background: rgba(15, 23, 42, 0.3);
   border-radius: 4px;
 }
 
-.cnpj-files-table-container::-webkit-scrollbar-thumb {
+.cnpj-files-grid::-webkit-scrollbar-thumb {
   background: #475569;
   border-radius: 4px;
 }
 
-.cnpj-files-table-container::-webkit-scrollbar-thumb:hover {
+.cnpj-files-grid::-webkit-scrollbar-thumb:hover {
   background: #64748b;
-}
-
-/* Status badges na tabela */
-.cnpj-files-table .status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
 }
 
 /* Responsividade */
 @media (max-width: 1200px) {
-  .top-grid {
-    grid-template-columns: 1fr;
+  .service-cards .service-card:nth-child(1),
+  .service-cards .service-card:nth-child(2) {
+    width: 100%;
+    margin: 0 0 1rem 0;
   }
   
   .cnpj-files-table {
@@ -1995,7 +2078,7 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .cnpj-files-table-container {
+  .cnpj-files-grid {
     max-height: 300px;
   }
   
