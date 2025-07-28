@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class CNPJProcessor:
     """Processador de arquivos CNPJ da Receita Federal"""
     
-    def __init__(self, db_url: str = "postgresql+asyncpg://user:password@localhost/canonika"):
+    def __init__(self, db_url: str = "postgresql+asyncpg://canonika:canonika@postgres:5432/canonika"):
         self.db_url = db_url
         self.engine = None
         self.session_factory = None

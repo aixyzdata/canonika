@@ -617,6 +617,7 @@ class FisherService:
             base_url = "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/"
             
             async with aiohttp.ClientSession() as session:
+                # Primeiro, buscar a página principal para encontrar os diretórios
                 async with session.get(base_url) as response:
                     if response.status != 200:
                         raise Exception(f"Erro ao acessar fonte: {response.status}")
@@ -626,35 +627,50 @@ class FisherService:
                     # Usar BeautifulSoup para parsear o HTML
                     soup = BeautifulSoup(html_content, 'html.parser')
                     
-                    # Encontrar links para arquivos ZIP
-                    file_links = []
+                    # Encontrar links para diretórios (pastas)
+                    directory_links = []
                     for link in soup.find_all('a', href=True):
                         href = link.get('href')
-                        if href and href.endswith('.zip') and 'CNPJ' in href:
-                            # Extrair informações do arquivo
-                            filename = href.split('/')[-1]
-                            
-                            # Tentar extrair data do nome do arquivo
-                            date_match = re.search(r'CNPJ_(\d{4})_(\d{2})', filename)
-                            if date_match:
-                                year, month = date_match.groups()
-                                month_year = f"{year}-{month}"
-                            else:
-                                month_year = "N/A"
-                            
-                            # Tentar obter informações do arquivo (tamanho, data)
-                            file_info = {
-                                "filename": filename,
-                                "month_year": month_year,
-                                "size": "~2.0GB",  # Tamanho aproximado
-                                "last_updated": "N/A",
-                                "url": base_url + href
-                            }
-                            
-                            file_links.append(file_info)
+                        if href and href.endswith('/') and href != '/dados/cnpj/':
+                            # Extrair nome do diretório (formato YYYY-MM)
+                            dir_name = href.rstrip('/')
+                            if re.match(r'^\d{4}-\d{2}$', dir_name):
+                                directory_links.append(dir_name)
                     
-                    # Ordenar por data (mais recente primeiro)
-                    file_links.sort(key=lambda x: x['month_year'], reverse=True)
+                    # Ordenar diretórios por data (mais recente primeiro)
+                    directory_links.sort(reverse=True)
+                    
+                    # Buscar arquivos em cada diretório
+                    all_files = []
+                    for dir_name in directory_links[:12]:  # Últimos 12 meses
+                        dir_url = base_url + dir_name + "/"
+                        
+                        try:
+                            async with session.get(dir_url) as dir_response:
+                                if dir_response.status == 200:
+                                    dir_html = await dir_response.text()
+                                    dir_soup = BeautifulSoup(dir_html, 'html.parser')
+                                    
+                                    # Encontrar arquivos ZIP
+                                    for link in dir_soup.find_all('a', href=True):
+                                        href = link.get('href')
+                                        if href and href.endswith('.zip'):
+                                            filename = href
+                                            
+                                            # Extrair informações do arquivo
+                                            file_info = {
+                                                "filename": filename,
+                                                "month_year": dir_name,
+                                                "size": "~100MB",  # Tamanho aproximado
+                                                "last_updated": "N/A",
+                                                "url": dir_url + filename,
+                                                "directory": dir_name
+                                            }
+                                            
+                                            all_files.append(file_info)
+                        except Exception as e:
+                            logger.warning(f"Erro ao acessar diretório {dir_name}: {str(e)}")
+                            continue
                     
                     # Verificar arquivos baixados localmente
                     cnpj_dir = self.data_dir / "cnpj"
@@ -667,7 +683,7 @@ class FisherService:
                     
                     # Mapear status de cada arquivo
                     files_status = []
-                    for file_info in file_links:
+                    for file_info in all_files:
                         filename = file_info["filename"]
                         is_downloaded = filename in downloaded_files
                         
@@ -678,14 +694,15 @@ class FisherService:
                             "last_updated": file_info["last_updated"],
                             "status": "downloaded" if is_downloaded else "available",
                             "local_path": str(cnpj_dir / filename) if is_downloaded else None,
-                            "url": file_info["url"]
+                            "url": file_info["url"],
+                            "directory": file_info["directory"]
                         })
                     
                     return {
                         "status": "success",
-                        "total_available": len(file_links),
+                        "total_available": len(all_files),
                         "downloaded": len(downloaded_files),
-                        "missing": len(file_links) - len(downloaded_files),
+                        "missing": len(all_files) - len(downloaded_files),
                         "files": files_status,
                         "source_url": base_url,
                         "last_check": datetime.now().isoformat()
@@ -698,6 +715,14 @@ class FisherService:
                 "error": str(e),
                 "message": "Falha ao conectar com fonte oficial"
             }
+
+class CNPJProcessor:
+    """Processador de arquivos CNPJ da Receita Federal"""
+    
+    def __init__(self, db_url: str = "postgresql+asyncpg://canonika:canonika@postgres:5432/canonika"):
+        self.db_url = db_url
+        self.engine = None
+        self.session_factory = None
 
 # Instância global do serviço
 fisher_service = FisherService()

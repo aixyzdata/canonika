@@ -35,6 +35,18 @@ services:
       - redis
     restart: unless-stopped
 
+  fisher:
+    build: ./fisher
+    container_name: canonika_fisher
+    ports:
+      - "7724:7724"
+    volumes:
+      - ./fisher/api:/app
+      - fisher_data:/app/data
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
   skipper:
     build: ./skipper
     container_name: canonika_skipper
@@ -75,4 +87,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  pgdata: 
+  pgdata:
+  fisher_data: 
