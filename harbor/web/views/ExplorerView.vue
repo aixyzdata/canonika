@@ -289,133 +289,135 @@
   </div>
 
   <!-- Modal de Detalhes do Produto -->
-  <div v-if="showProductDetails && selectedProduct" class="product-details-modal">
-    <div class="modal-overlay" @click="closeProductDetails"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-box"></i> {{ selectedProduct.name }}</h3>
-        <button @click="closeProductDetails" class="close-modal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <div class="product-info-grid">
-          <!-- Informações Básicas -->
-          <div class="info-section">
-            <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">EAN:</span>
-                <span class="value">{{ selectedProduct.ean }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">SKU:</span>
-                <span class="value">{{ selectedProduct.sku || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Marca:</span>
-                <span class="value">{{ selectedProduct.brand || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Fabricante:</span>
-                <span class="value">{{ selectedProduct.manufacturer || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Categoria:</span>
-                <span class="value">{{ selectedProduct.category || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Status:</span>
-                <span class="value status-badge">{{ selectedProduct.status || 'Ativo' }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Especificações Técnicas -->
-          <div class="info-section">
-            <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">NCM:</span>
-                <span class="value">{{ selectedProduct.ncm || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">CEST:</span>
-                <span class="value">{{ selectedProduct.cest || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Dimensões:</span>
-                <span class="value">{{ selectedProduct.length_cm }}×{{ selectedProduct.width_cm }}×{{ selectedProduct.height_cm }}cm</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Peso:</span>
-                <span class="value">{{ selectedProduct.weight_kg }}kg</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Material:</span>
-                <span class="value">{{ selectedProduct.material || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Cor:</span>
-                <span class="value">{{ selectedProduct.color || 'N/A' }}</span>
+  <Teleport to="body">
+    <div v-if="showProductDetails && selectedProduct" class="product-details-modal">
+      <div class="modal-overlay" @click="closeProductDetails"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-box"></i> {{ selectedProduct.name }}</h3>
+          <button @click="closeProductDetails" class="close-modal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="product-info-grid">
+            <!-- Informações Básicas -->
+            <div class="info-section">
+              <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">EAN:</span>
+                  <span class="value">{{ selectedProduct.ean }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">SKU:</span>
+                  <span class="value">{{ selectedProduct.sku || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Marca:</span>
+                  <span class="value">{{ selectedProduct.brand || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Fabricante:</span>
+                  <span class="value">{{ selectedProduct.manufacturer || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Categoria:</span>
+                  <span class="value">{{ selectedProduct.category || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Status:</span>
+                  <span class="value status-badge">{{ selectedProduct.status || 'Ativo' }}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Características -->
-          <div class="info-section">
-            <h4><i class="fas fa-tags"></i> Características</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Tamanho:</span>
-                <span class="value">{{ selectedProduct.size || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Gênero:</span>
-                <span class="value">{{ selectedProduct.gender || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Faixa Etária:</span>
-                <span class="value">{{ selectedProduct.age_group || 'N/A' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Subcategorias:</span>
-                <span class="value">{{ selectedProduct.subcategories ? selectedProduct.subcategories.join(', ') : 'N/A' }}</span>
+            <!-- Especificações Técnicas -->
+            <div class="info-section">
+              <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">NCM:</span>
+                  <span class="value">{{ selectedProduct.ncm || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">CEST:</span>
+                  <span class="value">{{ selectedProduct.cest || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Dimensões:</span>
+                  <span class="value">{{ selectedProduct.length_cm }}×{{ selectedProduct.width_cm }}×{{ selectedProduct.height_cm }}cm</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Peso:</span>
+                  <span class="value">{{ selectedProduct.weight_kg }}kg</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Material:</span>
+                  <span class="value">{{ selectedProduct.material || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Cor:</span>
+                  <span class="value">{{ selectedProduct.color || 'N/A' }}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Tags -->
-          <div v-if="selectedProduct.tags && selectedProduct.tags.length > 0" class="info-section">
-            <h4><i class="fas fa-tags"></i> Tags</h4>
-            <div class="tags-container">
-              <span v-for="tag in selectedProduct.tags" :key="tag" class="tag">
-                {{ tag }}
-              </span>
+            <!-- Características -->
+            <div class="info-section">
+              <h4><i class="fas fa-tags"></i> Características</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Tamanho:</span>
+                  <span class="value">{{ selectedProduct.size || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Gênero:</span>
+                  <span class="value">{{ selectedProduct.gender || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Faixa Etária:</span>
+                  <span class="value">{{ selectedProduct.age_group || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Subcategorias:</span>
+                  <span class="value">{{ selectedProduct.subcategories ? selectedProduct.subcategories.join(', ') : 'N/A' }}</span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Descrição -->
-          <div v-if="selectedProduct.description" class="info-section">
-            <h4><i class="fas fa-align-left"></i> Descrição</h4>
-            <p class="description">{{ selectedProduct.description }}</p>
-          </div>
+            <!-- Tags -->
+            <div v-if="selectedProduct.tags && selectedProduct.tags.length > 0" class="info-section">
+              <h4><i class="fas fa-tags"></i> Tags</h4>
+              <div class="tags-container">
+                <span v-for="tag in selectedProduct.tags" :key="tag" class="tag">
+                  {{ tag }}
+                </span>
+              </div>
+            </div>
 
-          <!-- Atualização -->
-          <div class="info-section">
-            <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Última Atualização:</span>
-                <span class="value">{{ formatDate(selectedProduct.updated_at) }}</span>
+            <!-- Descrição -->
+            <div v-if="selectedProduct.description" class="info-section">
+              <h4><i class="fas fa-align-left"></i> Descrição</h4>
+              <p class="description">{{ selectedProduct.description }}</p>
+            </div>
+
+            <!-- Atualização -->
+            <div class="info-section">
+              <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Última Atualização:</span>
+                  <span class="value">{{ formatDate(selectedProduct.updated_at) }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script>
