@@ -84,82 +84,101 @@
             </div>
           </div>
 
-          <div class="cnpj-files-table">
-            <div class="table-header">
-              <div class="header-cell checkbox">
-                <input 
-                  type="checkbox" 
-                  :checked="allSelected" 
-                  @change="toggleSelectAll"
-                  :indeterminate="someSelected"
-                >
-              </div>
-              <div class="header-cell">Mês/Ano</div>
-              <div class="header-cell">Arquivo</div>
-              <div class="header-cell">Tamanho</div>
-              <div class="header-cell">Status</div>
-              <div class="header-cell">Processamento</div>
-              <div class="header-cell">Última Atualização</div>
-              <div class="header-cell">Ações</div>
-            </div>
-            
-            <div class="table-body">
-              <div v-for="file in cnpjFiles" :key="file.id" class="table-row" :class="file.status">
-                <div class="table-cell checkbox">
+          <div class="cnpj-files-grid">
+            <div v-for="file in cnpjFiles" :key="file.id" class="file-card" :class="file.status">
+              <div class="file-card-header">
+                <div class="file-checkbox">
                   <input 
                     type="checkbox" 
                     v-model="file.selected"
                     :disabled="file.status === 'downloaded'"
                   >
                 </div>
-                <div class="table-cell month">{{ file.monthYear }}</div>
-                <div class="table-cell filename">{{ file.filename }}</div>
-                <div class="table-cell size">{{ file.size }}</div>
-                <div class="table-cell status">
+                <div class="file-status">
                   <span class="status-badge" :class="file.status">
                     {{ getStatusText(file.status) }}
                   </span>
                 </div>
-                <div class="table-cell processing">
-                  <span class="status-badge" :class="file.processingStatus || 'pending'">
-                    {{ getProcessingStatusText(file.processingStatus) }}
-                  </span>
+              </div>
+              
+              <div class="file-card-content">
+                <div class="file-info">
+                  <div class="file-name">
+                    <i class="fas fa-file-archive"></i>
+                    {{ file.filename }}
+                  </div>
+                  <div class="file-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Mês/Ano:</span>
+                      <span class="detail-value">{{ file.monthYear }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Tamanho:</span>
+                      <span class="detail-value">{{ file.size }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Processamento:</span>
+                      <span class="detail-value">
+                        <span class="status-badge" :class="file.processingStatus || 'pending'">
+                          {{ getProcessingStatusText(file.processingStatus) }}
+                        </span>
+                      </span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Atualizado:</span>
+                      <span class="detail-value">{{ file.lastUpdated }}</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="table-cell updated">{{ file.lastUpdated }}</div>
-                <div class="table-cell actions">
+                
+                <div class="file-actions">
                   <button 
                     v-if="file.status === 'available'" 
                     @click="downloadFile(file)"
-                    class="btn-small"
+                    class="btn-action btn-small"
                     title="Baixar arquivo"
                   >
                     <i class="fas fa-download"></i>
+                    Baixar
                   </button>
                   <button 
                     v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
                     @click="processFile(file)"
-                    class="btn-small"
+                    class="btn-action btn-small"
                     title="Processar arquivo"
                   >
                     <i class="fas fa-cogs"></i>
+                    Processar
                   </button>
                   <button 
                     v-if="file.status === 'downloaded'" 
                     @click="viewFile(file)"
-                    class="btn-small"
+                    class="btn-action btn-small"
                     title="Visualizar arquivo"
                   >
                     <i class="fas fa-eye"></i>
+                    Ver
                   </button>
                   <button 
                     v-if="file.status === 'downloaded'" 
                     @click="deleteFile(file)"
-                    class="btn-small danger"
+                    class="btn-action btn-small danger"
                     title="Excluir arquivo"
                   >
                     <i class="fas fa-trash"></i>
+                    Excluir
                   </button>
                 </div>
+              </div>
+            </div>
+            
+            <div v-if="cnpjFiles.length === 0" class="empty-state">
+              <div class="empty-icon">
+                <i class="fas fa-folder-open"></i>
+              </div>
+              <div class="empty-text">
+                <h4>Nenhum arquivo encontrado</h4>
+                <p>Clique em "Atualizar Lista" para buscar arquivos CNPJ disponíveis</p>
               </div>
             </div>
           </div>
@@ -1491,92 +1510,121 @@ export default {
   color: #3b82f6;
 }
 
-.cnpj-files-table {
+.cnpj-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+  gap: 1rem;
+  padding: 0.5rem; /* Add some padding to the grid */
+}
+
+.file-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.3);
   border: 1px solid #475569;
   border-radius: 0.5rem;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.table-header {
-  display: grid;
-  grid-template-columns: 50px 100px 1fr 100px 120px 150px 100px;
+.file-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.file-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
   background: rgba(15, 23, 42, 0.5);
   border-bottom: 1px solid #475569;
-  font-weight: 600;
-  color: #e2e8f0;
 }
 
-.header-cell {
-  padding: 0.75rem;
+.file-checkbox {
+  flex: 0 0 30px; /* Fixed width for checkbox */
   display: flex;
   align-items: center;
-}
-
-.header-cell.checkbox {
   justify-content: center;
 }
 
-.table-body {
-  max-height: 400px;
-  overflow-y: auto;
+.file-status {
+  flex: 1;
+  text-align: right;
 }
 
-.table-row {
-  display: grid;
-  grid-template-columns: 50px 100px 1fr 100px 120px 150px 100px;
-  border-bottom: 1px solid #475569;
-  transition: background-color 0.2s;
+.file-card-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  flex-grow: 1; /* Allow content to grow and take available space */
 }
 
-.table-row:hover {
-  background: rgba(15, 23, 42, 0.2);
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
 }
 
-.table-row.downloaded {
-  background: rgba(34, 197, 94, 0.05);
-}
-
-.table-row.available {
-  background: rgba(59, 130, 246, 0.05);
-}
-
-.table-row.downloading {
-  background: rgba(245, 158, 11, 0.05);
-}
-
-.table-row.error {
-  background: rgba(239, 68, 68, 0.05);
-}
-
-.table-cell {
-  padding: 0.75rem;
+.file-name {
+  font-weight: 600;
+  color: #e2e8f0;
   display: flex;
   align-items: center;
-  color: #e2e8f0;
-  font-size: 0.875rem;
+  gap: 0.5rem;
+  font-family: 'Courier New', monospace;
 }
 
-.table-cell.checkbox {
-  justify-content: center;
-}
-
-.table-cell.month {
-  font-weight: 600;
+.file-name i {
   color: #3b82f6;
 }
 
-.table-cell.filename {
-  font-family: 'Courier New', monospace;
-  color: #cbd5e1;
-}
-
-.table-cell.size {
+.file-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.875rem;
   color: #94a3b8;
-  font-size: 0.75rem;
 }
 
-.table-cell.status {
-  justify-content: center;
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  font-weight: 600;
+}
+
+.file-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  grid-column: 1 / -1; /* Span across all columns */
+  text-align: center;
+  padding: 2rem 0;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-text h4 {
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+}
+
+.empty-text p {
+  font-size: 0.9rem;
 }
 
 .status-badge {
@@ -1622,14 +1670,35 @@ export default {
   color: #f59e0b;
 }
 
-.table-cell.updated {
-  color: #94a3b8;
-  font-size: 0.75rem;
+.status-badge.processed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
 }
 
-.table-cell.actions {
-  justify-content: center;
-  gap: 0.25rem;
+.status-badge.processing {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+/* Card status colors */
+.file-card.downloaded {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.02);
+}
+
+.file-card.available {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.02);
+}
+
+.file-card.downloading {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.02);
+}
+
+.file-card.error {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.02);
 }
 
 .btn-small {
@@ -1641,6 +1710,9 @@ export default {
   cursor: pointer;
   font-size: 0.75rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .btn-small:hover {
