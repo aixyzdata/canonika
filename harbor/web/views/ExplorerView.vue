@@ -1,165 +1,153 @@
 <template>
-  <div class="canonika-view">
-    <CanonikaViewTemplate
-      title="Explorer"
-      description="Pesquise e explore informações"
-      icon="fa-search"
-    >
-      <div class="explorer-content">
-        <!-- Logo e Título -->
-        <div class="explorer-header">
-          <div class="explorer-logo">
-            <i class="fas fa-compass"></i>
-            <span class="logo-text">Explorer</span>
-          </div>
-          <p class="explorer-subtitle">Descubra o que você procura</p>
+  <div class="explorer-view">
+    <div class="explorer-content">
+      <!-- Logo e Título -->
+      <div class="explorer-header">
+        <div class="explorer-logo">
+          <i class="fas fa-compass"></i>
+          <span class="logo-text">Explorer</span>
         </div>
+        <p class="explorer-subtitle">Descubra o que você procura</p>
+      </div>
 
-        <!-- Barra de Pesquisa -->
-        <div class="search-container">
-          <div class="search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input
-              v-model="searchQuery"
-              @keyup.enter="performSearch"
-              @input="handleSearchInput"
-              type="text"
-              class="search-input"
-              placeholder="Digite sua pesquisa..."
-              autocomplete="off"
-            />
-            <button
-              v-if="searchQuery"
-              @click="clearSearch"
-              class="clear-button"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          
-          <!-- Botões de Ação -->
-          <div class="search-actions">
-            <button @click="performSearch" class="search-button">
-              <i class="fas fa-search"></i>
-              Pesquisar
-            </button>
-            <button @click="performAdvancedSearch" class="advanced-button">
-              <i class="fas fa-cog"></i>
-              Pesquisa Avançada
-            </button>
-          </div>
+      <!-- Barra de Pesquisa -->
+      <div class="search-container">
+        <div class="search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            v-model="searchQuery"
+            @keyup.enter="performSearch"
+            @input="handleSearchInput"
+            type="text"
+            class="search-input"
+            placeholder="Digite sua pesquisa..."
+            autocomplete="off"
+          />
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="clear-button"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+        
+        <!-- Botões de Ação -->
+        <div class="search-actions">
+          <button @click="performSearch" class="search-button">
+            <i class="fas fa-search"></i>
+            Pesquisar
+          </button>
+          <button @click="performAdvancedSearch" class="advanced-button">
+            <i class="fas fa-cog"></i>
+            Pesquisa Avançada
+          </button>
+        </div>
+      </div>
 
-        <!-- Sugestões de Pesquisa -->
-        <div v-if="searchSuggestions.length > 0 && !searchResults.length" class="suggestions-container">
-          <h3>Sugestões</h3>
-          <div class="suggestions-list">
-            <div
-              v-for="suggestion in searchSuggestions"
-              :key="suggestion"
-              @click="selectSuggestion(suggestion)"
-              class="suggestion-item"
-            >
-              <i class="fas fa-lightbulb"></i>
-              <span>{{ suggestion }}</span>
-            </div>
+      <!-- Sugestões de Pesquisa -->
+      <div v-if="searchSuggestions.length > 0 && !searchResults.length" class="suggestions-container">
+        <h3>Sugestões</h3>
+        <div class="suggestions-list">
+          <div
+            v-for="suggestion in searchSuggestions"
+            :key="suggestion"
+            @click="selectSuggestion(suggestion)"
+            class="suggestion-item"
+          >
+            <i class="fas fa-lightbulb"></i>
+            <span>{{ suggestion }}</span>
           </div>
         </div>
+      </div>
 
-        <!-- Resultados da Pesquisa -->
-        <div v-if="searchResults.length > 0" class="results-container">
-          <div class="results-header">
-            <h3>Resultados da Pesquisa</h3>
-            <span class="results-count">{{ searchResults.length }} resultados encontrados</span>
-          </div>
-          
-          <div class="results-list">
-            <div
-              v-for="(result, index) in searchResults"
-              :key="index"
-              class="result-item"
-            >
-              <div class="result-title">
-                <a :href="result.url" target="_blank">{{ result.title }}</a>
-              </div>
-              <div class="result-url">{{ result.url }}</div>
-              <div class="result-description">{{ result.description }}</div>
-              <div class="result-meta">
-                <span class="result-type">{{ result.type }}</span>
-                <span class="result-date">{{ result.date }}</span>
-              </div>
-            </div>
-          </div>
+      <!-- Resultados da Pesquisa -->
+      <div v-if="searchResults.length > 0" class="results-container">
+        <div class="results-header">
+          <h3>Resultados da Pesquisa</h3>
+          <span class="results-count">{{ searchResults.length }} resultados encontrados</span>
         </div>
-
-        <!-- Histórico de Pesquisas -->
-        <div v-if="!searchQuery && !searchResults.length" class="history-container">
-          <h3>Pesquisas Recentes</h3>
-          <div class="history-list">
-            <div
-              v-for="(item, index) in searchHistory"
-              :key="index"
-              @click="loadHistoryItem(item)"
-              class="history-item"
-            >
-              <i class="fas fa-history"></i>
-              <span>{{ item.query }}</span>
-              <span class="history-date">{{ item.date }}</span>
+        
+        <div class="results-list">
+          <div
+            v-for="(result, index) in searchResults"
+            :key="index"
+            class="result-item"
+          >
+            <div class="result-title">
+              <a :href="result.url" target="_blank">{{ result.title }}</a>
             </div>
-          </div>
-        </div>
-
-        <!-- Filtros Avançados -->
-        <div v-if="showAdvancedFilters" class="filters-container">
-          <h3>Filtros Avançados</h3>
-          <div class="filters-grid">
-            <div class="filter-group">
-              <label>Tipo de Conteúdo</label>
-              <select v-model="filters.contentType" class="filter-select">
-                <option value="">Todos os tipos</option>
-                <option value="web">Páginas Web</option>
-                <option value="images">Imagens</option>
-                <option value="videos">Vídeos</option>
-                <option value="documents">Documentos</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Período</label>
-              <select v-model="filters.timeRange" class="filter-select">
-                <option value="">Qualquer data</option>
-                <option value="day">Últimas 24 horas</option>
-                <option value="week">Última semana</option>
-                <option value="month">Último mês</option>
-                <option value="year">Último ano</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Idioma</label>
-              <select v-model="filters.language" class="filter-select">
-                <option value="">Todos os idiomas</option>
-                <option value="pt">Português</option>
-                <option value="en">Inglês</option>
-                <option value="es">Espanhol</option>
-              </select>
+            <div class="result-url">{{ result.url }}</div>
+            <div class="result-description">{{ result.description }}</div>
+            <div class="result-meta">
+              <span class="result-type">{{ result.type }}</span>
+              <span class="result-date">{{ result.date }}</span>
             </div>
           </div>
         </div>
       </div>
-    </CanonikaViewTemplate>
+
+      <!-- Histórico de Pesquisas -->
+      <div v-if="!searchQuery && !searchResults.length" class="history-container">
+        <h3>Pesquisas Recentes</h3>
+        <div class="history-list">
+          <div
+            v-for="(item, index) in searchHistory"
+            :key="index"
+            @click="loadHistoryItem(item)"
+            class="history-item"
+          >
+            <i class="fas fa-history"></i>
+            <span>{{ item.query }}</span>
+            <span class="history-date">{{ item.date }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros Avançados -->
+      <div v-if="showAdvancedFilters" class="filters-container">
+        <h3>Filtros Avançados</h3>
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>Tipo de Conteúdo</label>
+            <select v-model="filters.contentType" class="filter-select">
+              <option value="">Todos os tipos</option>
+              <option value="web">Páginas Web</option>
+              <option value="images">Imagens</option>
+              <option value="videos">Vídeos</option>
+              <option value="documents">Documentos</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>Período</label>
+            <select v-model="filters.timeRange" class="filter-select">
+              <option value="">Qualquer data</option>
+              <option value="day">Últimas 24 horas</option>
+              <option value="week">Última semana</option>
+              <option value="month">Último mês</option>
+              <option value="year">Último ano</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>Idioma</label>
+            <select v-model="filters.language" class="filter-select">
+              <option value="">Todos os idiomas</option>
+              <option value="pt">Português</option>
+              <option value="en">Inglês</option>
+              <option value="es">Espanhol</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import CanonikaViewTemplate from '../../../shared/templates/CanonikaViewTemplate.vue'
-import '../../../shared/styles/canonika-view.css'
-
 export default {
   name: 'ExplorerView',
-  components: {
-    CanonikaViewTemplate
-  },
   data() {
     return {
       searchQuery: '',
@@ -277,10 +265,22 @@ export default {
 </script>
 
 <style scoped>
+.explorer-view {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
 .explorer-content {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  padding: 60px 40px;
 }
 
 .explorer-header {
@@ -560,7 +560,7 @@ export default {
 /* Responsive */
 @media (max-width: 768px) {
   .explorer-content {
-    padding: 20px 15px;
+    padding: 40px 20px;
   }
   
   .logo-text {
