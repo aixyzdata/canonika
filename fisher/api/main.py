@@ -453,11 +453,18 @@ class FisherService:
             
             # Usar a URL completa do arquivo
             file_url = file_info["url"]
+            month_year = file_info["month_year"]  # Formato: YYYY-MM
             
-            # Diretório local
+            # Criar estrutura de diretórios: data/cnpj/YYYY/MM/
             cnpj_dir = self.data_dir / "cnpj"
-            cnpj_dir.mkdir(exist_ok=True)
-            local_path = cnpj_dir / filename
+            year_dir = cnpj_dir / month_year.split('-')[0]  # Ano
+            month_dir = year_dir / month_year.split('-')[1]  # Mês
+            
+            # Criar diretórios se não existirem
+            month_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Caminho local do arquivo
+            local_path = month_dir / filename
             
             # Inicializar progresso
             download_id = f"download_{filename}_{datetime.now().timestamp()}"
@@ -531,27 +538,34 @@ class FisherService:
                     "status": "completed",
                     "progress": 100,
                     "message": "Download concluído com sucesso!",
-                    "speed": None,
-                    "eta": None
+                    "local_path": str(local_path),
+                    "month_year": month_year,
+                    "directory": str(month_dir)
                 })
                 
+                # Broadcast conclusão
                 await self.broadcast_progress(download_id)
+                
+                logger.info(f"✅ Download concluído: {filename} -> {local_path}")
                 
                 return {
                     "status": "success",
                     "filename": filename,
                     "local_path": str(local_path),
+                    "month_year": month_year,
+                    "directory": str(month_dir),
                     "size_bytes": total_size,
                     "download_id": download_id
                 }
                 
         except Exception as e:
-            logger.error(f"Erro no download de {filename}: {str(e)}")
+            logger.error(f"❌ Erro no download de {filename}: {str(e)}")
             
+            # Atualizar progresso com erro
             if download_id in self.download_progress:
                 self.download_progress[download_id].update({
                     "status": "error",
-                    "message": f"Erro no download: {str(e)}"
+                    "message": f"Erro: {str(e)}"
                 })
                 await self.broadcast_progress(download_id)
             
@@ -613,21 +627,52 @@ class FisherService:
         """Deleta um arquivo CNPJ baixado"""
         try:
             cnpj_dir = self.data_dir / "cnpj"
-            file_path = cnpj_dir / filename
             
-            if file_path.exists():
+            # Buscar o arquivo na estrutura de pastas ano/mês
+            file_found = False
+            file_path = None
+            
+            if cnpj_dir.exists():
+                for year_dir in cnpj_dir.iterdir():
+                    if year_dir.is_dir() and year_dir.name.isdigit():
+                        for month_dir in year_dir.iterdir():
+                            if month_dir.is_dir() and month_dir.name.isdigit():
+                                potential_path = month_dir / filename
+                                if potential_path.exists():
+                                    file_path = potential_path
+                                    file_found = True
+                                    break
+                        if file_found:
+                            break
+            
+            if file_path and file_path.exists():
                 file_path.unlink()
+                
+                # Verificar se o diretório ficou vazio e removê-lo se necessário
+                month_dir = file_path.parent
+                year_dir = month_dir.parent
+                
+                if not any(month_dir.iterdir()):
+                    month_dir.rmdir()
+                    logger.info(f"📁 Diretório vazio removido: {month_dir}")
+                
+                if not any(year_dir.iterdir()):
+                    year_dir.rmdir()
+                    logger.info(f"📁 Diretório vazio removido: {year_dir}")
+                
                 return {
                     "status": "success",
-                    "message": f"Arquivo {filename} deletado com sucesso"
+                    "message": f"Arquivo {filename} deletado com sucesso",
+                    "deleted_path": str(file_path)
                 }
             else:
                 return {
                     "status": "error",
-                    "message": f"Arquivo {filename} não encontrado"
+                    "message": f"Arquivo {filename} não encontrado na estrutura de pastas"
                 }
                 
         except Exception as e:
+            logger.error(f"❌ Erro ao deletar arquivo {filename}: {str(e)}")
             return {
                 "status": "error",
                 "message": f"Erro ao deletar arquivo: {str(e)}"
@@ -695,20 +740,31 @@ class FisherService:
                             logger.warning(f"Erro ao acessar diretório {dir_name}: {str(e)}")
                             continue
                     
-                    # Verificar arquivos baixados localmente
+                    # Verificar arquivos baixados localmente na nova estrutura
                     cnpj_dir = self.data_dir / "cnpj"
                     cnpj_dir.mkdir(exist_ok=True)
                     
                     downloaded_files = []
                     if cnpj_dir.exists():
-                        for file_path in cnpj_dir.glob("*.zip"):
-                            downloaded_files.append(file_path.name)
+                        # Buscar arquivos na estrutura: data/cnpj/YYYY/MM/
+                        for year_dir in cnpj_dir.iterdir():
+                            if year_dir.is_dir() and year_dir.name.isdigit():
+                                for month_dir in year_dir.iterdir():
+                                    if month_dir.is_dir() and month_dir.name.isdigit():
+                                        for file_path in month_dir.glob("*.zip"):
+                                            downloaded_files.append(file_path.name)
                     
                     # Mapear status de cada arquivo
                     files_status = []
                     for file_info in all_files:
                         filename = file_info["filename"]
-                        is_downloaded = filename in downloaded_files
+                        month_year = file_info["month_year"]
+                        
+                        # Verificar se arquivo está baixado na estrutura correta
+                        year = month_year.split('-')[0]
+                        month = month_year.split('-')[1]
+                        expected_path = cnpj_dir / year / month / filename
+                        is_downloaded = expected_path.exists()
                         
                         files_status.append({
                             "filename": filename,
@@ -716,9 +772,11 @@ class FisherService:
                             "size": file_info["size"],
                             "last_updated": file_info["last_updated"],
                             "status": "downloaded" if is_downloaded else "available",
-                            "local_path": str(cnpj_dir / filename) if is_downloaded else None,
+                            "local_path": str(expected_path) if is_downloaded else None,
                             "url": file_info["url"],
-                            "directory": file_info["directory"]
+                            "directory": file_info["directory"],
+                            "year": year,
+                            "month": month
                         })
                     
                     return {
@@ -796,14 +854,26 @@ async def get_download_progress(download_id: str):
 async def process_cnpj_file(filename: str):
     """Processa um arquivo CNPJ baixado"""
     try:
-        # Verificar se arquivo existe
+        # Buscar arquivo na nova estrutura de pastas
         cnpj_dir = fisher_service.data_dir / "cnpj"
-        file_path = cnpj_dir / filename
+        file_path = None
         
-        if not file_path.exists():
+        if cnpj_dir.exists():
+            for year_dir in cnpj_dir.iterdir():
+                if year_dir.is_dir() and year_dir.name.isdigit():
+                    for month_dir in year_dir.iterdir():
+                        if month_dir.is_dir() and month_dir.name.isdigit():
+                            potential_path = month_dir / filename
+                            if potential_path.exists():
+                                file_path = potential_path
+                                break
+                    if file_path:
+                        break
+        
+        if not file_path or not file_path.exists():
             return {
                 "status": "error",
-                "message": f"Arquivo {filename} não encontrado"
+                "message": f"Arquivo {filename} não encontrado na estrutura de pastas"
             }
         
         # Inicializar processador se necessário
@@ -827,14 +897,22 @@ async def process_cnpj_file(filename: str):
 async def process_all_cnpj_files():
     """Processa todos os arquivos CNPJ baixados"""
     try:
-        # Verificar arquivos baixados
+        # Verificar arquivos baixados na nova estrutura
         cnpj_dir = fisher_service.data_dir / "cnpj"
-        downloaded_files = list(cnpj_dir.glob("*.zip"))
+        downloaded_files = []
+        
+        if cnpj_dir.exists():
+            for year_dir in cnpj_dir.iterdir():
+                if year_dir.is_dir() and year_dir.name.isdigit():
+                    for month_dir in year_dir.iterdir():
+                        if month_dir.is_dir() and month_dir.name.isdigit():
+                            for file_path in month_dir.glob("*.zip"):
+                                downloaded_files.append(file_path)
         
         if not downloaded_files:
             return {
                 "status": "error",
-                "message": "Nenhum arquivo CNPJ baixado encontrado"
+                "message": "Nenhum arquivo CNPJ baixado encontrado na estrutura de pastas"
             }
         
         # Inicializar processador se necessário
