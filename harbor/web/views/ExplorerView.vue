@@ -165,10 +165,10 @@
             <h3>Pesquise Produtos Canônicos</h3>
             <p>Digite o nome, EAN, SKU ou descrição do produto que deseja encontrar</p>
             <div class="search-suggestions">
-              <span class="suggestion">iPhone 15 Pro</span>
-              <span class="suggestion">Samsung Galaxy</span>
-              <span class="suggestion">MacBook Air</span>
-              <span class="suggestion">190199267471</span>
+              <span class="suggestion" @click="selectSuggestion('iPhone 15 Pro')">iPhone 15 Pro</span>
+              <span class="suggestion" @click="selectSuggestion('Samsung Galaxy')">Samsung Galaxy</span>
+              <span class="suggestion" @click="selectSuggestion('MacBook Air')">MacBook Air</span>
+              <span class="suggestion" @click="selectSuggestion('190199267471')">190199267471</span>
             </div>
           </div>
         </div>
@@ -549,6 +549,18 @@ export default {
       this.showProductDetails = true
       console.log('🔍 showProductDetails depois:', this.showProductDetails)
       console.log('🔍 selectedProduct:', this.selectedProduct)
+      
+      // Debug adicional
+      setTimeout(() => {
+        console.log('🔍 showProductDetails após timeout:', this.showProductDetails)
+        console.log('🔍 Modal deveria estar visível:', this.showProductDetails)
+      }, 100)
+    },
+
+    selectSuggestion(suggestion) {
+      console.log('🔍 Sugestão selecionada:', suggestion)
+      this.searchQuery = suggestion
+      this.performProductSearch()
     },
 
     closeProductDetails() {
@@ -1580,64 +1592,64 @@ export default {
     grid-template-columns: 1fr;
   }
   
-  /* Modal de Detalhes do Produto */
-   .modal-overlay {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background: rgba(0, 0, 0, 0.5);
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     z-index: 1000;
-   }
+    /* Modal de Detalhes do Produto */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
 
-   .modal-content {
-     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-     border: 1px solid #475569;
-     border-radius: 0.5rem;
-     width: 90%;
-     max-width: 800px;
-     max-height: 90vh;
-     overflow-y: auto;
-   }
+  .modal-content {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border: 1px solid #475569;
+    border-radius: 0.5rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 
-   .modal-header {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 1.5rem;
-     border-bottom: 1px solid #475569;
-   }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #475569;
+  }
 
-   .modal-title {
-     font-size: 1.25rem;
-     font-weight: 600;
-     color: #e2e8f0;
-     margin: 0;
-     display: flex;
-     align-items: center;
-     gap: 0.5rem;
-   }
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-   .modal-close {
-     background: none;
-     border: none;
-     color: #94a3b8;
-     font-size: 1.25rem;
-     cursor: pointer;
-     padding: 0.25rem;
-   }
+  .modal-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
 
-   .modal-close:hover {
-     color: #e2e8f0;
-   }
+  .modal-close:hover {
+    color: #e2e8f0;
+  }
 
-   .modal-body {
-     padding: 1.5rem;
-   }
+  .modal-body {
+    padding: 1.5rem;
+  }
 
    .product-info-grid {
      display: grid;
