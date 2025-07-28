@@ -277,9 +277,18 @@
           <h3 style="margin: 0; color: #e2e8f0;">
             <i class="fas fa-box"></i> {{ selectedProduct?.name }}
           </h3>
-          <button @click="closeProductDetails" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">
-            <i class="fas fa-times"></i>
-          </button>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- Botões de Exportação -->
+            <button @click="exportToExcel" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+              <i class="fas fa-file-excel"></i> Excel
+            </button>
+            <button @click="exportToCSV" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #3b82f6; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+              <i class="fas fa-file-csv"></i> CSV
+            </button>
+            <button @click="closeProductDetails" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
         <div style="padding: 20px;">
           <div style="display: grid; gap: 20px;">
@@ -752,6 +761,127 @@ export default {
         type: 'diver',
         timestamp: new Date().toISOString()
       })
+    },
+
+    exportToExcel() {
+      if (!this.selectedProduct) return
+      
+      // Preparar dados para exportação
+      const data = this.prepareExportData()
+      
+      // Criar conteúdo do Excel (formato CSV com extensão .xlsx)
+      const csvContent = this.convertToCSV(data)
+      
+      // Criar blob e download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `${this.selectedProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      console.log('📊 Exportado para Excel:', this.selectedProduct.name)
+    },
+
+    exportToCSV() {
+      if (!this.selectedProduct) return
+      
+      // Preparar dados para exportação
+      const data = this.prepareExportData()
+      
+      // Criar conteúdo CSV
+      const csvContent = this.convertToCSV(data)
+      
+      // Criar blob e download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `${this.selectedProduct.name.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      console.log('📊 Exportado para CSV:', this.selectedProduct.name)
+    },
+
+    prepareExportData() {
+      const product = this.selectedProduct
+      const data = []
+      
+      // Dados básicos do produto
+      data.push(['INFORMAÇÕES BÁSICAS'])
+      data.push(['EAN', product.ean])
+      data.push(['SKU', product.sku || 'N/A'])
+      data.push(['Nome', product.name])
+      data.push(['Descrição', product.description || 'N/A'])
+      data.push(['Marca', product.brand || 'N/A'])
+      data.push(['Fabricante', product.manufacturer || 'N/A'])
+      data.push(['Categoria', product.category || 'N/A'])
+      data.push(['Status', product.status || 'Ativo'])
+      data.push([])
+      
+      // Especificações técnicas
+      data.push(['ESPECIFICAÇÕES TÉCNICAS'])
+      data.push(['NCM', product.ncm || 'N/A'])
+      data.push(['CEST', product.cest || 'N/A'])
+      data.push(['Dimensões', `${product.length_cm}×${product.width_cm}×${product.height_cm}cm`])
+      data.push(['Peso', `${product.weight_kg}kg`])
+      data.push(['Material', product.material || 'N/A'])
+      data.push(['Cor', product.color || 'N/A'])
+      data.push([])
+      
+      // Características
+      data.push(['CARACTERÍSTICAS'])
+      data.push(['Tamanho', product.size || 'N/A'])
+      data.push(['Gênero', product.gender || 'N/A'])
+      data.push(['Faixa Etária', product.age_group || 'N/A'])
+      data.push(['Subcategorias', product.subcategories ? product.subcategories.join(', ') : 'N/A'])
+      data.push([])
+      
+      // Tags
+      if (product.tags && product.tags.length > 0) {
+        data.push(['TAGS'])
+        data.push(['Tags', product.tags.join(', ')])
+        data.push([])
+      }
+      
+      // Informações da NFe (se disponível)
+      if (product.nfeNumber) {
+        data.push(['INFORMAÇÕES DA NFE'])
+        data.push(['Número da NFe', product.nfeNumber])
+        data.push(['Data de Emissão', this.formatDate(product.nfeIssueDate)])
+        data.push(['Valor Total', `R$ ${product.nfeTotalValue?.toFixed(2)}`])
+        data.push(['Emitente', product.nfeIssuer?.name])
+        data.push(['CNPJ', product.nfeIssuer?.cnpj])
+        data.push(['Quantidade de Produtos', product.nfeProducts?.length || 0])
+        data.push([])
+      }
+      
+      // Informações de atualização
+      data.push(['INFORMAÇÕES DE ATUALIZAÇÃO'])
+      data.push(['Última Atualização', this.formatDate(product.updated_at)])
+      
+      return data
+    },
+
+    convertToCSV(data) {
+      return data.map(row => {
+        if (Array.isArray(row)) {
+          return row.map(cell => {
+            // Escapar vírgulas e aspas
+            if (cell && typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+              return `"${cell.replace(/"/g, '""')}"`
+            }
+            return cell || ''
+          }).join(',')
+        }
+        return row
+      }).join('\n')
     },
 
 
