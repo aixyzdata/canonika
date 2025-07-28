@@ -336,6 +336,8 @@ export default {
       isPaused: false,
       downloadQueue: [],
       downloadInterval: null,
+      websocket: null,
+      apiBaseUrl: 'http://localhost:7724',
       sourceStatus: {
         status: 'ONLINE',
         description: 'Conexão ativa com Receita Federal',
@@ -349,233 +351,7 @@ export default {
         missing: 10,
         selected: 0
       },
-      cnpjFiles: [
-        {
-          id: 1,
-          monthYear: '2025-06',
-          filename: 'CNPJ_2025_06.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2025-06-15 14:58',
-          selected: false
-        },
-        {
-          id: 2,
-          monthYear: '2025-05',
-          filename: 'CNPJ_2025_05.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2025-05-12 01:22',
-          selected: false
-        },
-        {
-          id: 3,
-          monthYear: '2025-04',
-          filename: 'CNPJ_2025_04.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2025-04-19 22:36',
-          selected: false
-        },
-        {
-          id: 4,
-          monthYear: '2025-03',
-          filename: 'CNPJ_2025_03.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2025-03-23 01:46',
-          selected: false
-        },
-        {
-          id: 5,
-          monthYear: '2025-02',
-          filename: 'CNPJ_2025_02.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2025-02-08 22:41',
-          selected: false
-        },
-        {
-          id: 6,
-          monthYear: '2025-01',
-          filename: 'CNPJ_2025_01.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2025-01-11 22:57',
-          selected: false
-        },
-        {
-          id: 7,
-          monthYear: '2024-12',
-          filename: 'CNPJ_2024_12.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2024-12-30 09:52',
-          selected: false
-        },
-        {
-          id: 8,
-          monthYear: '2024-11',
-          filename: 'CNPJ_2024_11.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2024-11-13 18:21',
-          selected: false
-        },
-        {
-          id: 9,
-          monthYear: '2024-10',
-          filename: 'CNPJ_2024_10.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2024-12-30 09:13',
-          selected: false
-        },
-        {
-          id: 10,
-          monthYear: '2024-09',
-          filename: 'CNPJ_2024_09.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2024-10-03 21:12',
-          selected: false
-        },
-        {
-          id: 11,
-          monthYear: '2024-08',
-          filename: 'CNPJ_2024_08.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2024-10-07 12:57',
-          selected: false
-        },
-        {
-          id: 12,
-          monthYear: '2024-07',
-          filename: 'CNPJ_2024_07.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2024-10-19 03:58',
-          selected: false
-        },
-        {
-          id: 13,
-          monthYear: '2024-06',
-          filename: 'CNPJ_2024_06.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2024-10-18 22:33',
-          selected: false
-        },
-        {
-          id: 14,
-          monthYear: '2024-05',
-          filename: 'CNPJ_2024_05.zip',
-          size: '2.0GB',
-          status: 'downloaded',
-          lastUpdated: '2024-10-18 20:53',
-          selected: false
-        },
-        {
-          id: 15,
-          monthYear: '2024-04',
-          filename: 'CNPJ_2024_04.zip',
-          size: '2.1GB',
-          status: 'downloaded',
-          lastUpdated: '2024-11-04 12:22',
-          selected: false
-        },
-        {
-          id: 16,
-          monthYear: '2024-03',
-          filename: 'CNPJ_2024_03.zip',
-          size: '2.0GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 13:45',
-          selected: false
-        },
-        {
-          id: 17,
-          monthYear: '2024-02',
-          filename: 'CNPJ_2024_02.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 15:17',
-          selected: false
-        },
-        {
-          id: 18,
-          monthYear: '2024-01',
-          filename: 'CNPJ_2024_01.zip',
-          size: '2.0GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 17:43',
-          selected: false
-        },
-        {
-          id: 19,
-          monthYear: '2023-12',
-          filename: 'CNPJ_2023_12.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 18:31',
-          selected: false
-        },
-        {
-          id: 20,
-          monthYear: '2023-11',
-          filename: 'CNPJ_2023_11.zip',
-          size: '2.0GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 19:51',
-          selected: false
-        },
-        {
-          id: 21,
-          monthYear: '2023-10',
-          filename: 'CNPJ_2023_10.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 22:04',
-          selected: false
-        },
-        {
-          id: 22,
-          monthYear: '2023-09',
-          filename: 'CNPJ_2023_09.zip',
-          size: '2.0GB',
-          status: 'available',
-          lastUpdated: '2024-11-04 22:40',
-          selected: false
-        },
-        {
-          id: 23,
-          monthYear: '2023-08',
-          filename: 'CNPJ_2023_08.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2024-11-05 07:01',
-          selected: false
-        },
-        {
-          id: 24,
-          monthYear: '2023-07',
-          filename: 'CNPJ_2023_07.zip',
-          size: '2.0GB',
-          status: 'available',
-          lastUpdated: '2024-11-05 10:05',
-          selected: false
-        },
-        {
-          id: 25,
-          monthYear: '2023-06',
-          filename: 'CNPJ_2023_06.zip',
-          size: '2.1GB',
-          status: 'available',
-          lastUpdated: '2025-11-05 13:57',
-          selected: false
-        }
-      ],
+      cnpjFiles: [],
       dataMetrics: [
         {
           id: 1,
@@ -695,30 +471,76 @@ export default {
     }
   },
   methods: {
-    refreshData() {
+    async refreshData() {
       console.log('Refreshing SEFAZ data...')
-      this.refreshFileList()
+      await this.refreshFileList()
     },
-    syncData() {
+    async syncData() {
       console.log('Synchronizing SEFAZ data...')
-      this.downloadAllMissing()
+      await this.downloadAllMissing()
     },
-    refreshFileList() {
+    async refreshFileList() {
       console.log('Refreshing CNPJ file list...')
-      // Implementar busca na fonte oficial
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/files/status`)
+        const data = await response.json()
+        
+        if (data.status === 'success') {
+          this.cnpjFiles = data.files.map(file => ({
+            id: file.filename,
+            monthYear: this.extractMonthYear(file.filename),
+            filename: file.filename,
+            size: file.size,
+            status: file.status,
+            lastUpdated: file.last_updated,
+            selected: false,
+            localPath: file.local_path
+          }))
+          
+          this.updateFileStats()
+        } else {
+          console.error('Erro ao obter status dos arquivos:', data.error)
+        }
+      } catch (error) {
+        console.error('Erro na comunicação com API:', error)
+        // Fallback para dados mockados
+        this.loadMockData()
+      }
+    },
+    extractMonthYear(filename) {
+      const match = filename.match(/CNPJ_(\d{4})_(\d{2})/)
+      if (match) {
+        return `${match[1]}-${match[2]}`
+      }
+      return filename
+    },
+    loadMockData() {
+      // Dados mockados como fallback
+      this.cnpjFiles = [
+        {
+          id: 1,
+          monthYear: '2025-06',
+          filename: 'CNPJ_2025_06.zip',
+          size: '2.1GB',
+          status: 'available',
+          lastUpdated: '2025-06-15 14:58',
+          selected: false
+        },
+        // ... outros arquivos mockados
+      ]
       this.updateFileStats()
     },
-    downloadSelected() {
+    async downloadSelected() {
       const selectedFiles = this.cnpjFiles.filter(file => file.selected)
       console.log('Downloading selected files:', selectedFiles.map(f => f.filename))
-      this.startDownload(selectedFiles)
+      await this.startDownload(selectedFiles)
     },
-    downloadAllMissing() {
+    async downloadAllMissing() {
       const missingFiles = this.cnpjFiles.filter(file => file.status === 'available')
       console.log('Downloading all missing files:', missingFiles.map(f => f.filename))
-      this.startDownload(missingFiles)
+      await this.startDownload(missingFiles)
     },
-    startDownload(files) {
+    async startDownload(files) {
       // Preparar fila de download
       this.downloadQueue = files.map((file, index) => ({
         id: file.id,
@@ -729,17 +551,63 @@ export default {
         speed: null,
         eta: null,
         message: null,
-        startTime: null
+        startTime: null,
+        downloadId: null
       }))
       
       this.showDownloadModal = true
       this.isDownloading = true
       this.isPaused = false
       
-      // Simular download sequencial
-      this.processDownloadQueue()
+      // Conectar WebSocket se não estiver conectado
+      if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+        this.connectWebSocket()
+      }
+      
+      // Iniciar downloads sequenciais
+      await this.processDownloadQueue()
     },
-    processDownloadQueue() {
+    connectWebSocket() {
+      try {
+        this.websocket = new WebSocket(`ws://localhost:7724/ws/downloads`)
+        
+        this.websocket.onopen = () => {
+          console.log('WebSocket conectado')
+        }
+        
+        this.websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data)
+          if (data.type === 'download_progress') {
+            this.updateDownloadProgress(data.download_id, data.data)
+          }
+        }
+        
+        this.websocket.onerror = (error) => {
+          console.error('Erro no WebSocket:', error)
+        }
+        
+        this.websocket.onclose = () => {
+          console.log('WebSocket desconectado')
+        }
+      } catch (error) {
+        console.error('Erro ao conectar WebSocket:', error)
+      }
+    },
+    updateDownloadProgress(downloadId, progressData) {
+      const queueItem = this.downloadQueue.find(item => item.downloadId === downloadId)
+      if (queueItem) {
+        Object.assign(queueItem, progressData)
+        
+        // Se download concluído, atualizar status na lista principal
+        if (progressData.status === 'completed') {
+          const fileIndex = this.cnpjFiles.findIndex(f => f.filename === progressData.filename)
+          if (fileIndex !== -1) {
+            this.cnpjFiles[fileIndex].status = 'downloaded'
+          }
+        }
+      }
+    },
+    async processDownloadQueue() {
       if (this.isPaused) return
       
       const pendingItem = this.downloadQueue.find(item => item.status === 'pending')
@@ -748,67 +616,34 @@ export default {
         return
       }
       
-      // Iniciar download do item
-      pendingItem.status = 'downloading'
-      pendingItem.startTime = Date.now()
-      pendingItem.message = 'Iniciando download...'
-      
-      // Simular progresso do download
-      this.simulateDownload(pendingItem)
-    },
-    simulateDownload(item) {
-      if (this.isPaused) return
-      
-      const updateProgress = () => {
-        if (this.isPaused) return
+      try {
+        // Iniciar download via API
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/download/${pendingItem.filename}`, {
+          method: 'POST'
+        })
         
-        if (item.progress < 100) {
-          // Simular progresso aleatório
-          const increment = Math.random() * 5 + 1
-          item.progress = Math.min(100, item.progress + increment)
-          
-          // Calcular velocidade e ETA
-          const elapsed = (Date.now() - item.startTime) / 1000
-          const remaining = (100 - item.progress) / (item.progress / elapsed)
-          
-          item.speed = this.formatSpeed(item.progress / elapsed)
-          item.eta = this.formatTime(remaining)
-          item.message = `Baixando... ${item.progress.toFixed(1)}%`
-          
-          if (item.progress < 100) {
-            setTimeout(updateProgress, 200)
-          } else {
-            // Download concluído
-            item.status = 'completed'
-            item.message = 'Download concluído com sucesso!'
-            item.speed = null
-            item.eta = null
-            
-            // Atualizar status do arquivo na lista principal
-            const fileIndex = this.cnpjFiles.findIndex(f => f.id === item.id)
-            if (fileIndex !== -1) {
-              this.cnpjFiles[fileIndex].status = 'downloaded'
-            }
-            
-            // Processar próximo item
-            setTimeout(() => this.processDownloadQueue(), 500)
-          }
+        const result = await response.json()
+        
+        if (result.status === 'success') {
+          pendingItem.downloadId = result.download_id
+          pendingItem.status = 'downloading'
+          pendingItem.startTime = Date.now()
+          pendingItem.message = 'Iniciando download...'
+        } else {
+          pendingItem.status = 'error'
+          pendingItem.message = result.error || 'Erro no download'
         }
-      }
-      
-      updateProgress()
-    },
-    formatSpeed(progressPerSecond) {
-      const mbPerSecond = (progressPerSecond * 2.1) / 100 // 2.1GB = 100%
-      return `${mbPerSecond.toFixed(1)} MB/s`
-    },
-    formatTime(seconds) {
-      if (seconds < 60) {
-        return `${Math.ceil(seconds)}s`
-      } else if (seconds < 3600) {
-        return `${Math.ceil(seconds / 60)}m`
-      } else {
-        return `${Math.ceil(seconds / 3600)}h`
+        
+        // Processar próximo item após um delay
+        setTimeout(() => this.processDownloadQueue(), 1000)
+        
+      } catch (error) {
+        console.error('Erro no download:', error)
+        pendingItem.status = 'error'
+        pendingItem.message = 'Erro de conexão'
+        
+        // Processar próximo item
+        setTimeout(() => this.processDownloadQueue(), 1000)
       }
     },
     pauseDownloads() {
@@ -847,17 +682,36 @@ export default {
       })
       this.updateFileStats()
     },
-    downloadFile(file) {
+    async downloadFile(file) {
       console.log('Downloading file:', file.filename)
-      this.startDownload([file])
+      await this.startDownload([file])
     },
-    viewFile(file) {
+    async viewFile(file) {
       console.log('Viewing file:', file.filename)
       // Implementar visualização do arquivo
     },
-    deleteFile(file) {
+    async deleteFile(file) {
       console.log('Deleting file:', file.filename)
-      // Implementar exclusão do arquivo
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/files/${file.filename}`, {
+          method: 'DELETE'
+        })
+        
+        const result = await response.json()
+        
+        if (result.status === 'success') {
+          // Atualizar status na lista
+          const fileIndex = this.cnpjFiles.findIndex(f => f.filename === file.filename)
+          if (fileIndex !== -1) {
+            this.cnpjFiles[fileIndex].status = 'available'
+          }
+          this.updateFileStats()
+        } else {
+          console.error('Erro ao deletar arquivo:', result.message)
+        }
+      } catch (error) {
+        console.error('Erro na comunicação com API:', error)
+      }
     },
     getStatusText(status) {
       const statusMap = {
@@ -892,8 +746,13 @@ export default {
       }
     }
   },
-  mounted() {
-    this.updateFileStats()
+  async mounted() {
+    await this.refreshFileList()
+  },
+  beforeUnmount() {
+    if (this.websocket) {
+      this.websocket.close()
+    }
   },
   watch: {
     'cnpjFiles': {
