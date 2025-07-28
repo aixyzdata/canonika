@@ -394,6 +394,39 @@
               <p style="color: #e2e8f0; line-height: 1.6; margin: 0;">{{ selectedProduct?.description }}</p>
             </div>
 
+            <!-- Informações da NFe (apenas para produtos canonizados) -->
+            <div v-if="selectedProduct?.nfeNumber" style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-file-invoice"></i> Informações da NFe
+              </h4>
+              <div style="display: grid; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Número da NFe:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.nfeNumber }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Data de Emissão:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ formatDate(selectedProduct?.nfeIssueDate) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Valor Total:</span>
+                  <span style="color: #10b981; font-weight: 600;">R$ {{ selectedProduct?.nfeTotalValue?.toFixed(2) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Emitente:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.nfeIssuer?.name }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">CNPJ:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.nfeIssuer?.cnpj }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Produtos na NFe:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.nfeProducts?.length || 0 }} itens</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Atualização -->
             <div style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
               <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
@@ -584,10 +617,46 @@ export default {
 
 
     viewNFeDetails() {
-      // Implementar visualização de detalhes da NFe
-      console.log('Visualizando detalhes da NFe:', this.canonizedNFe)
-      // Por enquanto, apenas mostra no console
-      alert('Funcionalidade de detalhes da NFe será implementada em breve!')
+      if (this.canonizedNFe && this.canonizedNFe.products && this.canonizedNFe.products.length > 0) {
+        // Usar o primeiro produto da NFe como exemplo
+        const nfeProduct = this.canonizedNFe.products[0]
+        
+        // Converter para formato de produto canônico
+        this.selectedProduct = {
+          id: nfeProduct.id,
+          ean: this.canonizedNFe.number.substring(0, 13), // Usar parte do número da NFe como EAN
+          sku: `NFE-${this.canonizedNFe.number}`,
+          name: nfeProduct.name,
+          description: nfeProduct.description,
+          brand: 'Extraído da NFe',
+          manufacturer: this.canonizedNFe.issuer.name,
+          category: 'Produto Canonizado',
+          subcategories: ['NFe', 'Canonizado'],
+          ncm: '0000.00.00', // Placeholder
+          cest: '00.000.00', // Placeholder
+          weight_kg: 0.5, // Placeholder
+          width_cm: 10,
+          height_cm: 10,
+          length_cm: 10,
+          color: 'N/A',
+          size: 'Padrão',
+          material: 'N/A',
+          gender: 'Unissex',
+          age_group: 'Adulto',
+          images: [],
+          tags: ['nfe', 'canonizado', 'extraído'],
+          status: 'Canonizado',
+          updated_at: this.canonizedNFe.issueDate,
+          // Informações específicas da NFe
+          nfeNumber: this.canonizedNFe.number,
+          nfeIssueDate: this.canonizedNFe.issueDate,
+          nfeTotalValue: this.canonizedNFe.totalValue,
+          nfeIssuer: this.canonizedNFe.issuer,
+          nfeProducts: this.canonizedNFe.products
+        }
+        
+        this.showProductDetails = true
+      }
     },
 
 
