@@ -267,7 +267,7 @@ export default {
 <style scoped>
 .explorer-view {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -277,9 +277,10 @@ export default {
 .explorer-content {
   max-width: 800px;
   width: 100%;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 60px 40px;
 }
 
@@ -304,12 +305,12 @@ export default {
 .logo-text {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #1f2937;
+  color: #e2e8f0;
 }
 
 .explorer-subtitle {
   font-size: 1.2rem;
-  color: #6b7280;
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -327,15 +328,21 @@ export default {
   width: 100%;
   padding: 15px 50px 15px 50px;
   font-size: 1.1rem;
-  border: 2px solid #e5e7eb;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
   border-radius: 25px;
   outline: none;
   transition: all 0.3s ease;
+  color: #e2e8f0;
 }
 
 .search-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: #64748b;
 }
 
 .search-icon {
@@ -386,23 +393,24 @@ export default {
 }
 
 .search-button {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
+  border-color: #3b82f6;
 }
 
 .search-button:hover {
-  background: #2563eb;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-1px);
 }
 
 .advanced-button {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .advanced-button:hover {
-  background: #e5e7eb;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .suggestions-container, .results-container, .history-container, .filters-container {
@@ -410,30 +418,32 @@ export default {
 }
 
 .suggestions-container h3, .results-container h3, .history-container h3, .filters-container h3 {
-  color: #374151;
+  color: #e2e8f0;
   margin-bottom: 15px;
   font-size: 1.2rem;
 }
 
 .suggestions-list, .history-list {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .suggestion-item, .history-item {
   padding: 12px 20px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
   transition: background 0.2s ease;
+  color: #e2e8f0;
 }
 
 .suggestion-item:hover, .history-item:hover {
-  background: #f9fafb;
+  background: rgba(15, 23, 42, 0.5);
 }
 
 .suggestion-item i, .history-item i {
@@ -443,7 +453,7 @@ export default {
 
 .history-date {
   margin-left: auto;
-  color: #9ca3af;
+  color: #64748b;
   font-size: 0.9rem;
 }
 
@@ -455,7 +465,7 @@ export default {
 }
 
 .results-count {
-  color: #6b7280;
+  color: #94a3b8;
   font-size: 0.9rem;
 }
 
@@ -466,20 +476,22 @@ export default {
 }
 
 .result-item {
-  background: white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
 }
 
 .result-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
 }
 
 .result-title a {
-  color: #1e40af;
+  color: #3b82f6;
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 600;
@@ -490,13 +502,13 @@ export default {
 }
 
 .result-url {
-  color: #059669;
+  color: #10b981;
   font-size: 0.9rem;
   margin: 5px 0;
 }
 
 .result-description {
-  color: #374151;
+  color: #e2e8f0;
   line-height: 1.5;
   margin: 10px 0;
 }
@@ -505,7 +517,7 @@ export default {
   display: flex;
   gap: 15px;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 .result-type, .result-date {
@@ -518,10 +530,11 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  background: white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-group {
@@ -532,17 +545,17 @@ export default {
 
 .filter-group label {
   font-weight: 600;
-  color: #374151;
+  color: #e2e8f0;
   font-size: 0.9rem;
 }
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
   border-radius: 6px;
   font-size: 0.9rem;
-  background: white;
-  color: #374151;
+  color: #e2e8f0;
 }
 
 .filter-select:focus {
