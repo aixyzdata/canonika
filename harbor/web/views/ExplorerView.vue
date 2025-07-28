@@ -7,188 +7,265 @@
           <i class="fas fa-compass"></i>
           <span class="logo-text">Explorer</span>
         </div>
-        <p class="explorer-subtitle">Pesquise informações canônicas de produtos e notas fiscais</p>
+        <p class="explorer-subtitle">Pesquise produtos ou canonize notas fiscais</p>
       </div>
 
-      <!-- Barra de Pesquisa -->
-      <div class="search-container">
-        <div class="search-input-wrapper">
-          <i class="fas fa-search search-icon"></i>
-          <input
-            v-model="searchQuery"
-            @keyup.enter="performSearch"
-            type="text"
-            class="search-input"
-            placeholder="Digite o nome do produto, código da nota fiscal, XML da SEFAZ..."
-          />
-          <button @click="performSearch" class="search-button">
+      <!-- Seleção de Jornada -->
+      <div class="journey-selector">
+        <div class="journey-tabs">
+          <button 
+            @click="activeJourney = 'search'" 
+            :class="['journey-tab', { active: activeJourney === 'search' }]"
+          >
             <i class="fas fa-search"></i>
+            Pesquisar Produto
+          </button>
+          <button 
+            @click="activeJourney = 'canonize'" 
+            :class="['journey-tab', { active: activeJourney === 'canonize' }]"
+          >
+            <i class="fas fa-file-invoice"></i>
+            Canonizar NFe
           </button>
         </div>
       </div>
 
-      <!-- Upload de XML -->
-      <div class="upload-section">
-        <div class="upload-area" @drop="handleFileDrop" @dragover.prevent @dragenter.prevent>
-          <i class="fas fa-file-upload"></i>
-          <p>Arraste um XML da SEFAZ aqui ou clique para selecionar</p>
-          <input type="file" ref="fileInput" @change="handleFileSelect" accept=".xml" style="display: none;" />
-          <button @click="$refs.fileInput.click()" class="upload-button">Selecionar Arquivo</button>
+      <!-- Jornada: Pesquisar Produto -->
+      <div v-if="activeJourney === 'search'" class="journey-content">
+        <!-- Barra de Pesquisa -->
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              v-model="searchQuery"
+              @keyup.enter="performProductSearch"
+              type="text"
+              class="search-input"
+              placeholder="Digite o nome do produto, código de barras..."
+            />
+            <button @click="performProductSearch" class="search-button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Filtros Avançados -->
-      <div class="advanced-filters">
-        <button @click="showAdvancedFilters = !showAdvancedFilters" class="advanced-button">
-          <i class="fas fa-filter"></i>
-          Filtros Avançados
-        </button>
-        
-        <div v-if="showAdvancedFilters" class="filters-grid">
-          <div class="filter-group">
-            <label>Tipo de Busca:</label>
-            <select v-model="searchType" class="filter-select">
-              <option value="all">Todos os Tipos</option>
-              <option value="product">Produtos</option>
-              <option value="invoice">Notas Fiscais</option>
-              <option value="code">Códigos</option>
-            </select>
+        <!-- Resultados de Produtos -->
+        <div v-if="productResults.length > 0" class="results-section">
+          <div class="results-header">
+            <h3>Produtos Encontrados ({{ productResults.length }})</h3>
+            <button @click="clearProductResults" class="clear-button">
+              <i class="fas fa-times"></i>
+              Limpar
+            </button>
           </div>
           
-          <div class="filter-group">
-            <label>Período:</label>
-            <select v-model="period" class="filter-select">
-              <option value="all">Todos os Períodos</option>
-              <option value="today">Hoje</option>
-              <option value="week">Última Semana</option>
-              <option value="month">Último Mês</option>
-              <option value="year">Último Ano</option>
-            </select>
+          <div class="results-grid">
+            <div
+              v-for="product in productResults"
+              :key="product.id"
+              class="service-card product-card"
+            >
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-box"></i>
+                </div>
+                <div class="card-title">
+                  <h4>{{ product.name }}</h4>
+                  <span class="card-subtitle">{{ product.category }}</span>
+                </div>
+                <div class="card-actions">
+                  <button @click="askDiverAboutProduct(product)" class="btn btn-sm btn-success">
+                    <i class="fas fa-question"></i>
+                    Perguntar ao Diver
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card-content">
+                <p class="card-description">{{ product.description }}</p>
+                
+                <div class="card-meta">
+                  <div class="meta-item">
+                    <i class="fas fa-tag"></i>
+                    <span>R$ {{ product.price }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="fas fa-barcode"></i>
+                    <span>{{ product.barcode }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="fas fa-building"></i>
+                    <span>{{ product.brand }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico de Pesquisas -->
+        <div v-if="searchHistory.length > 0 && !productResults.length" class="history-section">
+          <h3>Pesquisas Recentes</h3>
+          <div class="history-list">
+            <div
+              v-for="item in searchHistory"
+              :key="item.id"
+              @click="loadHistoryItem(item)"
+              class="history-item"
+            >
+              <i class="fas fa-history"></i>
+              <span>{{ item.query }}</span>
+              <small class="history-date">{{ formatDate(item.date) }}</small>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Resultados da Pesquisa -->
-      <div v-if="searchResults.length > 0" class="results-section">
-        <div class="results-header">
-          <h3>Resultados Encontrados ({{ searchResults.length }})</h3>
-          <button @click="clearResults" class="clear-button">
-            <i class="fas fa-times"></i>
-            Limpar
-          </button>
+      <!-- Jornada: Canonizar NFe -->
+      <div v-if="activeJourney === 'canonize'" class="journey-content">
+        <!-- Upload de NFe -->
+        <div class="upload-section">
+          <div class="upload-area" @drop="handleFileDrop" @dragover.prevent @dragenter.prevent>
+            <i class="fas fa-file-upload"></i>
+            <p>Arraste uma NFe aqui ou clique para selecionar</p>
+            <input type="file" ref="fileInput" @change="handleFileSelect" accept=".xml" style="display: none;" />
+            <button @click="$refs.fileInput.click()" class="upload-button">Selecionar NFe</button>
+          </div>
         </div>
-        
-        <div class="results-grid">
-          <div
-            v-for="result in searchResults"
-            :key="result.id"
-            class="service-card"
-          >
-            <div class="card-header">
-              <div class="card-icon">
-                <i :class="getResultIcon(result.type)"></i>
-              </div>
-              <div class="card-title">
-                <h4>{{ result.title }}</h4>
-                <span class="card-subtitle">{{ result.type }}</span>
-              </div>
-              <div class="card-actions">
-                <button @click="viewDetails(result)" class="btn btn-sm btn-primary">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button @click="downloadResult(result)" class="btn btn-sm btn-secondary">
-                  <i class="fas fa-download"></i>
-                </button>
+
+        <!-- Botão para Carregar NFe Fake -->
+        <div class="fake-nfe-section">
+          <button @click="loadFakeNFe" class="fake-nfe-button">
+            <i class="fas fa-magic"></i>
+            Carregar NFe Fake para Demonstração
+          </button>
+          <p class="fake-nfe-info">NFe com dados reais de empresas e produtos existentes</p>
+        </div>
+
+        <!-- Resultado da Canonização -->
+        <div v-if="canonizedNFe" class="canonization-result">
+          <div class="result-header">
+            <h3>NFe Canonizada</h3>
+            <div class="status-badge success">
+              <i class="fas fa-check-circle"></i>
+              Canonização Concluída
+            </div>
+          </div>
+          
+          <div class="nfe-details">
+            <div class="nfe-section">
+              <h4>Informações da Nota</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <strong>Número:</strong> {{ canonizedNFe.number }}
+                </div>
+                <div class="detail-item">
+                  <strong>Data Emissão:</strong> {{ formatDate(canonizedNFe.issueDate) }}
+                </div>
+                <div class="detail-item">
+                  <strong>Valor Total:</strong> R$ {{ canonizedNFe.totalValue }}
+                </div>
               </div>
             </div>
             
-            <div class="card-content">
-              <p class="card-description">{{ result.description }}</p>
-              
-              <div class="card-meta">
-                <div class="meta-item">
-                  <i class="fas fa-calendar"></i>
-                  <span>{{ formatDate(result.date) }}</span>
+            <div class="nfe-section">
+              <h4>Emitente</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <strong>Razão Social:</strong> {{ canonizedNFe.issuer.name }}
                 </div>
-                <div class="meta-item">
-                  <i class="fas fa-percentage"></i>
-                  <span>Relevância: {{ result.score }}%</span>
-                </div>
-                <div class="meta-item">
-                  <i class="fas fa-link"></i>
-                  <span>{{ result.source }}</span>
+                <div class="detail-item">
+                  <strong>CNPJ:</strong> {{ canonizedNFe.issuer.cnpj }}
                 </div>
               </div>
-              
-              <div v-if="result.details" class="card-details">
-                <div v-for="(value, key) in result.details" :key="key" class="detail-item">
-                  <strong>{{ key }}:</strong> {{ value }}
+            </div>
+            
+            <div class="nfe-section">
+              <h4>Produtos Canonizados</h4>
+              <div class="products-list">
+                <div
+                  v-for="product in canonizedNFe.products"
+                  :key="product.id"
+                  class="product-item"
+                >
+                  <div class="product-info">
+                    <h5>{{ product.name }}</h5>
+                    <p>{{ product.description }}</p>
+                  </div>
+                  <div class="product-meta">
+                    <span class="quantity">{{ product.quantity }}x</span>
+                    <span class="price">R$ {{ product.unitPrice }}</span>
+                    <span class="total">R$ {{ product.totalPrice }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="nfe-section">
+              <h4>Análise do Diver</h4>
+              <div class="diver-analysis">
+                <div class="analysis-item">
+                  <i class="fas fa-check-circle text-success"></i>
+                  <span>Produtos identificados e categorizados</span>
+                </div>
+                <div class="analysis-item">
+                  <i class="fas fa-check-circle text-success"></i>
+                  <span>Empresas validadas na base de dados</span>
+                </div>
+                <div class="analysis-item">
+                  <i class="fas fa-info-circle text-info"></i>
+                  <span>Dados canonizados para uso interno</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Notificação de Pesquisa em Andamento -->
-      <div v-if="searchInProgress" class="notification-section">
-        <div class="notification-card">
-          <div class="notification-header">
-            <i class="fas fa-search"></i>
-            <h4>Pesquisa em Andamento</h4>
-          </div>
-          <p>Estamos buscando informações em nossa base de dados e fontes externas...</p>
           
-          <div class="notification-options">
-            <h5>Deseja ser notificado quando concluirmos?</h5>
-            <div class="notification-buttons">
-              <button @click="enableEmailNotification" class="btn btn-primary">
-                <i class="fas fa-envelope"></i>
-                Email
-              </button>
-              <button @click="enableWhatsAppNotification" class="btn btn-success">
-                <i class="fab fa-whatsapp"></i>
-                WhatsApp
-              </button>
-              <button @click="disableNotification" class="btn btn-secondary">
-                <i class="fas fa-times"></i>
-                Não notificar
-              </button>
+          <div class="action-buttons">
+            <button @click="askDiverAboutNFe" class="btn btn-success">
+              <i class="fas fa-question"></i>
+              Perguntar ao Diver
+            </button>
+            <button @click="clearCanonization" class="btn btn-secondary">
+              <i class="fas fa-times"></i>
+              Nova Canonização
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat com Diver -->
+      <div v-if="showDiverChat" class="diver-chat">
+        <div class="chat-header">
+          <h4><i class="fas fa-robot"></i> Diver - Assistente IA</h4>
+          <button @click="closeDiverChat" class="close-chat">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="chat-messages">
+          <div
+            v-for="message in diverMessages"
+            :key="message.id"
+            :class="['message', message.type]"
+          >
+            <div class="message-content">
+              <div class="message-text">{{ message.text }}</div>
+              <div class="message-time">{{ formatTime(message.timestamp) }}</div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Histórico de Pesquisas -->
-      <div v-if="searchHistory.length > 0 && !searchResults.length" class="history-section">
-        <h3>Pesquisas Recentes</h3>
-        <div class="history-list">
-          <div
-            v-for="item in searchHistory"
-            :key="item.id"
-            @click="loadHistoryItem(item)"
-            class="history-item"
-          >
-            <i class="fas fa-history"></i>
-            <span>{{ item.query }}</span>
-            <small class="history-date">{{ formatDate(item.date) }}</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sugestões -->
-      <div v-if="suggestions.length > 0 && !searchQuery && !searchResults.length" class="suggestions-section">
-        <h3>Sugestões de Pesquisa</h3>
-        <div class="suggestions-list">
-          <div
-            v-for="suggestion in suggestions"
-            :key="suggestion.id"
-            @click="loadSuggestion(suggestion)"
-            class="suggestion-item"
-          >
-            <i class="fas fa-lightbulb"></i>
-            <span>{{ suggestion.text }}</span>
-          </div>
+        
+        <div class="chat-input">
+          <input
+            v-model="chatInput"
+            @keyup.enter="sendMessageToDiver"
+            type="text"
+            placeholder="Digite sua pergunta..."
+            class="chat-input-field"
+          />
+          <button @click="sendMessageToDiver" class="send-button">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -201,101 +278,112 @@ export default {
   data() {
     return {
       searchQuery: '',
-      searchResults: [],
+      productResults: [],
       searchHistory: [
-        { id: 1, query: 'Nota Fiscal 123456', date: '2024-01-15' },
-        { id: 2, query: 'Produto XYZ-789', date: '2024-01-14' },
-        { id: 3, query: 'Código 987654', date: '2024-01-13' }
+        { id: 1, query: 'Produto XYZ-789', date: '2024-01-14' },
+        { id: 2, query: 'Código 987654', date: '2024-01-13' }
       ],
-      suggestions: [
-        { id: 1, text: 'Pesquisar por código de barras' },
-        { id: 2, text: 'Buscar nota fiscal por número' },
-        { id: 3, text: 'Consultar produto por nome' },
-        { id: 4, text: 'Upload de XML da SEFAZ' }
-      ],
-      showAdvancedFilters: false,
-      searchType: 'all',
-      period: 'all',
-      searchInProgress: false,
-      notificationEnabled: false,
-      notificationType: null
+      activeJourney: 'search', // 'search' or 'canonize'
+      canonizedNFe: null,
+      showDiverChat: false,
+      diverMessages: [],
+      chatInput: '',
+      diver: {
+        name: 'Diver',
+        avatar: 'https://via.placeholder.com/50',
+        isHuman: false
+      }
     }
   },
   methods: {
-    performSearch() {
+    performProductSearch() {
       if (!this.searchQuery.trim()) return
       
-      this.searchInProgress = true
-      this.searchResults = []
-      
-      // Simular pesquisa em base de dados
-      setTimeout(() => {
-        // Verificar se encontrou resultados
-        const foundResults = this.searchInDatabase(this.searchQuery)
-        
-        if (foundResults.length > 0) {
-          this.searchResults = foundResults
-          this.addToHistory(this.searchQuery)
-        } else {
-          // Se não encontrou, iniciar pesquisa externa
-          this.startExternalSearch()
-        }
-        
-        this.searchInProgress = false
-      }, 2000)
-    },
-
-    searchInDatabase(query) {
-      // Simular busca na base de dados
-      const mockResults = [
-        {
-          id: 1,
-          title: 'Nota Fiscal 123456',
-          type: 'Nota Fiscal',
-          description: 'Nota fiscal eletrônica emitida em 15/01/2024',
-          date: '2024-01-15',
-          score: 95,
-          source: 'Base Local',
-          details: {
-            'Número': '123456',
-            'Emitente': 'Empresa ABC Ltda',
-            'Valor': 'R$ 1.250,00',
-            'Status': 'Aprovada'
-          }
-        },
-        {
-          id: 2,
-          title: 'Produto XYZ-789',
-          type: 'Produto',
-          description: 'Produto cadastrado no sistema com código de barras',
-          date: '2024-01-14',
-          score: 88,
-          source: 'Base Local',
-          details: {
-            'Código': 'XYZ-789',
-            'Categoria': 'Eletrônicos',
-            'Preço': 'R$ 299,90',
-            'Estoque': '15 unidades'
-          }
-        }
-      ]
-      
-      return mockResults.filter(result => 
-        result.title.toLowerCase().includes(query.toLowerCase()) ||
-        result.description.toLowerCase().includes(query.toLowerCase())
+      // Simular pesquisa de produtos
+      this.productResults = [
+        { id: 1, name: 'Produto A', category: 'Categoria 1', description: 'Descrição do Produto A', price: 10.50, barcode: '1234567890123', brand: 'Marca A' },
+        { id: 2, name: 'Produto B', category: 'Categoria 2', description: 'Descrição do Produto B', price: 20.00, barcode: '9876543210987', brand: 'Marca B' },
+        { id: 3, name: 'Produto C', category: 'Categoria 1', description: 'Descrição do Produto C', price: 5.75, barcode: '1122334455667', brand: 'Marca A' }
+      ].filter(product => 
+        product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.barcode.toLowerCase().includes(this.searchQuery.toLowerCase())
       )
+      this.addToHistory(this.searchQuery)
     },
 
-    startExternalSearch() {
-      this.searchInProgress = true
-      
-      // Simular pesquisa externa
+    clearProductResults() {
+      this.productResults = []
+      this.searchQuery = ''
+    },
+
+    askDiverAboutProduct(product) {
+      this.showDiverChat = true
+      this.diverMessages.push({
+        id: Date.now(),
+        text: `Você gostaria de saber mais sobre o produto "${product.name}"?`,
+        type: 'human',
+        timestamp: new Date().toISOString()
+      })
+      this.diverMessages.push({
+        id: Date.now() + 1,
+        text: `Este produto é da categoria "${product.category}" e custa R$ ${product.price}. Ele tem um código de barras ${product.barcode} e é da marca "${product.brand}".`,
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
+    },
+
+    askDiverAboutNFe() {
+      this.showDiverChat = true
+      this.diverMessages.push({
+        id: Date.now(),
+        text: 'Você gostaria de saber mais sobre a nota fiscal que acabou de canonizar?',
+        type: 'human',
+        timestamp: new Date().toISOString()
+      })
+      this.diverMessages.push({
+        id: Date.now() + 1,
+        text: `A nota fiscal Nº ${this.canonizedNFe.number} de emissão ${this.formatDate(this.canonizedNFe.issueDate)} tem um valor total de R$ ${this.canonizedNFe.totalValue}. A empresa emitente é ${this.canonizedNFe.issuer.name} (CNPJ: ${this.canonizedNFe.issuer.cnpj}).`,
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
+    },
+
+    loadFakeNFe() {
+      this.canonizedNFe = {
+        number: '12345678901234',
+        issueDate: '2024-01-15T10:00:00',
+        totalValue: 1250.00,
+        issuer: {
+          name: 'Empresa Exemplo Ltda',
+          cnpj: '12.345.678/0001-90'
+        },
+        products: [
+          { id: 1, name: 'Produto A', description: 'Descrição do Produto A', quantity: 2, unitPrice: 10.50, totalPrice: 21.00 },
+          { id: 2, name: 'Produto B', description: 'Descrição do Produto B', quantity: 1, unitPrice: 20.00, totalPrice: 20.00 },
+          { id: 3, name: 'Produto C', description: 'Descrição do Produto C', quantity: 3, unitPrice: 5.75, totalPrice: 17.25 }
+        ]
+      }
+      this.showDiverChat = true
+      this.diverMessages.push({
+        id: Date.now(),
+        text: 'Carregando NFe Fake...',
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
       setTimeout(() => {
-        this.searchInProgress = false
-        
-        // Mostrar opções de notificação
-        this.notificationEnabled = true
-      }, 3000)
+        this.diverMessages.push({
+          id: Date.now() + 1,
+          text: `NFe Fake carregada com sucesso! Número: ${this.canonizedNFe.number}, Valor Total: R$ ${this.canonizedNFe.totalValue}.`,
+          type: 'diver',
+          timestamp: new Date().toISOString()
+        })
+      }, 1000)
+    },
+
+    clearCanonization() {
+      this.canonizedNFe = null
+      this.diverMessages = []
+      this.chatInput = ''
     },
 
     handleFileDrop(event) {
@@ -329,69 +417,66 @@ export default {
 
     extractDataFromXML(xmlContent) {
       // Simular extração de dados do XML
-      this.searchQuery = 'XML Processado - ' + new Date().toLocaleString()
-      this.performSearch()
-    },
-
-    getResultIcon(type) {
-      const icons = {
-        'Nota Fiscal': 'fas fa-file-invoice',
-        'Produto': 'fas fa-box',
-        'Código': 'fas fa-barcode',
-        'XML': 'fas fa-file-code'
+      this.canonizedNFe = {
+        number: '12345678901234',
+        issueDate: '2024-01-15T10:00:00',
+        totalValue: 1250.00,
+        issuer: {
+          name: 'Empresa Exemplo Ltda',
+          cnpj: '12.345.678/0001-90'
+        },
+        products: [
+          { id: 1, name: 'Produto A', description: 'Descrição do Produto A', quantity: 2, unitPrice: 10.50, totalPrice: 21.00 },
+          { id: 2, name: 'Produto B', description: 'Descrição do Produto B', quantity: 1, unitPrice: 20.00, totalPrice: 20.00 },
+          { id: 3, name: 'Produto C', description: 'Descrição do Produto C', quantity: 3, unitPrice: 5.75, totalPrice: 17.25 }
+        ]
       }
-      return icons[type] || 'fas fa-file'
+      this.showDiverChat = true
+      this.diverMessages.push({
+        id: Date.now(),
+        text: 'XML processado. Iniciando canonização...',
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
+      setTimeout(() => {
+        this.diverMessages.push({
+          id: Date.now() + 1,
+          text: `Canonização concluída! Número: ${this.canonizedNFe.number}, Valor Total: R$ ${this.canonizedNFe.totalValue}.`,
+          type: 'diver',
+          timestamp: new Date().toISOString()
+        })
+      }, 2000)
     },
 
     formatDate(dateString) {
       return new Date(dateString).toLocaleDateString('pt-BR')
     },
 
-    viewDetails(result) {
-      // Implementar visualização detalhada
-      console.log('Visualizar detalhes:', result)
+    formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString('pt-BR', { hour: 'numeric', minute: 'numeric' })
     },
 
-    downloadResult(result) {
-      // Implementar download do resultado
-      console.log('Download:', result)
+    sendMessageToDiver() {
+      if (!this.chatInput.trim()) return
+      this.diverMessages.push({
+        id: Date.now(),
+        text: this.chatInput,
+        type: 'human',
+        timestamp: new Date().toISOString()
+      })
+      this.chatInput = ''
+      this.diverMessages.push({
+        id: Date.now() + 1,
+        text: 'Esta é uma resposta simulada do Diver. Em um cenário real, ele usaria uma API de IA para processar a pergunta.',
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
     },
 
-    enableEmailNotification() {
-      this.notificationType = 'email'
-      this.notificationEnabled = false
-      this.showNotificationSuccess('Email configurado para notificação!')
-    },
-
-    enableWhatsAppNotification() {
-      this.notificationType = 'whatsapp'
-      this.notificationEnabled = false
-      this.showNotificationSuccess('WhatsApp configurado para notificação!')
-    },
-
-    disableNotification() {
-      this.notificationType = null
-      this.notificationEnabled = false
-    },
-
-    showNotificationSuccess(message) {
-      // Implementar toast de sucesso
-      console.log(message)
-    },
-
-    clearResults() {
-      this.searchResults = []
-      this.searchQuery = ''
-    },
-
-    loadHistoryItem(item) {
-      this.searchQuery = item.query
-      this.performSearch()
-    },
-
-    loadSuggestion(suggestion) {
-      this.searchQuery = suggestion.text
-      this.performSearch()
+    closeDiverChat() {
+      this.showDiverChat = false
+      this.diverMessages = []
+      this.chatInput = ''
     },
 
     addToHistory(query) {
@@ -409,6 +494,11 @@ export default {
       if (this.searchHistory.length > 10) {
         this.searchHistory = this.searchHistory.slice(0, 10)
       }
+    },
+
+    loadHistoryItem(item) {
+      this.searchQuery = item.query
+      this.performProductSearch()
     }
   }
 }
@@ -450,6 +540,53 @@ export default {
   font-size: 1.2rem;
   color: #94a3b8;
   margin: 0;
+}
+
+.journey-selector {
+  margin-bottom: 30px;
+}
+
+.journey-tabs {
+  display: flex;
+  gap: 10px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.journey-tab {
+  flex: 1;
+  padding: 15px 25px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+.journey-tab:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.journey-tab.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.journey-tab i {
+  font-size: 1.1rem;
+}
+
+.journey-content {
+  margin-top: 30px;
 }
 
 .search-container {
@@ -556,314 +693,323 @@ export default {
   transform: translateY(-1px);
 }
 
-.advanced-filters {
-  margin-bottom: 30px;
+.fake-nfe-section {
+  margin-top: 20px;
+  text-align: center;
 }
 
-.advanced-button {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+.fake-nfe-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  color: white;
+  border: none;
   border-radius: 8px;
   padding: 12px 24px;
   cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
 }
 
-.advanced-button:hover {
-  background: rgba(59, 130, 246, 0.2);
+.fake-nfe-button:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+  transform: translateY(-1px);
 }
 
-.filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+.fake-nfe-info {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.canonization-result {
+  margin-top: 30px;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
-  padding: 20px;
   border-radius: 10px;
+  padding: 25px;
 }
 
-.filter-group {
+.result-header {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filter-group label {
-  font-weight: 600;
-  color: #e2e8f0;
-  font-size: 0.9rem;
-}
-
-.filter-select {
-  padding: 8px 12px;
-  background: rgba(15, 23, 42, 0.3);
-  border: 1px solid #475569;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: #e2e8f0;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.results-section {
-  margin-top: 30px;
-}
-
-.results-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.results-header h3 {
+.result-header h3 {
   color: #e2e8f0;
   margin: 0;
 }
 
-.clear-button {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
+.status-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.clear-button:hover {
-  background: rgba(239, 68, 68, 0.2);
-}
-
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-}
-
-.service-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 10px;
-  padding: 20px;
-  transition: all 0.3s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-color: #3b82f6;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.card-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-}
-
-.card-title h4 {
-  color: #e2e8f0;
-  margin: 0 0 5px 0;
-  font-size: 1.1rem;
-}
-
-.card-subtitle {
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.card-actions {
-  margin-left: auto;
-  display: flex;
   gap: 8px;
-}
-
-.btn {
-  padding: 6px 12px;
-  border: none;
+  padding: 8px 12px;
   border-radius: 6px;
-  cursor: pointer;
+  font-weight: 600;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
+.status-badge.success {
+  background-color: rgba(10, 100, 50, 0.1);
+  color: #059669;
+  border: 1px solid rgba(10, 100, 50, 0.2);
 }
 
-.btn-secondary {
-  background: rgba(148, 163, 184, 0.1);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+.status-badge.info {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-.btn-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.card-content {
-  color: #e2e8f0;
-}
-
-.card-description {
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-
-.card-meta {
-  display: flex;
+.nfe-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
+  margin-bottom: 20px;
+}
+
+.nfe-section h4 {
+  color: #e2e8f0;
   margin-bottom: 15px;
-  font-size: 0.9rem;
-  color: #94a3b8;
 }
 
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-details {
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 15px;
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.detail-item strong {
+  color: #e2e8f0;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+
+.product-info h5 {
+  color: #e2e8f0;
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+}
+
+.product-info p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}
+
+.product-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.diver-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.analysis-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.9rem;
 }
 
-.detail-item:last-child {
-  margin-bottom: 0;
+.analysis-item i {
+  font-size: 1rem;
 }
 
-.notification-section {
-  margin-top: 30px;
+.text-success {
+  color: #10b981;
 }
 
-.notification-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 10px;
-  padding: 25px;
-  text-align: center;
-}
-
-.notification-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.notification-header i {
-  font-size: 1.5rem;
+.text-info {
   color: #3b82f6;
 }
 
-.notification-header h4 {
-  color: #e2e8f0;
-  margin: 0;
-}
-
-.notification-card p {
-  color: #94a3b8;
-  margin-bottom: 20px;
-}
-
-.notification-options h5 {
-  color: #e2e8f0;
-  margin-bottom: 15px;
-}
-
-.notification-buttons {
+.action-buttons {
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
-.history-section, .suggestions-section {
-  margin-top: 30px;
-}
-
-.history-section h3, .suggestions-section h3 {
-  color: #e2e8f0;
-  margin-bottom: 15px;
-}
-
-.history-list, .suggestions-list {
+.diver-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 450px;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
   overflow: hidden;
 }
 
-.history-item, .suggestion-item {
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  cursor: pointer;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-bottom: 1px solid #475569;
+}
+
+.chat-header h4 {
+  color: white;
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: background 0.2s ease;
+  gap: 8px;
+}
+
+.chat-header i {
+  font-size: 1.2rem;
+  color: white;
+}
+
+.close-chat {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: white;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.close-chat:hover {
+  transform: scale(1.1);
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.message.human {
+  flex-direction: row-reverse;
+}
+
+.message.diver {
+  flex-direction: row;
+}
+
+.message-content {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.message.human .message-content {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.message.diver .message-content {
+  background-color: #475569;
   color: #e2e8f0;
 }
 
-.history-item:hover, .suggestion-item:hover {
-  background: rgba(15, 23, 42, 0.5);
+.message-text {
+  margin-bottom: 5px;
+  line-height: 1.4;
 }
 
-.history-item i, .suggestion-item i {
-  color: #3b82f6;
-  font-size: 0.9rem;
+.message-time {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-align: right;
 }
 
-.history-date {
-  margin-left: auto;
-  color: #64748b;
-  font-size: 0.8rem;
+.message.human .message-time {
+  text-align: left;
+}
+
+.chat-input {
+  display: flex;
+  padding: 15px 20px;
+  background: #263238;
+  border-top: 1px solid #475569;
+}
+
+.chat-input-field {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: 1px solid #475569;
+  border-radius: 20px;
+  background: #374151;
+  color: #e2e8f0;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.chat-input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.send-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-button:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-1px);
+}
+
+.send-button i {
+  font-size: 1.1rem;
 }
 
 @media (max-width: 768px) {
@@ -884,14 +1030,11 @@ export default {
     grid-template-columns: 1fr;
   }
   
-  .notification-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .card-meta {
-    flex-direction: column;
-    gap: 10px;
+  .diver-chat {
+    width: 90%;
+    height: 60%;
+    bottom: 10px;
+    right: 10px;
   }
 }
 </style> 
