@@ -65,6 +65,19 @@
               </router-link>
             </li>
             
+            <!-- Explorer -->
+            <li class="nav-item">
+              <router-link class="nav-link" to="/explorer" @click="handleNavClick">
+                <div class="nav-icon">
+                  <i class="fas fa-compass"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Explorer</div>
+                  <div class="service-subtitle">Pesquisa e Exploração</div>
+                </div>
+              </router-link>
+            </li>
+            
             <!-- Diver -->
             <li class="nav-item">
               <router-link class="nav-link" to="/diver" @click="handleNavClick">

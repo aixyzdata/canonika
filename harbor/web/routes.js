@@ -6,6 +6,13 @@ export default [
     component: () => import('./views/DashboardView.vue')
   },
   
+  // Explorer - Interface de pesquisa
+  {
+    path: '/explorer',
+    name: 'Explorer',
+    component: () => import('./views/ExplorerView.vue')
+  },
+  
   // Diver - Primeiro item do menu
   {
     path: '/diver',
