@@ -194,7 +194,7 @@
         </div>
 
         <!-- Estado Vazio - Sugestões -->
-        <div v-if="!productResults.length && !searchQuery" class="empty-state">
+        <div v-if="!productResults.length && !searchQuery.trim()" class="empty-state">
           <div class="empty-content">
             <div class="empty-icon">
               <i class="fas fa-search"></i>
@@ -387,6 +387,7 @@ export default {
   },
   methods: {
     performProductSearch() {
+      console.log('🔍 Executando pesquisa:', this.searchQuery)
       if (!this.searchQuery.trim()) return
       
       // Simular pesquisa de produtos canônicos
@@ -502,6 +503,7 @@ export default {
         product.ean.includes(this.searchQuery) ||
         (product.sku && product.sku.toLowerCase().includes(this.searchQuery.toLowerCase()))
       )
+      console.log('📊 Resultados encontrados:', this.productResults.length)
       this.addToHistory(this.searchQuery)
     },
 
