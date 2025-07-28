@@ -17,16 +17,21 @@ from pathlib import Path
 import hashlib
 import os
 import websockets
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import httpx
 from urllib.parse import urljoin, urlparse
 import re
 from bs4 import BeautifulSoup
+from pydantic import BaseModel
 
 from cnpj_processor import CNPJProcessor
 from sqlalchemy import text
+
+# Modelo para request de download
+class DownloadRequest(BaseModel):
+    force_replace: bool = False
 
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
@@ -424,7 +429,7 @@ class FisherService:
                 "error": str(e)
             }
     
-    async def download_cnpj_file(self, filename: str, month_year: str = None) -> Dict[str, Any]:
+    async def download_cnpj_file(self, filename: str, month_year: str = None, force_replace: bool = False) -> Dict[str, Any]:
         """Download real de um arquivo CNPJ da Receita Federal"""
         try:
             # Primeiro, buscar a lista de arquivos para obter a URL correta
@@ -475,6 +480,21 @@ class FisherService:
             
             # Caminho local do arquivo
             local_path = month_dir / filename
+            
+            # Verificar se arquivo já existe
+            if local_path.exists() and not force_replace:
+                return {
+                    "status": "error",
+                    "filename": filename,
+                    "error": f"Arquivo {filename} já existe. Use force_replace=true para substituir.",
+                    "local_path": str(local_path),
+                    "month_year": month_year
+                }
+            
+            # Se force_replace=True e arquivo existe, remover primeiro
+            if local_path.exists() and force_replace:
+                local_path.unlink()
+                logger.info(f"🗑️ Arquivo existente removido: {local_path}")
             
             # Inicializar progresso
             download_id = f"download_{filename}_{datetime.now().timestamp()}"
@@ -616,16 +636,28 @@ class FisherService:
     async def broadcast_progress(self, download_id: str):
         """Envia progresso via WebSocket para todos os clientes conectados"""
         if download_id in self.download_progress:
-            progress_data = {
+            # Criar uma cópia dos dados de progresso para serialização
+            progress_data = self.download_progress[download_id].copy()
+            
+            # Converter datetime para string se existir
+            if 'start_time' in progress_data and isinstance(progress_data['start_time'], datetime):
+                progress_data['start_time'] = progress_data['start_time'].isoformat()
+            
+            message_data = {
                 "type": "download_progress",
                 "download_id": download_id,
-                "data": self.download_progress[download_id]
+                "data": progress_data
             }
+            
+            logger.info(f"📡 Broadcast progresso: {download_id} - {progress_data['progress']}%")
+            logger.info(f"📡 Conexões ativas: {len(active_connections)}")
             
             for connection in active_connections:
                 try:
-                    await connection.send_text(json.dumps(progress_data))
-                except:
+                    await connection.send_text(json.dumps(message_data))
+                    logger.info(f"✅ Progresso enviado para conexão")
+                except Exception as e:
+                    logger.error(f"❌ Erro ao enviar progresso: {e}")
                     # Remover conexões inativas
                     active_connections.remove(connection)
     
@@ -735,13 +767,9 @@ class FisherService:
                                             if last_downloaded_month is None or month_year > last_downloaded_month:
                                                 last_downloaded_month = month_year
                     
-                    # Filtrar apenas diretórios que ainda não foram baixados
-                    if downloaded_months:
-                        directory_links = [d for d in directory_links if d not in downloaded_months]
-                        logger.info(f"📁 Meses já baixados: {sorted(downloaded_months)}")
-                        logger.info(f"📁 Meses disponíveis para download: {len(directory_links)}")
-                    else:
-                        logger.info(f"📁 Nenhum mês baixado ainda. Todos os meses disponíveis: {len(directory_links)}")
+                    # Mostrar todos os meses disponíveis (não filtrar os já baixados)
+                    logger.info(f"📁 Meses já baixados: {sorted(downloaded_months)}")
+                    logger.info(f"📁 Todos os meses disponíveis: {len(directory_links)}")
                     
                     # Buscar arquivos em cada diretório
                     all_files = []
@@ -842,6 +870,7 @@ cnpj_processor = CNPJProcessor()
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     active_connections.append(websocket)
+    logger.info(f"🔌 Nova conexão WebSocket aceita. Total: {len(active_connections)}")
     
     try:
         while True:
@@ -849,6 +878,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.receive_text()
     except WebSocketDisconnect:
         active_connections.remove(websocket)
+        logger.info(f"🔌 Conexão WebSocket fechada. Total: {len(active_connections)}")
 
 # Endpoints REST
 @app.get("/cnpj/files/status")
@@ -862,9 +892,9 @@ async def download_cnpj_files(filenames: List[str]):
     return await fisher_service.download_multiple_cnpj_files(filenames)
 
 @app.post("/cnpj/download/{filename}")
-async def download_single_cnpj_file(filename: str, month_year: str = None):
+async def download_single_cnpj_file(filename: str, month_year: str = None, request: DownloadRequest = DownloadRequest()):
     """Download de um arquivo CNPJ específico"""
-    return await fisher_service.download_cnpj_file(filename, month_year)
+    return await fisher_service.download_cnpj_file(filename, month_year, request.force_replace)
 
 @app.delete("/cnpj/files/{filename}")
 async def delete_cnpj_file(filename: str):
@@ -1010,7 +1040,7 @@ async def setup_cnpj_database():
             return {
                 "status": "error",
                 "message": "Arquivo schema.sql não encontrado"
-            }
+                    }
         
         # Inicializar processador
         await cnpj_processor.initialize_db()
@@ -1033,7 +1063,7 @@ async def setup_cnpj_database():
             "status": "success",
             "message": "Banco de dados configurado com sucesso"
         }
-        
+    
     except Exception as e:
         logger.error(f"Erro ao configurar banco de dados: {e}")
         return {

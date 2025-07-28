@@ -29,7 +29,6 @@ services:
       - "3701:80"
     volumes:
       - ./shared/styles:/usr/share/nginx/html/shared/styles
-      - ./harbor/web:/usr/share/nginx/html
     depends_on:
       - postgres
       - redis

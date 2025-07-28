@@ -1,36 +1,27 @@
 # Dockerfile simplificado para Harbor - Desenvolvimento
 FROM nginx:1.25-alpine
 
-# Instalar Python e dependências
+# Instalar dependências básicas
 RUN apk add --no-cache \
     python3 \
     py3-pip \
     gcc \
     musl-dev \
-    libffi-dev \
-    openssl-dev \
-    postgresql-dev
+    libffi-dev
 
-# Copiar configuração do nginx
+# Copiar configuração do Nginx
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copiar arquivos da aplicação
-COPY web/ /usr/share/nginx/html/
-COPY api/ /app/api/
+COPY web/dist/ /usr/share/nginx/html/
 
-# Instalar dependências Python se existirem
-RUN if [ -f /app/api/requirements.txt ]; then \
-        pip3 install --no-cache-dir -r /app/api/requirements.txt --break-system-packages; \
-    fi
-
-# Script de inicialização
+# Criar script de inicialização
 RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'nginx -g "daemon off;" &' >> /start.sh && \
-    echo 'if [ -f /app/api/main.py ]; then' >> /start.sh && \
-    echo '    cd /app/api && python3 main.py &' >> /start.sh && \
-    echo 'fi' >> /start.sh && \
-    echo 'wait' >> /start.sh && \
+    echo 'nginx -g "daemon off;"' >> /start.sh && \
     chmod +x /start.sh
 
+# Expor porta
 EXPOSE 80
+
+# Comando padrão
 CMD ["/start.sh"] 

@@ -18,13 +18,13 @@
           <h3>Status Geral</h3>
           <div class="card-icon">
             <i class="fas fa-chart-line"></i>
-          </div>
+        </div>
         </div>
         <div class="card-content">
           <div class="balance-display">
             <div class="balance-value">{{ config.metrics[0].value }}</div>
             <div class="balance-label">{{ config.metrics[0].label }}</div>
-          </div>
+      </div>
           <div class="balance-details">
             <div class="detail-item">
               <span class="detail-label">Dados Processados:</span>
@@ -48,8 +48,8 @@
           <h3>Fontes de Dados</h3>
           <div class="card-icon">
             <i class="fas fa-database"></i>
-          </div>
-        </div>
+                </div>
+              </div>
         <div class="card-content">
           <div class="plans-grid">
             <div 
@@ -86,11 +86,11 @@
                   {{ activity.description }}
                 </div>
                 <div class="transaction-time">{{ activity.time }}</div>
-              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
       <!-- Status do Sistema -->
       <div class="service-card">

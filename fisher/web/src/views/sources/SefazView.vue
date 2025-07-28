@@ -54,13 +54,20 @@
           <div class="cnpj-controls">
             <div class="control-buttons">
               <button @click="refreshFileList" class="btn-action">
-                <i class="fas fa-refresh"></i> Atualizar Lista
+                <i class="fas fa-sync-alt"></i>
+                Atualizar Lista
               </button>
-              <button @click="downloadSelected" class="btn-action" :disabled="!hasSelectedFiles">
-                <i class="fas fa-download"></i> Baixar Selecionados
+              <button @click="downloadSelectedFiles" class="btn-action" :disabled="!hasSelectedFiles">
+                <i class="fas fa-download"></i>
+                Baixar Selecionados
               </button>
-              <button @click="downloadAllMissing" class="btn-action" :disabled="!hasMissingFiles">
-                <i class="fas fa-download"></i> Baixar Todos os Faltantes
+              <button @click="downloadMissingFiles" class="btn-action" :disabled="!hasMissingFiles">
+                <i class="fas fa-download"></i>
+                Baixar Todos os Faltantes
+              </button>
+              <button @click="testModal" class="btn-action">
+                <i class="fas fa-test"></i>
+                Teste Modal
               </button>
             </div>
             
@@ -413,34 +420,47 @@
           </div>
           
           <div class="modal-footer">
-            <button 
-              @click="pauseDownloads" 
-              class="btn-action"
-              :disabled="!isDownloading"
-            >
-              <i class="fas fa-pause"></i> Pausar
-            </button>
-            <button 
-              @click="resumeDownloads" 
-              class="btn-action"
-              :disabled="!isPaused"
-            >
-              <i class="fas fa-play"></i> Retomar
-            </button>
-            <button 
-              @click="cancelDownloads" 
-              class="btn-action danger"
-              :disabled="!isDownloading && !isPaused"
-            >
-              <i class="fas fa-stop"></i> Cancelar
-            </button>
-            <button 
-              @click="closeDownloadModal" 
-              class="btn-action"
-              :disabled="isDownloading"
-            >
-              <i class="fas fa-check"></i> Fechar
-            </button>
+            <div class="download-options">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  v-model="forceReplace"
+                  class="checkbox-input"
+                >
+                <span class="checkbox-text">Forçar substituição de arquivos existentes</span>
+              </label>
+            </div>
+            
+            <div class="modal-actions">
+              <button 
+                @click="pauseDownloads" 
+                class="btn-action"
+                :disabled="!isDownloading"
+              >
+                <i class="fas fa-pause"></i> Pausar
+              </button>
+              <button 
+                @click="resumeDownloads" 
+                class="btn-action"
+                :disabled="!isPaused"
+              >
+                <i class="fas fa-play"></i> Retomar
+              </button>
+              <button 
+                @click="cancelDownloads" 
+                class="btn-action danger"
+                :disabled="!isDownloading && !isPaused"
+              >
+                <i class="fas fa-stop"></i> Cancelar
+              </button>
+              <button 
+                @click="closeDownloadModal" 
+                class="btn-action"
+                :disabled="isDownloading"
+              >
+                <i class="fas fa-check"></i> Fechar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -453,93 +473,34 @@ export default {
   name: 'SefazView',
   data() {
     return {
+      sourceStatus: {
+        status: 'connecting',
+        message: 'Conectando...',
+        lastUpdate: null
+      },
+      fileStats: {
+        total: 0,
+        downloaded: 0,
+        available: 0,
+        processing: 0
+      },
+      processingStats: {
+        total: 0,
+        processed: 0,
+        failed: 0,
+        pending: 0
+      },
+      recentLogs: [],
+      cnpjFiles: [],
       showDownloadModal: false,
       isDownloading: false,
       isPaused: false,
       downloadQueue: [],
-      downloadInterval: null,
       websocket: null,
       apiBaseUrl: 'http://localhost:7724',
-      processingStats: {
-        downloaded: 0,
-        processed: 0,
-        pending: 0,
-        totalRecords: 0
-      },
-      processingLogs: [],
-      sourceStatus: {
-        status: 'CONECTANDO...',
-        description: 'Verificando conexão com Receita Federal',
-        lastSync: 'Nunca',
-        downloadedFiles: '0/0',
-        successRate: '0%'
-      },
-      fileStats: {
-        totalAvailable: 0,
-        downloaded: 0,
-        missing: 0,
-        selected: 0
-      },
-      cnpjFiles: [],
-      dataMetrics: [
-        {
-          id: 1,
-          value: '0',
-          label: 'Arquivos Baixados',
-          icon: 'fas fa-download'
-        },
-        {
-          id: 2,
-          value: '0GB',
-          label: 'Dados Armazenados',
-          icon: 'fas fa-hdd'
-        },
-        {
-          id: 3,
-          value: '0',
-          label: 'CNPJs Processados',
-          icon: 'fas fa-building'
-        },
-        {
-          id: 4,
-          value: '0%',
-          label: 'Taxa de Disponibilidade',
-          icon: 'fas fa-check-circle'
-        }
-      ],
-      configurations: [
-        {
-          id: 1,
-          name: 'URL Base CNPJ',
-          value: 'https://arquivos.receitafederal.gov.br/dados/cnpj/',
-          status: 'online',
-          statusText: 'ATIVO'
-        },
-        {
-          id: 2,
-          name: 'Diretório Local',
-          value: '/app/data/cnpj/',
-          status: 'online',
-          statusText: 'CONFIGURADO'
-        },
-        {
-          id: 3,
-          name: 'Tamanho Máximo',
-          value: '~100MB por arquivo',
-          status: 'online',
-          statusText: 'OK'
-        },
-        {
-          id: 4,
-          name: 'Backup Automático',
-          value: 'Não configurado',
-          status: 'offline',
-          statusText: 'INATIVO'
-        }
-      ],
-      recentLogs: [],
-      selectedMonthYear: '', // Para controlar o filtro de mês/ano
-      availableMonths: [] // Para armazenar os meses/anos disponíveis
+      selectedMonthYear: null,
+      availableMonths: [],
+      forceReplace: false
     }
   },
   computed: {
@@ -956,12 +917,12 @@ export default {
       ]
       this.updateFileStats()
     },
-    async downloadSelected() {
+    async downloadSelectedFiles() {
       const selectedFiles = this.cnpjFiles.filter(file => file.selected)
       console.log('Downloading selected files:', selectedFiles.map(f => f.filename))
       await this.startDownload(selectedFiles)
     },
-    async downloadAllMissing() {
+    async downloadMissingFiles() {
       const missingFiles = this.cnpjFiles.filter(file => file.status === 'available')
       console.log('Downloading all missing files:', missingFiles.map(f => f.filename))
       await this.startDownload(missingFiles)
@@ -985,52 +946,49 @@ export default {
       this.isDownloading = true
       this.isPaused = false
       
-      // Conectar WebSocket se não estiver conectado
-      if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
-        this.connectWebSocket()
-      }
+      console.log('🚀 Iniciando downloads com polling...')
+      console.log('📊 Fila inicial:', this.downloadQueue.map(item => ({ id: item.id, filename: item.filename, status: item.status })))
+      console.log('🔧 Force replace inicial:', this.forceReplace)
       
       // Iniciar downloads sequenciais
       await this.processDownloadQueue()
     },
-    connectWebSocket() {
-      try {
-        this.websocket = new WebSocket(`ws://localhost:7724/ws/downloads`)
-        
-        this.websocket.onopen = () => {
-          console.log('WebSocket conectado')
-        }
-        
-        this.websocket.onmessage = (event) => {
-          const data = JSON.parse(event.data)
-          if (data.type === 'download_progress') {
-            this.updateDownloadProgress(data.download_id, data.data)
-          }
-        }
-        
-        this.websocket.onerror = (error) => {
-          console.error('Erro no WebSocket:', error)
-        }
-        
-        this.websocket.onclose = () => {
-          console.log('WebSocket desconectado')
-        }
-      } catch (error) {
-        console.error('Erro ao conectar WebSocket:', error)
-      }
-    },
     updateDownloadProgress(downloadId, progressData) {
+      console.log('📊 Atualizando progresso:', downloadId, progressData)
+      console.log('📊 Fila atual antes da atualização:', this.downloadQueue.map(item => ({ id: item.id, downloadId: item.downloadId, filename: item.filename, progress: item.progress })))
+      
       const queueItem = this.downloadQueue.find(item => item.downloadId === downloadId)
       if (queueItem) {
-        Object.assign(queueItem, progressData)
+        console.log('✅ Item encontrado na fila, atualizando...')
+        console.log('📊 Progresso anterior:', queueItem.progress, '%')
+        console.log('📊 Progresso novo:', progressData.progress, '%')
+        console.log('📊 Status anterior:', queueItem.status)
+        console.log('📊 Status novo:', progressData.status)
+        
+        // Forçar reatividade do Vue
+        this.$set(queueItem, 'progress', progressData.progress)
+        this.$set(queueItem, 'status', progressData.status)
+        this.$set(queueItem, 'message', progressData.message)
+        this.$set(queueItem, 'speed', progressData.speed)
+        this.$set(queueItem, 'eta', progressData.eta)
+        
+        console.log('✅ Progresso atualizado na fila com $set')
+        console.log('📊 Fila atual após atualização:', this.downloadQueue.map(item => ({ id: item.id, downloadId: item.downloadId, filename: item.filename, progress: item.progress, status: item.status })))
         
         // Se download concluído, atualizar status na lista principal
         if (progressData.status === 'completed') {
+          console.log('✅ Download concluído, atualizando lista principal...')
           const fileIndex = this.cnpjFiles.findIndex(f => f.filename === progressData.filename)
           if (fileIndex !== -1) {
             this.cnpjFiles[fileIndex].status = 'downloaded'
+            console.log('✅ Status atualizado na lista principal')
+          } else {
+            console.log('❌ Arquivo não encontrado na lista principal:', progressData.filename)
           }
         }
+      } else {
+        console.log('❌ Item não encontrado na fila:', downloadId)
+        console.log('Fila atual:', this.downloadQueue.map(item => ({ id: item.id, downloadId: item.downloadId, filename: item.filename })))
       }
     },
     async processDownloadQueue() {
@@ -1038,39 +996,115 @@ export default {
       
       const pendingItem = this.downloadQueue.find(item => item.status === 'pending')
       if (!pendingItem) {
+        console.log('✅ Nenhum item pendente na fila')
         this.isDownloading = false
         return
       }
       
+      console.log('🚀 Processando item:', pendingItem.filename)
+      console.log('📊 Status atual do item:', pendingItem.status)
+      
       try {
         // Iniciar download via API
-        const response = await fetch(`${this.apiBaseUrl}/cnpj/download/${pendingItem.filename}`, {
-          method: 'POST'
+        const downloadUrl = `${this.apiBaseUrl}/cnpj/download/${pendingItem.filename}`
+        console.log('📡 Iniciando download via:', downloadUrl)
+        console.log('🔧 Force replace:', this.forceReplace)
+        
+        const response = await fetch(downloadUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            force_replace: this.forceReplace
+          })
         })
         
+        console.log('📡 Resposta do download:', response.status, response.statusText)
+        
         const result = await response.json()
+        console.log('📊 Resultado do download:', result)
         
         if (result.status === 'success') {
           pendingItem.downloadId = result.download_id
           pendingItem.status = 'downloading'
           pendingItem.startTime = Date.now()
           pendingItem.message = 'Iniciando download...'
+          
+          console.log('✅ Download iniciado com ID:', result.download_id)
+          console.log('📊 Item atualizado na fila:', pendingItem)
+          console.log('📊 Fila completa após iniciar download:', this.downloadQueue.map(item => ({ id: item.id, downloadId: item.downloadId, filename: item.filename, status: item.status, progress: item.progress })))
+          
+          // Iniciar polling se WebSocket não estiver funcionando
+          console.log('🔄 Iniciando polling para download ID:', result.download_id)
+          this.startProgressPolling(pendingItem.downloadId)
         } else {
           pendingItem.status = 'error'
           pendingItem.message = result.error || 'Erro no download'
+          console.error('❌ Erro no download:', result.error)
         }
         
         // Processar próximo item após um delay
         setTimeout(() => this.processDownloadQueue(), 1000)
         
       } catch (error) {
-        console.error('Erro no download:', error)
+        console.error('❌ Erro no download:', error)
         pendingItem.status = 'error'
-        pendingItem.message = 'Erro de conexão'
+        pendingItem.message = `Erro: ${error.message}`
         
-        // Processar próximo item
+        // Processar próximo item após um delay
         setTimeout(() => this.processDownloadQueue(), 1000)
       }
+    },
+    startProgressPolling(downloadId) {
+      console.log('🔄 Iniciando polling para:', downloadId)
+      
+      const pollInterval = setInterval(async () => {
+        try {
+          console.log('📡 Fazendo request para:', `${this.apiBaseUrl}/cnpj/downloads/${downloadId}/progress`)
+          const response = await fetch(`${this.apiBaseUrl}/cnpj/downloads/${downloadId}/progress`)
+          
+          if (!response.ok) {
+            console.error('❌ Erro na resposta:', response.status, response.statusText)
+            return
+          }
+          
+          const progressData = await response.json()
+          console.log('📊 Polling progresso:', progressData)
+          
+          if (progressData && progressData.status) {
+            console.log('✅ Dados de progresso válidos, atualizando...')
+            console.log('📊 Progresso anterior na fila:', this.downloadQueue.find(item => item.downloadId === downloadId)?.progress || 'N/A')
+            this.updateDownloadProgress(downloadId, progressData)
+            console.log('📊 Progresso atualizado na fila:', this.downloadQueue.find(item => item.downloadId === downloadId)?.progress || 'N/A')
+            
+            // Se download concluído ou com erro, parar polling
+            if (progressData.status === 'completed' || progressData.status === 'error') {
+              clearInterval(pollInterval)
+              console.log('✅ Polling finalizado para:', downloadId)
+            }
+          } else {
+            console.log('⚠️ Dados de progresso inválidos:', progressData)
+          }
+        } catch (error) {
+          console.error('❌ Erro no polling:', error)
+          clearInterval(pollInterval)
+        }
+      }, 1000) // Poll a cada 1 segundo
+      
+      console.log('✅ Polling iniciado com intervalo:', pollInterval)
+      
+      // Teste direto após 2 segundos
+      setTimeout(async () => {
+        console.log('🧪 TESTE DIRETO - Verificando se polling está funcionando...')
+        try {
+          const testResponse = await fetch(`${this.apiBaseUrl}/cnpj/downloads/${downloadId}/progress`)
+          const testData = await testResponse.json()
+          console.log('🧪 TESTE DIRETO - Dados recebidos:', testData)
+        } catch (error) {
+          console.error('🧪 TESTE DIRETO - Erro:', error)
+        }
+      }, 2000)
     },
     pauseDownloads() {
       this.isPaused = true
@@ -1219,14 +1253,55 @@ export default {
       if (!monthYear) return 'Todos os meses'
       const [year, month] = monthYear.split('-')
       return `${month}/${year}`
-    }
+    },
+    testModal() {
+      console.log('🧪 Testando modal...')
+      console.log('🔧 Force replace atual:', this.forceReplace)
+      
+      // Simular alguns arquivos para teste
+      const testFiles = [
+        {
+          id: 1,
+          filename: 'test1.zip',
+          size: '1.2 MB',
+          status: 'available'
+        },
+        {
+          id: 2,
+          filename: 'test2.zip',
+          size: '2.5 MB',
+          status: 'available'
+        }
+      ]
+      
+      this.startDownload(testFiles)
+    },
   },
   async mounted() {
+    console.log('🔧 SefazView mounted - iniciando carregamento...')
     await this.refreshAllData()
+    
     // Preencher a lista de meses/anos disponíveis
-    const response = await fetch(`${this.apiBaseUrl}/cnpj/files/months`)
-    const data = await response.json()
-    this.availableMonths = data.months
+    try {
+      console.log('🔧 Carregando meses disponíveis de:', `${this.apiBaseUrl}/cnpj/files/months`)
+      const response = await fetch(`${this.apiBaseUrl}/cnpj/files/months`)
+      console.log('🔧 Response status:', response.status)
+      
+      const data = await response.json()
+      console.log('🔧 Response data:', data)
+      
+      if (data.status === 'success') {
+        this.availableMonths = data.months
+        console.log('✅ Meses disponíveis carregados:', this.availableMonths)
+        console.log('✅ 2025-04 está na lista?', this.availableMonths.includes('2025-04'))
+      } else {
+        console.error('❌ Erro ao carregar meses:', data.error)
+        this.availableMonths = []
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar meses disponíveis:', error)
+      this.availableMonths = []
+    }
   },
   beforeUnmount() {
     if (this.websocket) {
@@ -1420,7 +1495,7 @@ export default {
 .progress-bar {
   width: 100%;
   height: 0.5rem;
-  background: rgba(71, 85, 105, 0.5);
+  background: rgba(71, 85, 69, 0.5);
   border-radius: 0.25rem;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -1472,11 +1547,13 @@ export default {
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
   border-top: 1px solid #475569;
   background: rgba(15, 23, 42, 0.5);
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .modal-footer .btn-action {
@@ -1503,6 +1580,43 @@ export default {
 
 .modal-footer .btn-action.danger:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.2);
+}
+
+.download-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 300px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .cnpj-controls {
@@ -2140,6 +2254,117 @@ export default {
 }
 </style>
 
-<style>
-@import '../../../../../shared/styles/canonika-view.css';
+<style scoped>
+/* v1.1 - Force cache reload */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  border-bottom: 1px solid #475569;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #475569;
+  background: rgba(15, 23, 42, 0.5);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.download-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 300px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-action.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.btn-action.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
 </style> 

@@ -124,8 +124,8 @@
           <h3>🔍 Consulta de Produto</h3>
           <button @click="closeConsultaModal" class="modal-close">
             <i class="fas fa-times"></i>
-          </button>
-        </div>
+      </button>
+    </div>
         <div class="modal-body">
           <form @submit.prevent="consultarProduto" class="canonika-form">
             <div class="form-row">
