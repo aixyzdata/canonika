@@ -287,134 +287,132 @@
       </div>
     </div>
 
-    <!-- Modal de Detalhes do Produto -->
-    <div v-if="showProductDetails && selectedProduct" class="product-details-modal">
-      <div class="modal-overlay" @click="closeProductDetails"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3><i class="fas fa-box"></i> {{ selectedProduct.name }}</h3>
-          <button @click="closeProductDetails" class="close-modal">
-            <i class="fas fa-times"></i>
-          </button>
+      <!-- Modal Inline - Melhor UX -->
+  <div v-if="showProductDetails" class="product-details-inline">
+    <div class="inline-header">
+      <button @click="closeProductDetails" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        Voltar aos Resultados
+      </button>
+      <h2><i class="fas fa-box"></i> {{ selectedProduct?.name }}</h2>
+    </div>
+    
+    <div class="inline-content">
+      <div class="product-info-grid">
+        <!-- Informações Básicas -->
+        <div class="info-section">
+          <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">EAN:</span>
+              <span class="value">{{ selectedProduct?.ean }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">SKU:</span>
+              <span class="value">{{ selectedProduct?.sku || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Marca:</span>
+              <span class="value">{{ selectedProduct?.brand || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Fabricante:</span>
+              <span class="value">{{ selectedProduct?.manufacturer || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Categoria:</span>
+              <span class="value">{{ selectedProduct?.category || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Status:</span>
+              <span class="value status-badge">{{ selectedProduct?.status || 'Ativo' }}</span>
+            </div>
+          </div>
         </div>
-        
-        <div class="modal-body">
-          <div class="product-info-grid">
-            <!-- Informações Básicas -->
-            <div class="info-section">
-              <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">EAN:</span>
-                  <span class="value">{{ selectedProduct.ean }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">SKU:</span>
-                  <span class="value">{{ selectedProduct.sku || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Marca:</span>
-                  <span class="value">{{ selectedProduct.brand || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Fabricante:</span>
-                  <span class="value">{{ selectedProduct.manufacturer || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Categoria:</span>
-                  <span class="value">{{ selectedProduct.category || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Status:</span>
-                  <span class="value status-badge">{{ selectedProduct.status || 'Ativo' }}</span>
-                </div>
-              </div>
-            </div>
 
-            <!-- Especificações Técnicas -->
-            <div class="info-section">
-              <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">NCM:</span>
-                  <span class="value">{{ selectedProduct.ncm || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">CEST:</span>
-                  <span class="value">{{ selectedProduct.cest || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Dimensões:</span>
-                  <span class="value">{{ selectedProduct.length_cm }}×{{ selectedProduct.width_cm }}×{{ selectedProduct.height_cm }}cm</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Peso:</span>
-                  <span class="value">{{ selectedProduct.weight_kg }}kg</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Material:</span>
-                  <span class="value">{{ selectedProduct.material || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Cor:</span>
-                  <span class="value">{{ selectedProduct.color || 'N/A' }}</span>
-                </div>
-              </div>
+        <!-- Especificações Técnicas -->
+        <div class="info-section">
+          <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">NCM:</span>
+              <span class="value">{{ selectedProduct?.ncm || 'N/A' }}</span>
             </div>
-
-            <!-- Características -->
-            <div class="info-section">
-              <h4><i class="fas fa-tags"></i> Características</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">Tamanho:</span>
-                  <span class="value">{{ selectedProduct.size || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Gênero:</span>
-                  <span class="value">{{ selectedProduct.gender || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Faixa Etária:</span>
-                  <span class="value">{{ selectedProduct.age_group || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">Subcategorias:</span>
-                  <span class="value">{{ selectedProduct.subcategories ? selectedProduct.subcategories.join(', ') : 'N/A' }}</span>
-                </div>
-              </div>
+            <div class="info-item">
+              <span class="label">CEST:</span>
+              <span class="value">{{ selectedProduct?.cest || 'N/A' }}</span>
             </div>
-
-            <!-- Tags -->
-            <div v-if="selectedProduct.tags && selectedProduct.tags.length > 0" class="info-section">
-              <h4><i class="fas fa-tags"></i> Tags</h4>
-              <div class="tags-container">
-                <span v-for="tag in selectedProduct.tags" :key="tag" class="tag">
-                  {{ tag }}
-                </span>
-              </div>
+            <div class="info-item">
+              <span class="label">Dimensões:</span>
+              <span class="value">{{ selectedProduct?.length_cm }}×{{ selectedProduct?.width_cm }}×{{ selectedProduct?.height_cm }}cm</span>
             </div>
-
-            <!-- Descrição -->
-            <div v-if="selectedProduct.description" class="info-section">
-              <h4><i class="fas fa-align-left"></i> Descrição</h4>
-              <p class="description">{{ selectedProduct.description }}</p>
+            <div class="info-item">
+              <span class="label">Peso:</span>
+              <span class="value">{{ selectedProduct?.weight_kg }}kg</span>
             </div>
+            <div class="info-item">
+              <span class="label">Material:</span>
+              <span class="value">{{ selectedProduct?.material || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Cor:</span>
+              <span class="value">{{ selectedProduct?.color || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
 
-            <!-- Atualização -->
-            <div class="info-section">
-              <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">Última Atualização:</span>
-                  <span class="value">{{ formatDate(selectedProduct.updated_at) }}</span>
-                </div>
-              </div>
+        <!-- Características -->
+        <div class="info-section">
+          <h4><i class="fas fa-tags"></i> Características</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Tamanho:</span>
+              <span class="value">{{ selectedProduct?.size || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Gênero:</span>
+              <span class="value">{{ selectedProduct?.gender || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Faixa Etária:</span>
+              <span class="value">{{ selectedProduct?.age_group || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Subcategorias:</span>
+              <span class="value">{{ selectedProduct?.subcategories ? selectedProduct?.subcategories.join(', ') : 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div v-if="selectedProduct?.tags && selectedProduct?.tags.length > 0" class="info-section">
+          <h4><i class="fas fa-tags"></i> Tags</h4>
+          <div class="tags-container">
+            <span v-for="tag in selectedProduct?.tags" :key="tag" class="tag">
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Descrição -->
+        <div v-if="selectedProduct?.description" class="info-section">
+          <h4><i class="fas fa-align-left"></i> Descrição</h4>
+          <p class="description">{{ selectedProduct?.description }}</p>
+        </div>
+
+        <!-- Atualização -->
+        <div class="info-section">
+          <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Última Atualização:</span>
+              <span class="value">{{ formatDate(selectedProduct?.updated_at) }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -560,14 +558,21 @@ export default {
      
 
     viewProductDetails(product) {
+      console.log('🔍 viewProductDetails chamada:', product)
+      console.log('🔍 showProductDetails antes:', this.showProductDetails)
       this.selectedProduct = product
       this.showProductDetails = true
+      console.log('🔍 showProductDetails depois:', this.showProductDetails)
+      console.log('🔍 selectedProduct:', this.selectedProduct)
     },
 
     closeProductDetails() {
+      console.log('🔍 closeProductDetails chamada')
       this.showProductDetails = false
       this.selectedProduct = null
     },
+
+
 
     viewNFeDetails() {
       // Implementar visualização de detalhes da NFe
@@ -1783,79 +1788,63 @@ export default {
     right: 10px;
      }
 
-   /* Modal de Detalhes */
-   .product-details-modal {
-     position: fixed !important;
-     top: 0 !important;
-     left: 0 !important;
-     width: 100vw !important;
-     height: 100vh !important;
-     z-index: 99999 !important;
-     display: flex !important;
-     align-items: center !important;
-     justify-content: center !important;
-     pointer-events: auto !important;
+   /* Modal Inline - Melhor UX */
+   .product-details-inline {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+     z-index: 999999;
+     overflow-y: auto;
    }
 
-   .modal-overlay {
-     position: absolute !important;
-     top: 0 !important;
-     left: 0 !important;
-     width: 100% !important;
-     height: 100% !important;
-     background: rgba(0, 0, 0, 0.8) !important;
-     backdrop-filter: blur(5px) !important;
-     pointer-events: auto !important;
-   }
-
-   .modal-content {
-     position: relative !important;
-     background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-     border: 1px solid #475569 !important;
-     border-radius: 15px !important;
-     max-width: 900px !important;
-     width: 90% !important;
-     max-height: 85vh !important;
-     overflow-y: auto !important;
-     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
-     z-index: 100000 !important;
-     pointer-events: auto !important;
-   }
-
-   .modal-header {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 25px 30px;
+   .inline-header {
+     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+     padding: 20px 30px;
      border-bottom: 1px solid #475569;
+     display: flex;
+     align-items: center;
+     gap: 20px;
+     position: sticky;
+     top: 0;
+     z-index: 1000;
    }
 
-   .modal-header h3 {
+   .back-button {
+     background: rgba(59, 130, 246, 0.1);
+     color: #3b82f6;
+     border: 1px solid rgba(59, 130, 246, 0.2);
+     border-radius: 8px;
+     padding: 10px 16px;
+     cursor: pointer;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-size: 0.9rem;
+     font-weight: 600;
+     transition: all 0.2s ease;
+   }
+
+   .back-button:hover {
+     background: rgba(59, 130, 246, 0.2);
+     transform: translateY(-1px);
+   }
+
+   .inline-header h2 {
      color: #e2e8f0;
      margin: 0;
      display: flex;
      align-items: center;
      gap: 10px;
+     font-size: 1.5rem;
    }
 
-   .close-modal {
-     background: none;
-     border: none;
-     color: #94a3b8;
-     font-size: 1.2rem;
-     cursor: pointer;
-     padding: 8px;
-     border-radius: 6px;
-     transition: all 0.2s ease;
-   }
-
-   .close-modal:hover {
-     color: #e2e8f0;
-     background: rgba(148, 163, 184, 0.1);
-   }
-
-   .modal-body {
+   .inline-content {
      padding: 30px;
+     max-width: 1200px;
+     margin: 0 auto;
    }
 
    .product-info-grid {
