@@ -1043,8 +1043,42 @@ async def setup_cnpj_database():
 
 @app.get("/cnpj/files/refresh")
 async def refresh_cnpj_files_list():
-    """Atualiza lista de arquivos CNPJ da fonte oficial"""
+    """Atualiza lista de arquivos CNPJ disponíveis"""
     return await fisher_service.get_real_cnpj_files_list()
+
+@app.get("/cnpj/files/months")
+async def get_available_months():
+    """Obtém lista de meses/anos disponíveis para download"""
+    try:
+        files_list = await fisher_service.get_real_cnpj_files_list()
+        
+        if files_list["status"] != "success":
+            return {
+                "status": "error",
+                "error": "Não foi possível obter a lista de arquivos"
+            }
+        
+        # Extrair meses únicos dos arquivos disponíveis
+        available_months = set()
+        for file in files_list["files"]:
+            if file["status"] == "available":
+                available_months.add(file["month_year"])
+        
+        # Ordenar meses (mais recente primeiro)
+        sorted_months = sorted(list(available_months), reverse=True)
+        
+        return {
+            "status": "success",
+            "months": sorted_months,
+            "total_months": len(sorted_months)
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao obter meses disponíveis: {str(e)}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
 
 @app.get("/health")
 async def health_check():

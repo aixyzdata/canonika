@@ -64,6 +64,45 @@
               </button>
             </div>
             
+            <!-- Filtro de Mês/Ano -->
+            <div class="filter-controls">
+              <div class="filter-group">
+                <label for="monthYearFilter" class="filter-label">
+                  <i class="fas fa-filter"></i> Filtrar por Mês/Ano:
+                </label>
+                <select 
+                  id="monthYearFilter" 
+                  v-model="selectedMonthYear" 
+                  @change="applyMonthYearFilter"
+                  class="filter-select"
+                >
+                  <option value="">Todos os meses</option>
+                  <option 
+                    v-for="monthYear in availableMonths" 
+                    :key="monthYear" 
+                    :value="monthYear"
+                  >
+                    {{ formatMonthYear(monthYear) }}
+                  </option>
+                </select>
+                <button 
+                  @click="clearMonthYearFilter" 
+                  class="btn-small"
+                  :disabled="!selectedMonthYear"
+                  title="Limpar filtro"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              
+              <div class="filter-stats" v-if="selectedMonthYear">
+                <span class="filter-stat">
+                  <i class="fas fa-file"></i>
+                  {{ filteredFilesCount }} arquivos no mês {{ formatMonthYear(selectedMonthYear) }}
+                </span>
+              </div>
+            </div>
+            
             <div class="file-stats">
               <div class="stat-item">
                 <span class="stat-label">Total Disponível:</span>
@@ -498,7 +537,9 @@ export default {
           statusText: 'INATIVO'
         }
       ],
-      recentLogs: []
+      recentLogs: [],
+      selectedMonthYear: '', // Para controlar o filtro de mês/ano
+      availableMonths: [] // Para armazenar os meses/anos disponíveis
     }
   },
   computed: {
@@ -528,6 +569,12 @@ export default {
     },
     failedDownloads() {
       return this.downloadQueue.filter(item => item.status === 'error').length
+    },
+    filteredFilesCount() {
+      if (!this.selectedMonthYear) {
+        return this.cnpjFiles.filter(file => file.status === 'available').length;
+      }
+      return this.cnpjFiles.filter(file => file.monthYear === this.selectedMonthYear && file.status === 'available').length;
     }
   },
   methods: {
@@ -697,7 +744,7 @@ export default {
         const data = await response.json()
         
         if (data.status === 'success') {
-          this.cnpjFiles = data.files.map(file => ({
+          let files = data.files.map(file => ({
             id: file.filename,
             monthYear: file.month_year || this.extractMonthYear(file.filename),
             filename: file.filename,
@@ -710,6 +757,13 @@ export default {
             url: file.url
           }))
           
+          // Aplicar filtro de mês/ano se selecionado
+          if (this.selectedMonthYear) {
+            files = files.filter(file => file.monthYear === this.selectedMonthYear)
+            console.log(`Filtrado para mês ${this.selectedMonthYear}: ${files.length} arquivos`)
+          }
+          
+          this.cnpjFiles = files
           this.updateFileStats()
           
           // Atualizar métricas e logs com dados reais
@@ -717,7 +771,8 @@ export default {
           await this.refreshRecentLogs()
           
           // Adicionar log de sucesso
-          this.addProcessingLog('success', `Lista atualizada: ${data.total_available} arquivos disponíveis, ${data.downloaded} baixados`)
+          const filterText = this.selectedMonthYear ? ` (filtrado: ${this.formatMonthYear(this.selectedMonthYear)})` : ''
+          this.addProcessingLog('success', `Lista atualizada: ${files.length} arquivos${filterText}`)
         } else {
           console.error('Erro ao obter status dos arquivos:', data.error)
           this.addProcessingLog('error', `Erro ao atualizar lista: ${data.error}`)
@@ -1150,10 +1205,28 @@ export default {
           statusText: successRate > 50 ? 'BOM' : 'BAIXO'
         }
       ]
+    },
+    async applyMonthYearFilter() {
+      console.log('Applying month/year filter:', this.selectedMonthYear)
+      await this.refreshFileList() // Recarrega a lista com o filtro aplicado
+    },
+    clearMonthYearFilter() {
+      this.selectedMonthYear = ''
+      console.log('Clearing month/year filter')
+      this.refreshFileList() // Recarrega a lista sem filtro
+    },
+    formatMonthYear(monthYear) {
+      if (!monthYear) return 'Todos os meses'
+      const [year, month] = monthYear.split('-')
+      return `${month}/${year}`
     }
   },
   async mounted() {
     await this.refreshAllData()
+    // Preencher a lista de meses/anos disponíveis
+    const response = await fetch(`${this.apiBaseUrl}/cnpj/files/months`)
+    const data = await response.json()
+    this.availableMonths = data.months
   },
   beforeUnmount() {
     if (this.websocket) {
@@ -1465,6 +1538,80 @@ export default {
 .btn-action:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #94a3b8;
+}
+
+.filter-select {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  -webkit-appearance: none; /* Remove estilos padrão do select */
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-chevron-down'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem; /* Espaço para o ícone */
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.filter-select option {
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+.filter-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #475569;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.filter-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .file-stats {
