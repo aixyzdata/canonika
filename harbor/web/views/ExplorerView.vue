@@ -1,5 +1,5 @@
 <template>
-  <div class="explorer-view">
+  <div class="tollgate-view">
     <div class="explorer-content">
       <!-- Logo e Título -->
       <div class="explorer-header">
@@ -265,23 +265,17 @@ export default {
 </script>
 
 <style scoped>
-.explorer-view {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
 
 .explorer-content {
   max-width: 800px;
   width: 100%;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
   padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
 }
 
 .explorer-header {
