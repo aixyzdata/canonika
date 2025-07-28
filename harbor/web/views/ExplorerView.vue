@@ -271,126 +271,138 @@
     </div>
 
     <!-- Modal de Detalhes do Produto -->
-    <div v-if="showProductDetails" class="modal-overlay" @click="closeProductDetails">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h5 class="modal-title">
+    <div v-if="showProductDetails" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;" @click="closeProductDetails">
+      <div style="background: #1e293b; border: 1px solid #475569; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; color: white;" @click.stop>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #475569;">
+          <h3 style="margin: 0; color: #e2e8f0;">
             <i class="fas fa-box"></i> {{ selectedProduct?.name }}
-          </h5>
-          <button @click="closeProductDetails" class="modal-close">
+          </h3>
+          <button @click="closeProductDetails" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <div class="modal-body">
-          <div class="product-info-grid">
+        <div style="padding: 20px;">
+          <div style="display: grid; gap: 20px;">
             <!-- Informações Básicas -->
-            <div class="info-section">
-              <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">EAN:</span>
-                  <span class="value">{{ selectedProduct?.ean }}</span>
+            <div style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-info-circle"></i> Informações Básicas
+              </h4>
+              <div style="display: grid; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">EAN:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.ean }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">SKU:</span>
-                  <span class="value">{{ selectedProduct?.sku || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">SKU:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.sku || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Marca:</span>
-                  <span class="value">{{ selectedProduct?.brand || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Marca:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.brand || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Fabricante:</span>
-                  <span class="value">{{ selectedProduct?.manufacturer || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Fabricante:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.manufacturer || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Categoria:</span>
-                  <span class="value">{{ selectedProduct?.category || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Categoria:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.category || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Status:</span>
-                  <span class="value status-badge">{{ selectedProduct?.status || 'Ativo' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Status:</span>
+                  <span style="color: #10b981; font-weight: 600;">{{ selectedProduct?.status || 'Ativo' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Especificações Técnicas -->
-            <div class="info-section">
-              <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">NCM:</span>
-                  <span class="value">{{ selectedProduct?.ncm || 'N/A' }}</span>
+            <div style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-cogs"></i> Especificações Técnicas
+              </h4>
+              <div style="display: grid; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">NCM:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.ncm || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">CEST:</span>
-                  <span class="value">{{ selectedProduct?.cest || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">CEST:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.cest || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Dimensões:</span>
-                  <span class="value">{{ selectedProduct?.length_cm }}×{{ selectedProduct?.width_cm }}×{{ selectedProduct?.height_cm }}cm</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Dimensões:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.length_cm }}×{{ selectedProduct?.width_cm }}×{{ selectedProduct?.height_cm }}cm</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Peso:</span>
-                  <span class="value">{{ selectedProduct?.weight_kg }}kg</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Peso:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.weight_kg }}kg</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Material:</span>
-                  <span class="value">{{ selectedProduct?.material || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Material:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.material || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Cor:</span>
-                  <span class="value">{{ selectedProduct?.color || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Cor:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.color || 'N/A' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Características -->
-            <div class="info-section">
-              <h4><i class="fas fa-tags"></i> Características</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">Tamanho:</span>
-                  <span class="value">{{ selectedProduct?.size || 'N/A' }}</span>
+            <div style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-tags"></i> Características
+              </h4>
+              <div style="display: grid; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Tamanho:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.size || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Gênero:</span>
-                  <span class="value">{{ selectedProduct?.gender || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Gênero:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.gender || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Faixa Etária:</span>
-                  <span class="value">{{ selectedProduct?.age_group || 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Faixa Etária:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.age_group || 'N/A' }}</span>
                 </div>
-                <div class="info-item">
-                  <span class="label">Subcategorias:</span>
-                  <span class="value">{{ selectedProduct?.subcategories ? selectedProduct?.subcategories.join(', ') : 'N/A' }}</span>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Subcategorias:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ selectedProduct?.subcategories ? selectedProduct?.subcategories.join(', ') : 'N/A' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Tags -->
-            <div v-if="selectedProduct?.tags && selectedProduct?.tags.length > 0" class="info-section">
-              <h4><i class="fas fa-tags"></i> Tags</h4>
-              <div class="tags-container">
-                <span v-for="tag in selectedProduct?.tags" :key="tag" class="tag">
+            <div v-if="selectedProduct?.tags && selectedProduct?.tags.length > 0" style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-tags"></i> Tags
+              </h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span v-for="tag in selectedProduct?.tags" :key="tag" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; border: 1px solid rgba(59, 130, 246, 0.2);">
                   {{ tag }}
                 </span>
               </div>
             </div>
 
             <!-- Descrição -->
-            <div v-if="selectedProduct?.description" class="info-section">
-              <h4><i class="fas fa-align-left"></i> Descrição</h4>
-              <p class="description">{{ selectedProduct?.description }}</p>
+            <div v-if="selectedProduct?.description" style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-align-left"></i> Descrição
+              </h4>
+              <p style="color: #e2e8f0; line-height: 1.6; margin: 0;">{{ selectedProduct?.description }}</p>
             </div>
 
             <!-- Atualização -->
-            <div class="info-section">
-              <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">Última Atualização:</span>
-                  <span class="value">{{ formatDate(selectedProduct?.updated_at) }}</span>
+            <div style="background: rgba(15, 23, 42, 0.3); border-radius: 8px; padding: 15px; border: 1px solid #475569;">
+              <h4 style="color: #e2e8f0; margin: 0 0 15px 0;">
+                <i class="fas fa-clock"></i> Informações de Atualização
+              </h4>
+              <div style="display: grid; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">Última Atualização:</span>
+                  <span style="color: #e2e8f0; font-weight: 600;">{{ formatDate(selectedProduct?.updated_at) }}</span>
                 </div>
               </div>
             </div>
@@ -1592,154 +1604,6 @@ export default {
     grid-template-columns: 1fr;
   }
   
-    /* Modal de Detalhes do Produto */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .modal-content {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    border: 1px solid #475569;
-    border-radius: 0.5rem;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #475569;
-  }
-
-  .modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .modal-close {
-    background: none;
-    border: none;
-    color: #94a3b8;
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0.25rem;
-  }
-
-  .modal-close:hover {
-    color: #e2e8f0;
-  }
-
-  .modal-body {
-    padding: 1.5rem;
-  }
-
-   .product-info-grid {
-     display: grid;
-     gap: 30px;
-   }
-
-   .info-section {
-     background: rgba(15, 23, 42, 0.3);
-     border-radius: 10px;
-     padding: 20px;
-     border: 1px solid #475569;
-   }
-
-   .info-section h4 {
-     color: #e2e8f0;
-     margin: 0 0 15px 0;
-     display: flex;
-     align-items: center;
-     gap: 8px;
-     font-size: 1.1rem;
-   }
-
-   .info-grid {
-     display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-     gap: 15px;
-   }
-
-   .info-item {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 10px 0;
-     border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-   }
-
-   .info-item:last-child {
-     border-bottom: none;
-   }
-
-   .label {
-     color: #94a3b8;
-     font-weight: 500;
-     font-size: 0.9rem;
-   }
-
-   .value {
-     color: #e2e8f0;
-     font-weight: 600;
-     text-align: right;
-   }
-
-   .status-badge {
-     background: rgba(10, 100, 50, 0.1);
-     color: #10b981;
-     padding: 4px 8px;
-     border-radius: 4px;
-     font-size: 0.8rem;
-   }
-
-   .tags-container {
-     display: flex;
-     flex-wrap: wrap;
-     gap: 8px;
-   }
-
-   .tag {
-     background: rgba(59, 130, 246, 0.1);
-     color: #3b82f6;
-     padding: 4px 12px;
-     border-radius: 12px;
-     font-size: 0.8rem;
-     border: 1px solid rgba(59, 130, 246, 0.2);
-   }
-
-   .description {
-     color: #e2e8f0;
-     line-height: 1.6;
-     margin: 0;
-   }
-
-   @media (max-width: 768px) {
-     .modal-content {
-       width: 95%;
-       margin: 10px;
-     }
-     
-     .info-grid {
-       grid-template-columns: 1fr;
-     }
-   }
+    
 }
 </style> 
