@@ -52,7 +52,7 @@
         <!-- Resultados de Produtos -->
         <div v-if="productResults.length > 0" class="results-section">
           <div class="results-header">
-            <h3>Produtos Encontrados ({{ productResults.length }})</h3>
+            <h3>Produtos Canônicos Encontrados ({{ productResults.length }})</h3>
             <button @click="clearProductResults" class="clear-button">
               <i class="fas fa-times"></i>
               Limpar
@@ -71,12 +71,16 @@
                 </div>
                 <div class="card-title">
                   <h4>{{ product.name }}</h4>
-                  <span class="card-subtitle">{{ product.category }}</span>
+                  <span class="card-subtitle">{{ product.brand }} • {{ product.category }}</span>
                 </div>
                 <div class="card-actions">
+                  <button @click="viewProductDetails(product)" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i>
+                    Detalhes
+                  </button>
                   <button @click="askDiverAboutProduct(product)" class="btn btn-sm btn-success">
                     <i class="fas fa-question"></i>
-                    Perguntar ao Diver
+                    Diver
                   </button>
                 </div>
               </div>
@@ -86,16 +90,64 @@
                 
                 <div class="card-meta">
                   <div class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    <span>R$ {{ product.price }}</span>
+                    <i class="fas fa-barcode"></i>
+                    <span>EAN: {{ product.ean }}</span>
                   </div>
                   <div class="meta-item">
-                    <i class="fas fa-barcode"></i>
-                    <span>{{ product.barcode }}</span>
+                    <i class="fas fa-tag"></i>
+                    <span>SKU: {{ product.sku || 'N/A' }}</span>
                   </div>
                   <div class="meta-item">
                     <i class="fas fa-building"></i>
-                    <span>{{ product.brand }}</span>
+                    <span>{{ product.manufacturer }}</span>
+                  </div>
+                </div>
+                
+                <div class="card-details">
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <strong>NCM:</strong> {{ product.ncm || 'N/A' }}
+                    </div>
+                    <div class="detail-item">
+                      <strong>CEST:</strong> {{ product.cest || 'N/A' }}
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <strong>Dimensões:</strong> {{ product.length_cm }}x{{ product.width_cm }}x{{ product.height_cm }}cm
+                    </div>
+                    <div class="detail-item">
+                      <strong>Peso:</strong> {{ product.weight_kg }}kg
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <strong>Material:</strong> {{ product.material || 'N/A' }}
+                    </div>
+                    <div class="detail-item">
+                      <strong>Cor:</strong> {{ product.color || 'N/A' }}
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <strong>Status:</strong> 
+                      <span class="status-badge success">
+                        <i class="fas fa-check-circle"></i>
+                        {{ product.status || 'Ativo' }}
+                      </span>
+                    </div>
+                    <div class="detail-item">
+                      <strong>Atualizado:</strong> {{ formatDate(product.updated_at) }}
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-if="product.tags && product.tags.length > 0" class="tags-section">
+                  <h5>Tags:</h5>
+                  <div class="tags-list">
+                    <span v-for="tag in product.tags" :key="tag" class="tag">
+                      {{ tag }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -350,14 +402,118 @@ export default {
     performProductSearch() {
       if (!this.searchQuery.trim()) return
       
-      // Simular pesquisa de produtos
+      // Simular pesquisa de produtos canônicos
       this.productResults = [
-        { id: 1, name: 'Produto A', category: 'Categoria 1', description: 'Descrição do Produto A', price: 10.50, barcode: '1234567890123', brand: 'Marca A' },
-        { id: 2, name: 'Produto B', category: 'Categoria 2', description: 'Descrição do Produto B', price: 20.00, barcode: '9876543210987', brand: 'Marca B' },
-        { id: 3, name: 'Produto C', category: 'Categoria 1', description: 'Descrição do Produto C', price: 5.75, barcode: '1122334455667', brand: 'Marca A' }
+        {
+          id: 1,
+          ean: '190199267471',
+          sku: 'IPH15P256GB',
+          name: 'iPhone 15 Pro 256GB',
+          description: 'Smartphone Apple iPhone 15 Pro com chip A17 Pro, 256GB de armazenamento, câmera tripla de 48MP, tela Super Retina XDR de 6.1 polegadas',
+          brand: 'Apple',
+          manufacturer: 'Apple Inc.',
+          category: 'Smartphones',
+          subcategories: ['Eletrônicos', 'Telefonia'],
+          ncm: '8517.13.00',
+          cest: '28.038.00',
+          weight_kg: 0.187,
+          width_cm: 7.81,
+          height_cm: 15.95,
+          length_cm: 0.78,
+          color: 'Titanium Natural',
+          size: '6.1"',
+          material: 'Titanium',
+          gender: 'Unissex',
+          age_group: 'Adulto',
+          images: ['https://example.com/iphone15pro1.jpg', 'https://example.com/iphone15pro2.jpg'],
+          tags: ['smartphone', 'apple', 'iphone', '5g', 'camera', 'titanium'],
+          status: 'Ativo',
+          updated_at: '2024-01-15T10:00:00Z'
+        },
+        {
+          id: 2,
+          ean: '8806092291234',
+          sku: 'SGS24U256GB',
+          name: 'Samsung Galaxy S24 Ultra',
+          description: 'Smartphone Samsung Galaxy S24 Ultra com S Pen integrada, 256GB de armazenamento, câmera de 200MP, tela Dynamic AMOLED 2X de 6.8 polegadas',
+          brand: 'Samsung',
+          manufacturer: 'Samsung Electronics',
+          category: 'Smartphones',
+          subcategories: ['Eletrônicos', 'Telefonia'],
+          ncm: '8517.13.00',
+          cest: '28.038.00',
+          weight_kg: 0.232,
+          width_cm: 7.89,
+          height_cm: 16.32,
+          length_cm: 0.89,
+          color: 'Titanium Gray',
+          size: '6.8"',
+          material: 'Titanium',
+          gender: 'Unissex',
+          age_group: 'Adulto',
+          images: ['https://example.com/s24ultra1.jpg', 'https://example.com/s24ultra2.jpg'],
+          tags: ['smartphone', 'samsung', 'galaxy', '5g', 's-pen', 'camera'],
+          status: 'Ativo',
+          updated_at: '2024-01-14T15:30:00Z'
+        },
+        {
+          id: 3,
+          ean: '190199267472',
+          sku: 'MBAIRM213',
+          name: 'MacBook Air M2 13"',
+          description: 'Notebook Apple MacBook Air com chip M2, 13 polegadas, 256GB SSD, tela Retina, até 18 horas de bateria',
+          brand: 'Apple',
+          manufacturer: 'Apple Inc.',
+          category: 'Notebooks',
+          subcategories: ['Eletrônicos', 'Computadores'],
+          ncm: '8471.30.00',
+          cest: '28.038.00',
+          weight_kg: 1.24,
+          width_cm: 30.41,
+          height_cm: 21.24,
+          length_cm: 1.13,
+          color: 'Space Gray',
+          size: '13"',
+          material: 'Alumínio',
+          gender: 'Unissex',
+          age_group: 'Adulto',
+          images: ['https://example.com/macbookair1.jpg', 'https://example.com/macbookair2.jpg'],
+          tags: ['notebook', 'apple', 'macbook', 'm2', 'laptop', 'macos'],
+          status: 'Ativo',
+          updated_at: '2024-01-13T09:15:00Z'
+        },
+        {
+          id: 4,
+          ean: '190199267473',
+          sku: 'AIRPODSPRO2',
+          name: 'AirPods Pro 2ª Geração',
+          description: 'Fones de ouvido sem fio com cancelamento de ruído ativo, áudio espacial, resistentes a água e suor',
+          brand: 'Apple',
+          manufacturer: 'Apple Inc.',
+          category: 'Fones de Ouvido',
+          subcategories: ['Eletrônicos', 'Áudio'],
+          ncm: '8518.30.00',
+          cest: '28.038.00',
+          weight_kg: 0.005,
+          width_cm: 2.39,
+          height_cm: 3.09,
+          length_cm: 2.39,
+          color: 'Branco',
+          size: 'Padrão',
+          material: 'Plástico',
+          gender: 'Unissex',
+          age_group: 'Adulto',
+          images: ['https://example.com/airpodspro1.jpg', 'https://example.com/airpodspro2.jpg'],
+          tags: ['fones', 'apple', 'airpods', 'wireless', 'noise-cancelling', 'bluetooth'],
+          status: 'Ativo',
+          updated_at: '2024-01-12T14:45:00Z'
+        }
       ].filter(product => 
         product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        product.barcode.toLowerCase().includes(this.searchQuery.toLowerCase())
+        product.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.brand.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.ean.includes(this.searchQuery) ||
+        (product.sku && product.sku.toLowerCase().includes(this.searchQuery.toLowerCase()))
       )
       this.addToHistory(this.searchQuery)
     },
@@ -388,7 +544,37 @@ export default {
       })
       this.diverMessages.push({
         id: Date.now() + 1,
-        text: `Este produto é da categoria "${product.category}" e custa R$ ${product.price}. Ele tem um código de barras ${product.barcode} e é da marca "${product.brand}".`,
+        text: `Este produto é da categoria "${product.category}" e é da marca "${product.brand}". Ele tem EAN ${product.ean} e SKU ${product.sku}.`,
+        type: 'diver',
+        timestamp: new Date().toISOString()
+      })
+    },
+
+    viewProductDetails(product) {
+      this.showDiverChat = true
+      this.diverMessages.push({
+        id: Date.now(),
+        text: `Detalhes completos do produto: ${product.name}`,
+        type: 'human',
+        timestamp: new Date().toISOString()
+      })
+      this.diverMessages.push({
+        id: Date.now() + 1,
+        text: `📱 **${product.name}**\n\n` +
+              `**Informações Básicas:**\n` +
+              `• EAN: ${product.ean}\n` +
+              `• SKU: ${product.sku}\n` +
+              `• Marca: ${product.brand}\n` +
+              `• Fabricante: ${product.manufacturer}\n` +
+              `• Categoria: ${product.category}\n\n` +
+              `**Especificações Técnicas:**\n` +
+              `• NCM: ${product.ncm}\n` +
+              `• CEST: ${product.cest}\n` +
+              `• Dimensões: ${product.length_cm}x${product.width_cm}x${product.height_cm}cm\n` +
+              `• Peso: ${product.weight_kg}kg\n` +
+              `• Material: ${product.material}\n` +
+              `• Cor: ${product.color}\n\n` +
+              `**Status:** ${product.status} (Atualizado em ${this.formatDate(product.updated_at)})`,
         type: 'diver',
         timestamp: new Date().toISOString()
       })
@@ -1267,11 +1453,49 @@ export default {
   font-size: 0.9rem;
 }
 
-.detail-item:last-child {
-  margin-bottom: 0;
-}
+ .detail-item:last-child {
+   margin-bottom: 0;
+ }
 
-@media (max-width: 768px) {
+ .detail-row {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 15px;
+   margin-bottom: 10px;
+ }
+
+ .detail-row:last-child {
+   margin-bottom: 0;
+ }
+
+ .tags-section {
+   margin-top: 15px;
+   padding-top: 15px;
+   border-top: 1px solid rgba(148, 163, 184, 0.2);
+ }
+
+ .tags-section h5 {
+   color: #e2e8f0;
+   margin: 0 0 10px 0;
+   font-size: 0.9rem;
+ }
+
+ .tags-list {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 8px;
+ }
+
+ .tag {
+   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+   color: white;
+   padding: 4px 8px;
+   border-radius: 12px;
+   font-size: 0.8rem;
+   font-weight: 500;
+ }
+
+ @media (max-width: 768px) {
   .explorer-content {
     padding: 20px 15px;
   }
