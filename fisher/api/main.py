@@ -424,7 +424,7 @@ class FisherService:
                 "error": str(e)
             }
     
-    async def download_cnpj_file(self, filename: str) -> Dict[str, Any]:
+    async def download_cnpj_file(self, filename: str, month_year: str = None) -> Dict[str, Any]:
         """Download real de um arquivo CNPJ da Receita Federal"""
         try:
             # Primeiro, buscar a lista de arquivos para obter a URL correta
@@ -441,15 +441,25 @@ class FisherService:
             file_info = None
             for file in files_list["files"]:
                 if file["filename"] == filename:
+                    # Se um mês específico foi solicitado, verificar se corresponde
+                    if month_year and file["month_year"] != month_year:
+                        continue
                     file_info = file
                     break
             
             if not file_info:
-                return {
-                    "status": "error",
-                    "filename": filename,
-                    "error": f"Arquivo {filename} não encontrado na lista de arquivos disponíveis"
-                }
+                if month_year:
+                    return {
+                        "status": "error",
+                        "filename": filename,
+                        "error": f"Arquivo {filename} não encontrado no mês {month_year}"
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "filename": filename,
+                        "error": f"Arquivo {filename} não encontrado na lista de arquivos disponíveis"
+                    }
             
             # Usar a URL completa do arquivo
             file_url = file_info["url"]
@@ -708,9 +718,34 @@ class FisherService:
                     # Ordenar diretórios por data (mais recente primeiro)
                     directory_links.sort(reverse=True)
                     
+                    # Determinar a última pasta baixada
+                    cnpj_dir = self.data_dir / "cnpj"
+                    last_downloaded_month = None
+                    downloaded_months = set()
+                    
+                    if cnpj_dir.exists():
+                        for year_dir in cnpj_dir.iterdir():
+                            if year_dir.is_dir() and year_dir.name.isdigit():
+                                for month_dir in year_dir.iterdir():
+                                    if month_dir.is_dir() and month_dir.name.isdigit():
+                                        # Verificar se há arquivos baixados neste mês
+                                        if any(month_dir.glob("*.zip")):
+                                            month_year = f"{year_dir.name}-{month_dir.name:0>2}"
+                                            downloaded_months.add(month_year)
+                                            if last_downloaded_month is None or month_year > last_downloaded_month:
+                                                last_downloaded_month = month_year
+                    
+                    # Filtrar apenas diretórios que ainda não foram baixados
+                    if downloaded_months:
+                        directory_links = [d for d in directory_links if d not in downloaded_months]
+                        logger.info(f"📁 Meses já baixados: {sorted(downloaded_months)}")
+                        logger.info(f"📁 Meses disponíveis para download: {len(directory_links)}")
+                    else:
+                        logger.info(f"📁 Nenhum mês baixado ainda. Todos os meses disponíveis: {len(directory_links)}")
+                    
                     # Buscar arquivos em cada diretório
                     all_files = []
-                    for dir_name in directory_links[:12]:  # Últimos 12 meses
+                    for dir_name in directory_links[:12]:  # Máximo 12 meses
                         dir_url = base_url + dir_name + "/"
                         
                         try:
@@ -741,9 +776,6 @@ class FisherService:
                             continue
                     
                     # Verificar arquivos baixados localmente na nova estrutura
-                    cnpj_dir = self.data_dir / "cnpj"
-                    cnpj_dir.mkdir(exist_ok=True)
-                    
                     downloaded_files = []
                     if cnpj_dir.exists():
                         # Buscar arquivos na estrutura: data/cnpj/YYYY/MM/
@@ -786,7 +818,9 @@ class FisherService:
                         "missing": len(all_files) - len(downloaded_files),
                         "files": files_status,
                         "source_url": base_url,
-                        "last_check": datetime.now().isoformat()
+                        "last_check": datetime.now().isoformat(),
+                        "last_downloaded_month": last_downloaded_month,
+                        "available_months": directory_links[:12]
                     }
                     
         except Exception as e:
@@ -828,9 +862,9 @@ async def download_cnpj_files(filenames: List[str]):
     return await fisher_service.download_multiple_cnpj_files(filenames)
 
 @app.post("/cnpj/download/{filename}")
-async def download_single_cnpj_file(filename: str):
+async def download_single_cnpj_file(filename: str, month_year: str = None):
     """Download de um arquivo CNPJ específico"""
-    return await fisher_service.download_cnpj_file(filename)
+    return await fisher_service.download_cnpj_file(filename, month_year)
 
 @app.delete("/cnpj/files/{filename}")
 async def delete_cnpj_file(filename: str):
