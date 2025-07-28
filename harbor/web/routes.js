@@ -36,6 +36,36 @@ export default [
     name: 'FisherStatus',
     component: () => import('../../fisher/web/src/views/StatusView.vue')
   },
+  {
+    path: '/fisher/sefaz',
+    name: 'FisherSefaz',
+    component: () => import('../../fisher/web/src/views/sources/SefazView.vue')
+  },
+  {
+    path: '/fisher/marketplaces',
+    name: 'FisherMarketplaces',
+    component: () => import('../../fisher/web/src/views/sources/MarketplacesView.vue')
+  },
+  {
+    path: '/fisher/apis',
+    name: 'FisherApis',
+    component: () => import('../../fisher/web/src/views/sources/ApisView.vue')
+  },
+  {
+    path: '/fisher/databases',
+    name: 'FisherDatabases',
+    component: () => import('../../fisher/web/src/views/sources/DatabasesView.vue')
+  },
+  {
+    path: '/fisher/scraping',
+    name: 'FisherScraping',
+    component: () => import('../../fisher/web/src/views/sources/ScrapingView.vue')
+  },
+  {
+    path: '/fisher/files',
+    name: 'FisherFiles',
+    component: () => import('../../fisher/web/src/views/sources/FilesView.vue')
+  },
   
   // Skipper
   {

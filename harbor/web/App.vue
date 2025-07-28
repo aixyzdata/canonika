@@ -93,7 +93,7 @@
             
             <!-- Fisher -->
             <li class="nav-item">
-              <router-link class="nav-link" to="/fisher" @click="handleNavClick">
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('fisher')">
                 <div class="nav-icon">
                   <i class="fas fa-fish"></i>
                 </div>
@@ -101,7 +101,87 @@
                   <div class="nav-title">Fisher</div>
                   <div class="service-subtitle">Pesca de Dados</div>
                 </div>
-              </router-link>
+                <i :class="openSubmenus.fisher ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.fisher }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status Geral</div>
+                      <div class="service-subtitle">Visão geral do Fisher</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/sefaz" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-building"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">SEFAZ</div>
+                      <div class="service-subtitle">Dados da Receita Federal</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/marketplaces" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Marketplaces</div>
+                      <div class="service-subtitle">E-commerce e Marketplaces</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/apis" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">APIs Externas</div>
+                      <div class="service-subtitle">APIs de terceiros</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/databases" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-database"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Bancos de Dados</div>
+                      <div class="service-subtitle">Bases de dados internas</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/scraping" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-spider"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Web Scraping</div>
+                      <div class="service-subtitle">Coleta de dados web</div>
+                    </div>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/fisher/files" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Arquivos Locais</div>
+                      <div class="service-subtitle">CSV, Excel, XML</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
             </li>
             
             <!-- Skipper -->
@@ -591,6 +671,7 @@ export default {
       services: services,
       sidebarCollapsed: false,
       openSubmenus: {
+        fisher: false,
         skipper: false,
         ledger: false,
         tollgate: false,
@@ -659,6 +740,7 @@ export default {
       this.sidebarCollapsed = !this.sidebarCollapsed;
       
       if (this.sidebarCollapsed) {
+        this.openSubmenus.fisher = false;
         this.openSubmenus.skipper = false;
         this.openSubmenus.ledger = false;
         this.openSubmenus.tollgate = false;
