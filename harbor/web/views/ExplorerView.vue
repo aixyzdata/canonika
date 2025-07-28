@@ -49,40 +49,7 @@
           </div>
         </div>
 
-        <!-- Pesquisas Recentes (Sempre Visível) -->
-        <div v-if="searchHistory.length > 0" class="recent-searches-section">
-          <div class="section-header">
-            <h3><i class="fas fa-clock"></i> Pesquisas Recentes</h3>
-            <button @click="clearHistory" class="clear-button">
-              <i class="fas fa-trash"></i>
-              Limpar
-            </button>
-          </div>
-          
-          <div class="recent-searches-grid">
-            <div
-              v-for="item in searchHistory"
-              :key="item.id"
-              @click="loadHistoryItem(item)"
-              class="recent-search-card"
-            >
-              <div class="search-card-content">
-                <div class="search-icon-small">
-                  <i class="fas fa-search"></i>
-                </div>
-                <div class="search-info">
-                  <h4>{{ item.query }}</h4>
-                  <p>{{ formatDate(item.date) }} • {{ formatTime(item.date) }}</p>
-                </div>
-                <div class="search-actions">
-                  <button @click.stop="loadHistoryItem(item)" class="btn-recent-search">
-                    <i class="fas fa-arrow-right"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <!-- Resultados de Pesquisa (Destaque Principal) -->
         <div v-if="productResults.length > 0" class="search-results-section">
@@ -462,10 +429,6 @@ export default {
     return {
       searchQuery: '',
       productResults: [],
-      searchHistory: [
-        { id: 1, query: 'Produto XYZ-789', date: '2024-01-14' },
-        { id: 2, query: 'Código 987654', date: '2024-01-13' }
-      ],
       activeJourney: 'search', // 'search' or 'canonize'
       canonizedNFe: null,
       showProductDetails: false,
@@ -591,7 +554,6 @@ export default {
         (product.sku && product.sku.toLowerCase().includes(this.searchQuery.toLowerCase()))
       )
       console.log('📊 Resultados encontrados:', this.productResults.length)
-      this.addToHistory(this.searchQuery)
     },
 
          clearProductResults() {
@@ -599,16 +561,7 @@ export default {
        this.searchQuery = ''
      },
 
-     clearHistory() {
-       this.searchHistory = []
-     },
-
-     removeHistoryItem(item) {
-       const index = this.searchHistory.findIndex(historyItem => historyItem.id === item.id)
-       if (index > -1) {
-         this.searchHistory.splice(index, 1)
-       }
-     },
+     
 
     viewProductDetails(product) {
       this.selectedProduct = product
@@ -749,27 +702,7 @@ export default {
 
 
 
-    addToHistory(query) {
-      const existingIndex = this.searchHistory.findIndex(item => item.query === query)
-      if (existingIndex > -1) {
-        this.searchHistory.splice(existingIndex, 1)
-      }
-      
-      this.searchHistory.unshift({
-        id: Date.now(),
-        query,
-        date: new Date().toISOString().split('T')[0]
-      })
-      
-      if (this.searchHistory.length > 10) {
-        this.searchHistory = this.searchHistory.slice(0, 10)
-      }
-    },
 
-    loadHistoryItem(item) {
-      this.searchQuery = item.query
-      this.performProductSearch()
-    }
   }
 }
 </script>
@@ -1282,39 +1215,7 @@ export default {
   font-size: 1.1rem;
 }
 
-/* Estilos para o histórico com service-cards */
-.history-section {
-  margin-top: 30px;
-}
 
-.history-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.history-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-color: #8b5cf6;
-}
-
-.history-card .card-icon {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
-.history-card .card-subtitle {
-  color: #a78bfa;
-  font-size: 0.8rem;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-}
 
 /* Estilos para service-cards */
 .results-section {
@@ -1517,114 +1418,7 @@ export default {
    font-weight: 500;
  }
 
- /* Estilos para Pesquisas Recentes */
- .recent-searches-section {
-   margin-top: 30px;
-   margin-bottom: 40px;
- }
 
- .section-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   margin-bottom: 20px;
- }
-
- .section-header h3 {
-   color: #e2e8f0;
-   margin: 0;
-   display: flex;
-   align-items: center;
-   gap: 10px;
-   font-size: 1.3rem;
- }
-
- .recent-searches-grid {
-   display: grid;
-   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-   gap: 15px;
- }
-
- .recent-search-card {
-   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-   border: 1px solid #475569;
-   border-radius: 12px;
-   padding: 20px;
-   cursor: pointer;
-   transition: all 0.3s ease;
-   position: relative;
-   overflow: hidden;
- }
-
- .recent-search-card::before {
-   content: '';
-   position: absolute;
-   top: 0;
-   left: 0;
-   right: 0;
-   height: 3px;
-   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
- }
-
- .recent-search-card:hover {
-   transform: translateY(-3px);
-   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-   border-color: #8b5cf6;
- }
-
- .search-card-content {
-   display: flex;
-   align-items: center;
-   gap: 15px;
- }
-
- .search-icon-small {
-   width: 40px;
-   height: 40px;
-   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-   border-radius: 10px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: white;
-   font-size: 1rem;
- }
-
- .search-info {
-   flex: 1;
- }
-
- .search-info h4 {
-   color: #e2e8f0;
-   margin: 0 0 5px 0;
-   font-size: 1.1rem;
- }
-
- .search-info p {
-   color: #94a3b8;
-   margin: 0;
-   font-size: 0.9rem;
- }
-
- .search-actions {
-   display: flex;
-   gap: 8px;
- }
-
- .btn-recent-search {
-   background: rgba(139, 92, 246, 0.1);
-   color: #8b5cf6;
-   border: 1px solid rgba(139, 92, 246, 0.2);
-   border-radius: 8px;
-   padding: 8px 12px;
-   cursor: pointer;
-   transition: all 0.2s ease;
- }
-
- .btn-recent-search:hover {
-   background: rgba(139, 92, 246, 0.2);
-   transform: scale(1.05);
- }
 
  /* Estilos para Resultados de Pesquisa */
  .search-results-section {
