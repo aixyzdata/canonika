@@ -415,41 +415,41 @@ export default {
       },
       processingLogs: [],
       sourceStatus: {
-        status: 'ONLINE',
-        description: 'Conexão ativa com Receita Federal',
-        lastSync: '2024-01-15 14:30:00',
-        downloadedFiles: '15/25',
-        successRate: '98.5%'
+        status: 'CONECTANDO...',
+        description: 'Verificando conexão com Receita Federal',
+        lastSync: 'Nunca',
+        downloadedFiles: '0/0',
+        successRate: '0%'
       },
       fileStats: {
-        totalAvailable: 25,
-        downloaded: 15,
-        missing: 10,
+        totalAvailable: 0,
+        downloaded: 0,
+        missing: 0,
         selected: 0
       },
       cnpjFiles: [],
       dataMetrics: [
         {
           id: 1,
-          value: '15',
+          value: '0',
           label: 'Arquivos Baixados',
           icon: 'fas fa-download'
         },
         {
           id: 2,
-          value: '31.5GB',
+          value: '0GB',
           label: 'Dados Armazenados',
           icon: 'fas fa-hdd'
         },
         {
           id: 3,
-          value: '2.5M',
+          value: '0',
           label: 'CNPJs Processados',
           icon: 'fas fa-building'
         },
         {
           id: 4,
-          value: '98.5%',
+          value: '0%',
           label: 'Taxa de Disponibilidade',
           icon: 'fas fa-check-circle'
         }
@@ -465,59 +465,26 @@ export default {
         {
           id: 2,
           name: 'Diretório Local',
-          value: '/data/cnpj/',
+          value: '/app/data/cnpj/',
           status: 'online',
           statusText: 'CONFIGURADO'
         },
         {
           id: 3,
           name: 'Tamanho Máximo',
-          value: '2.5GB por arquivo',
+          value: '~100MB por arquivo',
           status: 'online',
           statusText: 'OK'
         },
         {
           id: 4,
           name: 'Backup Automático',
-          value: 'Diário às 03:00',
-          status: 'online',
-          statusText: 'ATIVO'
+          value: 'Não configurado',
+          status: 'offline',
+          statusText: 'INATIVO'
         }
       ],
-      recentLogs: [
-        {
-          id: 1,
-          title: 'Download CNPJ 2025-05',
-          message: 'Arquivo CNPJ_2025_05.zip baixado com sucesso (2.0GB)',
-          timestamp: '2 min atrás',
-          level: 'success',
-          icon: 'fas fa-check-circle'
-        },
-        {
-          id: 2,
-          title: 'Verificação de Novos Arquivos',
-          message: '25 arquivos disponíveis na fonte oficial',
-          timestamp: '15 min atrás',
-          level: 'info',
-          icon: 'fas fa-info-circle'
-        },
-        {
-          id: 3,
-          title: 'Processamento CNPJ 2025-04',
-          message: '2.1M CNPJs processados e indexados',
-          timestamp: '1 hora atrás',
-          level: 'info',
-          icon: 'fas fa-database'
-        },
-        {
-          id: 4,
-          title: 'Backup Automático',
-          message: 'Backup dos arquivos CNPJ concluído',
-          timestamp: '2 horas atrás',
-          level: 'info',
-          icon: 'fas fa-save'
-        }
-      ]
+      recentLogs: []
     }
   },
   computed: {
@@ -550,10 +517,159 @@ export default {
     }
   },
   methods: {
+    async refreshAllData() {
+      console.log('Refreshing all data from API...')
+      
+      // Buscar dados em paralelo
+      await Promise.all([
+        this.refreshSourceStatus(),
+        this.refreshFileList(),
+        this.refreshProcessingStatus(),
+        this.refreshDataMetrics(),
+        this.refreshRecentLogs()
+      ])
+    },
+    
+    async refreshSourceStatus() {
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/health`)
+        const data = await response.json()
+        
+        if (data.status === 'healthy') {
+          this.sourceStatus = {
+            status: 'ONLINE',
+            description: 'Conexão ativa com Receita Federal',
+            lastSync: new Date().toLocaleString(),
+            downloadedFiles: `${this.fileStats.downloaded}/${this.fileStats.totalAvailable}`,
+            successRate: this.fileStats.totalAvailable > 0 ? 
+              `${Math.round((this.fileStats.downloaded / this.fileStats.totalAvailable) * 100)}%` : '0%'
+          }
+        } else {
+          this.sourceStatus = {
+            status: 'OFFLINE',
+            description: 'Erro na conexão com Receita Federal',
+            lastSync: 'Nunca',
+            downloadedFiles: '0/0',
+            successRate: '0%'
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status da fonte:', error)
+        this.sourceStatus = {
+          status: 'ERRO',
+          description: 'Falha na conexão com API',
+          lastSync: 'Nunca',
+          downloadedFiles: '0/0',
+          successRate: '0%'
+        }
+      }
+    },
+    
+    async refreshDataMetrics() {
+      try {
+        // Calcular métricas baseadas nos dados reais
+        const totalSize = this.cnpjFiles
+          .filter(f => f.status === 'downloaded')
+          .reduce((sum, file) => {
+            const size = file.size ? parseFloat(file.size.replace(/[^\d.]/g, '')) : 0
+            return sum + size
+          }, 0)
+        
+        const processedRecords = this.processingStats.totalRecords
+        
+        this.dataMetrics = [
+          {
+            id: 1,
+            value: this.fileStats.downloaded.toString(),
+            label: 'Arquivos Baixados',
+            icon: 'fas fa-download'
+          },
+          {
+            id: 2,
+            value: `${(totalSize / 1024).toFixed(1)}GB`,
+            label: 'Dados Armazenados',
+            icon: 'fas fa-hdd'
+          },
+          {
+            id: 3,
+            value: processedRecords.toLocaleString(),
+            label: 'CNPJs Processados',
+            icon: 'fas fa-building'
+          },
+          {
+            id: 4,
+            value: this.fileStats.totalAvailable > 0 ? 
+              `${Math.round((this.fileStats.downloaded / this.fileStats.totalAvailable) * 100)}%` : '0%',
+            label: 'Taxa de Disponibilidade',
+            icon: 'fas fa-check-circle'
+          }
+        ]
+      } catch (error) {
+        console.error('Erro ao atualizar métricas:', error)
+      }
+    },
+    
+    async refreshRecentLogs() {
+      try {
+        // Criar logs baseados nas ações reais
+        const logs = []
+        
+        // Log de status da API
+        if (this.sourceStatus.status === 'ONLINE') {
+          logs.push({
+            id: Date.now(),
+            title: 'API Conectada',
+            message: 'Conexão estabelecida com sucesso',
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'success',
+            icon: 'fas fa-check-circle'
+          })
+        }
+        
+        // Log de arquivos encontrados
+        if (this.fileStats.totalAvailable > 0) {
+          logs.push({
+            id: Date.now() + 1,
+            title: 'Arquivos Encontrados',
+            message: `${this.fileStats.totalAvailable} arquivos disponíveis na fonte oficial`,
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'info',
+            icon: 'fas fa-info-circle'
+          })
+        }
+        
+        // Log de processamento
+        if (this.processingStats.processed > 0) {
+          logs.push({
+            id: Date.now() + 2,
+            title: 'Processamento Concluído',
+            message: `${this.processingStats.processed} arquivos processados com sucesso`,
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'info',
+            icon: 'fas fa-database'
+          })
+        }
+        
+        // Log de erro se houver
+        if (this.sourceStatus.status === 'ERRO') {
+          logs.push({
+            id: Date.now() + 3,
+            title: 'Erro de Conexão',
+            message: 'Falha ao conectar com a API do Fisher',
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'error',
+            icon: 'fas fa-exclamation-triangle'
+          })
+        }
+        
+        this.recentLogs = logs.slice(0, 10) // Manter apenas os 10 mais recentes
+      } catch (error) {
+        console.error('Erro ao atualizar logs:', error)
+      }
+    },
     async refreshData() {
       console.log('Refreshing SEFAZ data...')
-      await this.refreshFileList()
-      await this.refreshProcessingStatus()
+      await this.refreshAllData()
     },
     async syncData() {
       console.log('Synchronizing SEFAZ data...')
@@ -581,6 +697,10 @@ export default {
           }))
           
           this.updateFileStats()
+          
+          // Atualizar métricas e logs com dados reais
+          await this.refreshDataMetrics()
+          await this.refreshRecentLogs()
           
           // Adicionar log de sucesso
           this.addProcessingLog('success', `Lista atualizada: ${data.total_available} arquivos disponíveis, ${data.downloaded} baixados`)
@@ -970,22 +1090,56 @@ export default {
       return statusMap[status] || status
     },
     updateFileStats() {
-      const total = this.cnpjFiles.length
-      const downloaded = this.cnpjFiles.filter(f => f.status === 'downloaded').length
-      const missing = this.cnpjFiles.filter(f => f.status === 'available').length
-      const selected = this.cnpjFiles.filter(f => f.selected).length
-      
       this.fileStats = {
-        totalAvailable: total,
-        downloaded,
-        missing,
-        selected
+        totalAvailable: this.cnpjFiles.length,
+        downloaded: this.cnpjFiles.filter(f => f.status === 'downloaded').length,
+        missing: this.cnpjFiles.filter(f => f.status === 'available').length,
+        selected: this.cnpjFiles.filter(f => f.selected).length
       }
+      
+      // Atualizar configurações com dados reais
+      this.updateConfigurations()
+    },
+    
+    updateConfigurations() {
+      const downloadedCount = this.fileStats.downloaded
+      const totalCount = this.fileStats.totalAvailable
+      const successRate = totalCount > 0 ? Math.round((downloadedCount / totalCount) * 100) : 0
+      
+      this.configurations = [
+        {
+          id: 1,
+          name: 'URL Base CNPJ',
+          value: 'https://arquivos.receitafederal.gov.br/dados/cnpj/',
+          status: 'online',
+          statusText: 'ATIVO'
+        },
+        {
+          id: 2,
+          name: 'Diretório Local',
+          value: '/app/data/cnpj/',
+          status: 'online',
+          statusText: 'CONFIGURADO'
+        },
+        {
+          id: 3,
+          name: 'Arquivos Baixados',
+          value: `${downloadedCount}/${totalCount}`,
+          status: downloadedCount > 0 ? 'online' : 'offline',
+          statusText: downloadedCount > 0 ? 'ATIVO' : 'VAZIO'
+        },
+        {
+          id: 4,
+          name: 'Taxa de Sucesso',
+          value: `${successRate}%`,
+          status: successRate > 50 ? 'online' : 'offline',
+          statusText: successRate > 50 ? 'BOM' : 'BAIXO'
+        }
+      ]
     }
   },
   async mounted() {
-    await this.refreshFileList()
-    await this.refreshProcessingStatus()
+    await this.refreshAllData()
   },
   beforeUnmount() {
     if (this.websocket) {
