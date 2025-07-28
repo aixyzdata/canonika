@@ -74,42 +74,10 @@
                 <span class="service-port">7726</span>
                 <span class="service-description">Contabilidade</span>
               </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Beacon</span>
-                <span class="service-port">7728</span>
-                <span class="service-description">Sinalização</span>
-              </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Echo</span>
-                <span class="service-port">7729</span>
-                <span class="service-description">Comunicação</span>
-              </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Guardian</span>
-                <span class="service-port">7730</span>
-                <span class="service-description">Segurança</span>
-              </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Mapmaker</span>
-                <span class="service-port">7724</span>
-                <span class="service-description">Mapeamento</span>
-              </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Seagull</span>
-                <span class="service-port">7727</span>
-                <span class="service-description">Monitoramento</span>
-              </div>
-              <div class="service-status online">
-                <span class="status-dot"></span>
-                <span class="service-name">Wayfinder</span>
-                <span class="service-port">7723</span>
-                <span class="service-description">Navegação</span>
-              </div>
+
+
+
+
               <div class="service-status online">
                 <span class="status-dot"></span>
                 <span class="service-name">Dock</span>
@@ -200,14 +168,8 @@
                 <i class="fas fa-book"></i>
                 <span>Contabilidade</span>
               </router-link>
-              <router-link to="/beacon/status" class="quick-action-btn">
-                <i class="fas fa-broadcast-tower"></i>
-                <span>Sinalização</span>
-              </router-link>
-              <router-link to="/echo/status" class="quick-action-btn">
-                <i class="fas fa-wave-square"></i>
-                <span>Comunicação</span>
-              </router-link>
+
+
             </div>
           </div>
         </div>

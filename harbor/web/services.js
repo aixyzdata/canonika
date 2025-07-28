@@ -1,106 +1,132 @@
-// Informações dos serviços
-const services = [
-  {
-    id: 'skipper',
+// Configurações dos serviços
+export const services = {
+  // Diver - Consulta Canônica
+  diver: {
+    name: 'Diver',
+    description: 'Sistema de Consulta Canônica',
+    icon: 'fas fa-search',
+    port: 3702,
+    color: '#3b82f6',
+    status: 'online'
+  },
+
+  // Fisher - Pesca de Dados
+  fisher: {
+    name: 'Fisher',
+    description: 'Sistema de Pesca de Dados',
+    icon: 'fas fa-fish',
+    port: 3703,
+    color: '#3b82f6',
+    status: 'online'
+  },
+
+  // Skipper - Orquestrador
+  skipper: {
     name: 'Skipper',
-    description: 'Orquestrador de Navegação e Extração de Dados',
+    description: 'Sistema Orquestrador',
     icon: 'fas fa-ship',
-    color: '#007bff',
-    port: 7722,
-    url: 'http://localhost:7722'
+    port: 3700,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'ledger',
+
+  // Ledger - Contabilidade
+  ledger: {
     name: 'Ledger',
-    description: 'Sistema de Contabilidade e Gestão Financeira',
+    description: 'Sistema de Contabilidade',
     icon: 'fas fa-book',
-    color: '#28a745',
-    port: 7723,
-    url: 'http://localhost:7723'
+    port: 3706,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'tollgate',
+
+  // Tollgate - Pedágio e Controle
+  tollgate: {
     name: 'Tollgate',
-    description: 'Sistema de Pedágio e Controle de Acesso',
-    icon: 'fas fa-coins',
-    color: '#ffc107',
-    port: 7724,
-    url: 'http://localhost:7724'
+    description: 'Sistema de Pedágio e Controle',
+    icon: 'fas fa-road',
+    port: 3705,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'quarter',
+
+  // Quarter - Gestão de Usuários
+  quarter: {
     name: 'Quarter',
-    description: 'Gestão de Usuários e Permissões',
+    description: 'Sistema de Gestão de Usuários',
     icon: 'fas fa-users',
-    color: '#dc3545',
-    port: 7725,
-    url: 'http://localhost:7725'
+    port: 3714,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'beacon',
+
+  // Dock - Sistema de Docking
+  dock: {
+    name: 'Dock',
+    description: 'Sistema de Docking',
+    icon: 'fas fa-link',
+    port: 3710,
+    color: '#3b82f6',
+    status: 'online'
+  },
+
+  // Beacon - Sinalização
+  beacon: {
     name: 'Beacon',
-    description: 'Sistema de Sinalização e Comunicação',
+    description: 'Sistema de Sinalização',
     icon: 'fas fa-broadcast-tower',
-    color: '#6f42c1',
-    port: 7726,
-    url: 'http://localhost:7726'
+    port: 3701,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'echo',
+
+  // Echo - Comunicação
+  echo: {
     name: 'Echo',
-    description: 'Sistema de Eco e Ressonância',
-    icon: 'fas fa-echo',
-    color: '#fd7e14',
-    port: 7727,
-    url: 'http://localhost:7727'
+    description: 'Sistema de Comunicação',
+    icon: 'fas fa-comments',
+    port: 3707,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'guardian',
+
+  // Guardian - Segurança
+  guardian: {
     name: 'Guardian',
-    description: 'Sistema de Proteção e Segurança',
-    icon: 'fas fa-shield',
-    color: '#20c997',
-    port: 7728,
-    url: 'http://localhost:7728'
+    description: 'Sistema de Segurança',
+    icon: 'fas fa-shield-alt',
+    port: 3704,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'mapmaker',
+
+  // Mapmaker - Criação de Mapas
+  mapmaker: {
     name: 'Mapmaker',
-    description: 'Sistema de Criação e Gestão de Mapas',
-    icon: 'fas fa-map',
-    color: '#e83e8c',
-    port: 7729,
-    url: 'http://localhost:7729'
+    description: 'Sistema de Criação de Mapas',
+    icon: 'fas fa-map-marked-alt',
+    port: 3712,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'seagull',
+
+  // Seagull - Vigilância
+  seagull: {
     name: 'Seagull',
-    description: 'Sistema de Vigilância e Monitoramento',
-    icon: 'fas fa-seagull',
-    color: '#17a2b8',
-    port: 7730,
-    url: 'http://localhost:7730'
+    description: 'Sistema de Vigilância',
+    icon: 'fas fa-eye',
+    port: 3715,
+    color: '#3b82f6',
+    status: 'online'
   },
-  {
-    id: 'wayfinder',
+
+  // Wayfinder - Navegação
+  wayfinder: {
     name: 'Wayfinder',
-    description: 'Sistema de Navegação e Orientação',
-    icon: 'fas fa-compass',
-    color: '#6c757d',
-    port: 7731,
-    url: 'http://localhost:7731'
+    description: 'Sistema de Navegação',
+    icon: 'fas fa-route',
+    port: 3717,
+    color: '#3b82f6',
+    status: 'online'
   }
-];
-
-export function getAllServices() {
-  return services;
-}
-
-export function getServiceInfo(serviceId) {
-  return services.find(service => service.id === serviceId);
-}
-
-export function hasServiceView(serviceId) {
-  const service = getServiceInfo(serviceId);
-  return service !== undefined;
 } 

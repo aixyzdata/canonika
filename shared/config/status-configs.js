@@ -140,144 +140,6 @@ export const serviceConfigs = {
   },
 
   // ========================================
-  // BEACON - SINALIZAÇÃO
-  // ========================================
-  beacon: {
-    serviceName: 'Beacon',
-    serviceDescription: 'Sistema de Sinalização e Comunicação',
-    serviceIcon: 'fas fa-broadcast-tower',
-    serviceStatus: 'online',
-    statusText: 'ONLINE',
-    
-    metrics: [
-      {
-        id: 'active-signals',
-        title: 'Sinais Ativos',
-        value: '24',
-        label: 'Sinais Transmitindo',
-        icon: 'fas fa-signal'
-      },
-      {
-        id: 'signal-strength',
-        title: 'Força do Sinal',
-        value: '98%',
-        label: 'Qualidade de Transmissão',
-        icon: 'fas fa-wifi'
-      },
-      {
-        id: 'coverage-area',
-        title: 'Área de Cobertura',
-        value: '15km²',
-        label: 'Raio de Alcance',
-        icon: 'fas fa-map-marked-alt'
-      },
-      {
-        id: 'uptime',
-        title: 'Tempo Ativo',
-        value: '99.9%',
-        label: 'Disponibilidade',
-        icon: 'fas fa-clock'
-      }
-    ],
-    
-    recentActivity: [
-      {
-        id: 1,
-        title: 'Sinal Transmitido',
-        description: 'Nova mensagem enviada para 15 dispositivos',
-        time: '1 minuto atrás',
-        icon: 'fas fa-paper-plane'
-      },
-      {
-        id: 2,
-        title: 'Dispositivo Conectado',
-        description: 'Novo beacon registrado na rede',
-        time: '5 minutos atrás',
-        icon: 'fas fa-link'
-      },
-      {
-        id: 3,
-        title: 'Manutenção Programada',
-        description: 'Atualização de firmware concluída',
-        time: '1 hora atrás',
-        icon: 'fas fa-tools'
-      }
-    ],
-    
-    systemStatus: [
-      {
-        id: 'api',
-        name: 'API Beacon',
-        description: 'Serviço principal de sinalização',
-        status: 'online',
-        port: 'Port 3701'
-      },
-      {
-        id: 'websocket',
-        name: 'WebSocket Server',
-        description: 'Conexões em tempo real',
-        status: 'online',
-        port: 'Port 3702'
-      },
-      {
-        id: 'database',
-        name: 'MongoDB',
-        description: 'Armazenamento de mensagens',
-        status: 'online',
-        port: 'Port 27017'
-      }
-    ],
-    
-    configurations: [
-      {
-        id: 'signal-frequency',
-        name: 'Frequência de Sinal',
-        value: '2.4 GHz'
-      },
-      {
-        id: 'transmission-power',
-        name: 'Potência de Transmissão',
-        value: '20 dBm'
-      },
-      {
-        id: 'encryption',
-        name: 'Criptografia',
-        value: 'AES-256'
-      }
-    ],
-    
-    actions: [
-      {
-        id: 'send-signal',
-        title: 'Enviar Sinal',
-        description: 'Transmitir nova mensagem',
-        icon: 'fas fa-broadcast-tower',
-        handler: () => console.log('Enviar sinal')
-      },
-      {
-        id: 'configure-network',
-        title: 'Configurar Rede',
-        description: 'Ajustar parâmetros de rede',
-        icon: 'fas fa-network-wired',
-        handler: () => console.log('Configurar rede')
-      },
-      {
-        id: 'view-devices',
-        title: 'Ver Dispositivos',
-        description: 'Listar beacons conectados',
-        icon: 'fas fa-list',
-        handler: () => console.log('Ver dispositivos')
-      }
-    ],
-    
-    primaryAction: {
-      text: 'Enviar Sinal',
-      icon: 'fas fa-broadcast-tower',
-      handler: () => console.log('Enviar sinal')
-    }
-  },
-
-  // ========================================
   // SKIPPER - ORQUESTRAÇÃO
   // ========================================
   skipper: {
@@ -423,140 +285,140 @@ export const serviceConfigs = {
   },
 
   // ========================================
-  // GUARDIAN - SEGURANÇA
+  // BEACON - SINALIZAÇÃO
   // ========================================
-  guardian: {
-    serviceName: 'Guardian',
-    serviceDescription: 'Sistema de Segurança e Proteção',
-    serviceIcon: 'fas fa-shield-alt',
+  beacon: {
+    serviceName: 'Beacon',
+    serviceDescription: 'Sistema de Sinalização e Notificações',
+    serviceIcon: 'fas fa-broadcast-tower',
     serviceStatus: 'online',
     statusText: 'ONLINE',
     
     metrics: [
       {
-        id: 'active-threats',
-        title: 'Ameaças Ativas',
-        value: '0',
-        label: 'Sem ameaças detectadas',
-        icon: 'fas fa-shield-check'
+        id: 'active-signals',
+        title: 'Sinais Ativos',
+        value: '15',
+        label: 'Sinais Transmitindo',
+        icon: 'fas fa-broadcast-tower'
       },
       {
-        id: 'blocked-attacks',
-        title: 'Ataques Bloqueados',
-        value: '127',
-        label: 'Nas últimas 24h',
-        icon: 'fas fa-ban'
+        id: 'notifications-sent',
+        title: 'Notificações Enviadas',
+        value: '2.847',
+        label: 'Hoje',
+        icon: 'fas fa-bell'
       },
       {
-        id: 'security-score',
-        title: 'Score de Segurança',
-        value: '98/100',
-        label: 'Nível de Proteção',
-        icon: 'fas fa-star'
+        id: 'delivery-rate',
+        title: 'Taxa de Entrega',
+        value: '99.8%',
+        label: 'Notificações Entregues',
+        icon: 'fas fa-check-circle'
       },
       {
-        id: 'encrypted-data',
-        title: 'Dados Criptografados',
-        value: '100%',
-        label: 'Transmissão Segura',
-        icon: 'fas fa-lock'
+        id: 'response-time',
+        title: 'Tempo de Resposta',
+        value: '0.3s',
+        label: 'Média de Resposta',
+        icon: 'fas fa-clock'
       }
     ],
     
     recentActivity: [
       {
         id: 1,
-        title: 'Ataque Bloqueado',
-        description: 'Tentativa de SQL Injection bloqueada',
-        time: '5 minutos atrás',
-        icon: 'fas fa-shield-alt'
+        title: 'Sinal Transmitido',
+        description: 'Notificação de sistema enviada',
+        time: '2 minutos atrás',
+        icon: 'fas fa-broadcast-tower'
       },
       {
         id: 2,
-        title: 'Certificado Renovado',
-        description: 'SSL certificate atualizado automaticamente',
-        time: '1 hora atrás',
-        icon: 'fas fa-certificate'
+        title: 'Alerta Processado',
+        description: 'Alerta de segurança processado',
+        time: '5 minutos atrás',
+        icon: 'fas fa-exclamation-triangle'
       },
       {
         id: 3,
-        title: 'Backup Realizado',
-        description: 'Backup de segurança concluído',
-        time: '6 horas atrás',
-        icon: 'fas fa-save'
+        title: 'Broadcast Concluído',
+        description: 'Broadcast para todos os usuários',
+        time: '10 minutos atrás',
+        icon: 'fas fa-bullhorn'
       }
     ],
     
     systemStatus: [
       {
         id: 'api',
-        name: 'API Guardian',
-        description: 'Serviço principal de segurança',
+        name: 'API Beacon',
+        description: 'Serviço principal de sinalização',
         status: 'online',
-        port: 'Port 3704'
+        port: 'Port 3701'
       },
       {
-        id: 'firewall',
-        name: 'Firewall',
-        description: 'Proteção de rede',
+        id: 'websocket',
+        name: 'WebSocket',
+        description: 'Conexões em tempo real',
         status: 'online',
-        port: 'Port 3705'
+        port: 'Port 3702'
       },
       {
-        id: 'ids',
-        name: 'IDS/IPS',
-        description: 'Detecção de intrusão',
+        id: 'redis',
+        name: 'Redis',
+        description: 'Cache de notificações',
         status: 'online',
-        port: 'Port 3706'
+        port: 'Port 6379'
       }
     ],
     
     configurations: [
       {
-        id: 'firewall-rules',
-        name: 'Regras de Firewall',
-        value: '247 regras ativas'
+        id: 'signal-strength',
+        name: 'Força do Sinal',
+        value: 'Alta'
       },
       {
-        id: 'encryption-level',
-        name: 'Nível de Criptografia',
-        value: 'AES-256-GCM'
+        id: 'notification-queue',
+        name: 'Fila de Notificações',
+        value: '0 pendentes'
       },
       {
-        id: 'backup-frequency',
-        name: 'Frequência de Backup',
-        value: 'A cada 6 horas'
+        id: 'auto-retry',
+        name: 'Tentativas Automáticas',
+        value: '3 tentativas'
       }
     ],
     
     actions: [
       {
-        id: 'security-scan',
-        title: 'Scan de Segurança',
-        description: 'Executar verificação completa',
-        icon: 'fas fa-search',
-        handler: () => console.log('Scan de segurança')
+        id: 'send-notification',
+        title: 'Enviar Notificação',
+        description: 'Criar nova notificação',
+        icon: 'fas fa-bell',
+        handler: () => console.log('Enviar notificação')
       },
       {
-        id: 'view-logs',
-        title: 'Ver Logs',
-        description: 'Histórico de eventos de segurança',
-        icon: 'fas fa-file-alt',
-        handler: () => console.log('Ver logs')
+        id: 'view-signals',
+        title: 'Ver Sinais',
+        description: 'Listar sinais ativos',
+        icon: 'fas fa-list',
+        handler: () => console.log('Ver sinais')
       },
       {
-        id: 'configure-rules',
-        title: 'Configurar Regras',
-        description: 'Gerenciar regras de segurança',
+        id: 'configure-alerts',
+        title: 'Configurar Alertas',
+        description: 'Gerenciar alertas',
         icon: 'fas fa-cog',
-        handler: () => console.log('Configurar regras')
+        handler: () => console.log('Configurar alertas')
       }
     ],
     
     primaryAction: {
-      text: 'Scan de Segurança',
-      icon: 'fas fa-search',
-      handler: () => console.log('Scan de segurança')
+      text: 'Enviar Notificação',
+      icon: 'fas fa-bell',
+      handler: () => console.log('Enviar notificação')
     }
   },
 
@@ -699,6 +561,558 @@ export const serviceConfigs = {
   },
 
   // ========================================
+  // GUARDIAN - SEGURANÇA
+  // ========================================
+  guardian: {
+    serviceName: 'Guardian',
+    serviceDescription: 'Sistema de Segurança e Proteção',
+    serviceIcon: 'fas fa-shield-alt',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'active-threats',
+        title: 'Ameaças Ativas',
+        value: '0',
+        label: 'Sem ameaças detectadas',
+        icon: 'fas fa-shield-check'
+      },
+      {
+        id: 'blocked-attacks',
+        title: 'Ataques Bloqueados',
+        value: '127',
+        label: 'Nas últimas 24h',
+        icon: 'fas fa-ban'
+      },
+      {
+        id: 'security-score',
+        title: 'Score de Segurança',
+        value: '98/100',
+        label: 'Nível de Proteção',
+        icon: 'fas fa-star'
+      },
+      {
+        id: 'encrypted-data',
+        title: 'Dados Criptografados',
+        value: '100%',
+        label: 'Transmissão Segura',
+        icon: 'fas fa-lock'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Ataque Bloqueado',
+        description: 'Tentativa de SQL Injection bloqueada',
+        time: '5 minutos atrás',
+        icon: 'fas fa-shield-alt'
+      },
+      {
+        id: 2,
+        title: 'Certificado Renovado',
+        description: 'SSL certificate atualizado automaticamente',
+        time: '1 hora atrás',
+        icon: 'fas fa-certificate'
+      },
+      {
+        id: 3,
+        title: 'Backup Realizado',
+        description: 'Backup de segurança concluído',
+        time: '6 horas atrás',
+        icon: 'fas fa-save'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Guardian',
+        description: 'Serviço principal de segurança',
+        status: 'online',
+        port: 'Port 3704'
+      },
+      {
+        id: 'firewall',
+        name: 'Firewall',
+        description: 'Proteção de rede',
+        status: 'online',
+        port: 'Port 3705'
+      },
+      {
+        id: 'ids',
+        name: 'IDS/IPS',
+        description: 'Detecção de intrusão',
+        status: 'online',
+        port: 'Port 3706'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'firewall-rules',
+        name: 'Regras de Firewall',
+        value: '247 regras ativas'
+      },
+      {
+        id: 'encryption-level',
+        name: 'Nível de Criptografia',
+        value: 'AES-256-GCM'
+      },
+      {
+        id: 'backup-frequency',
+        name: 'Frequência de Backup',
+        value: 'A cada 6 horas'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'security-scan',
+        title: 'Scan de Segurança',
+        description: 'Executar verificação completa',
+        icon: 'fas fa-search',
+        handler: () => console.log('Scan de segurança')
+      },
+      {
+        id: 'view-logs',
+        title: 'Ver Logs',
+        description: 'Histórico de eventos de segurança',
+        icon: 'fas fa-file-alt',
+        handler: () => console.log('Ver logs')
+      },
+      {
+        id: 'configure-rules',
+        title: 'Configurar Regras',
+        description: 'Gerenciar regras de segurança',
+        icon: 'fas fa-cog',
+        handler: () => console.log('Configurar regras')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Scan de Segurança',
+      icon: 'fas fa-search',
+      handler: () => console.log('Scan de segurança')
+    }
+  },
+
+  // ========================================
+  // MAPMAKER - CRIAÇÃO DE MAPAS
+  // ========================================
+  mapmaker: {
+    serviceName: 'Mapmaker',
+    serviceDescription: 'Sistema de Criação e Gestão de Mapas',
+    serviceIcon: 'fas fa-map-marked-alt',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'active-maps',
+        title: 'Mapas Ativos',
+        value: '47',
+        label: 'Mapas em Uso',
+        icon: 'fas fa-map'
+      },
+      {
+        id: 'total-layers',
+        title: 'Camadas Totais',
+        value: '2.847',
+        label: 'Camadas Criadas',
+        icon: 'fas fa-layer-group'
+      },
+      {
+        id: 'storage-used',
+        title: 'Armazenamento',
+        value: '45.2GB',
+        label: 'Espaço Utilizado',
+        icon: 'fas fa-hdd'
+      },
+      {
+        id: 'processing-time',
+        title: 'Tempo de Processamento',
+        value: '1.8s',
+        label: 'Média por Mapa',
+        icon: 'fas fa-stopwatch'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Mapa Criado',
+        description: 'Novo mapa de rotas criado',
+        time: '3 minutos atrás',
+        icon: 'fas fa-plus'
+      },
+      {
+        id: 2,
+        title: 'Camada Adicionada',
+        description: 'Camada de tráfego atualizada',
+        time: '10 minutos atrás',
+        icon: 'fas fa-layer-group'
+      },
+      {
+        id: 3,
+        title: 'Exportação Concluída',
+        description: 'Mapa exportado em PDF',
+        time: '1 hora atrás',
+        icon: 'fas fa-download'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Mapmaker',
+        description: 'Serviço principal de mapas',
+        status: 'online',
+        port: 'Port 3712'
+      },
+      {
+        id: 'database',
+        name: 'PostgreSQL',
+        description: 'Banco de dados geoespacial',
+        status: 'online',
+        port: 'Port 5432'
+      },
+      {
+        id: 'tile-server',
+        name: 'Tile Server',
+        description: 'Servidor de tiles de mapas',
+        status: 'online',
+        port: 'Port 3713'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'max-maps',
+        name: 'Máximo de Mapas',
+        value: '1.000 simultâneos'
+      },
+      {
+        id: 'tile-format',
+        name: 'Formato de Tiles',
+        value: 'PNG 256x256'
+      },
+      {
+        id: 'cache-size',
+        name: 'Tamanho do Cache',
+        value: '10GB'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'create-map',
+        title: 'Criar Mapa',
+        description: 'Criar novo mapa',
+        icon: 'fas fa-plus',
+        handler: () => console.log('Criar mapa')
+      },
+      {
+        id: 'import-data',
+        title: 'Importar Dados',
+        description: 'Importar dados geoespaciais',
+        icon: 'fas fa-upload',
+        handler: () => console.log('Importar dados')
+      },
+      {
+        id: 'view-maps',
+        title: 'Ver Mapas',
+        description: 'Listar todos os mapas',
+        icon: 'fas fa-list',
+        handler: () => console.log('Ver mapas')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Criar Mapa',
+      icon: 'fas fa-plus',
+      handler: () => console.log('Criar mapa')
+    }
+  },
+
+  // ========================================
+  // SEAGULL - VIGILÂNCIA
+  // ========================================
+  seagull: {
+    serviceName: 'Seagull',
+    serviceDescription: 'Sistema de Vigilância e Monitoramento',
+    serviceIcon: 'fas fa-eye',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'active-cameras',
+        title: 'Câmeras Ativas',
+        value: '24',
+        label: 'Câmeras Online',
+        icon: 'fas fa-video'
+      },
+      {
+        id: 'detection-rate',
+        title: 'Taxa de Detecção',
+        value: '98.5%',
+        label: 'Precisão de Detecção',
+        icon: 'fas fa-bullseye'
+      },
+      {
+        id: 'alerts-today',
+        title: 'Alertas Hoje',
+        value: '47',
+        label: 'Eventos Detectados',
+        icon: 'fas fa-bell'
+      },
+      {
+        id: 'storage-used',
+        title: 'Armazenamento',
+        value: '2.3TB',
+        label: 'Gravações Salvadas',
+        icon: 'fas fa-hdd'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Movimento Detectado',
+        description: 'Atividade detectada na câmera 3',
+        time: '2 minutos atrás',
+        icon: 'fas fa-running'
+      },
+      {
+        id: 2,
+        title: 'Alerta Processado',
+        description: 'Análise de segurança concluída',
+        time: '5 minutos atrás',
+        icon: 'fas fa-shield-check'
+      },
+      {
+        id: 3,
+        title: 'Backup Realizado',
+        description: 'Gravações salvas automaticamente',
+        time: '1 hora atrás',
+        icon: 'fas fa-save'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Seagull',
+        description: 'Serviço principal de vigilância',
+        status: 'online',
+        port: 'Port 3715'
+      },
+      {
+        id: 'database',
+        name: 'PostgreSQL',
+        description: 'Banco de dados de eventos',
+        status: 'online',
+        port: 'Port 5432'
+      },
+      {
+        id: 'storage',
+        name: 'Sistema de Storage',
+        description: 'Armazenamento de gravações',
+        status: 'online',
+        port: 'Port 3716'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'recording-quality',
+        name: 'Qualidade de Gravação',
+        value: '1080p HD'
+      },
+      {
+        id: 'motion-sensitivity',
+        name: 'Sensibilidade de Movimento',
+        value: 'Média'
+      },
+      {
+        id: 'retention-period',
+        name: 'Período de Retenção',
+        value: '30 dias'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'view-cameras',
+        title: 'Ver Câmeras',
+        description: 'Acessar feeds ao vivo',
+        icon: 'fas fa-video',
+        handler: () => console.log('Ver câmeras')
+      },
+      {
+        id: 'configure-alerts',
+        title: 'Configurar Alertas',
+        description: 'Ajustar detecções',
+        icon: 'fas fa-cog',
+        handler: () => console.log('Configurar alertas')
+      },
+      {
+        id: 'view-recordings',
+        title: 'Ver Gravações',
+        description: 'Histórico de eventos',
+        icon: 'fas fa-history',
+        handler: () => console.log('Ver gravações')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Ver Câmeras',
+      icon: 'fas fa-video',
+      handler: () => console.log('Ver câmeras')
+    }
+  },
+
+  // ========================================
+  // WAYFINDER - NAVEGAÇÃO
+  // ========================================
+  wayfinder: {
+    serviceName: 'Wayfinder',
+    serviceDescription: 'Sistema de Navegação e Orientação',
+    serviceIcon: 'fas fa-route',
+    serviceStatus: 'online',
+    statusText: 'ONLINE',
+    
+    metrics: [
+      {
+        id: 'active-routes',
+        title: 'Rotas Ativas',
+        value: '156',
+        label: 'Rotas Calculadas',
+        icon: 'fas fa-route'
+      },
+      {
+        id: 'avg-travel-time',
+        title: 'Tempo Médio',
+        value: '23min',
+        label: 'Tempo de Viagem',
+        icon: 'fas fa-clock'
+      },
+      {
+        id: 'traffic-score',
+        title: 'Score de Tráfego',
+        value: '8.5/10',
+        label: 'Condições de Tráfego',
+        icon: 'fas fa-chart-line'
+      },
+      {
+        id: 'fuel-efficiency',
+        title: 'Eficiência',
+        value: '92%',
+        label: 'Economia de Combustível',
+        icon: 'fas fa-gas-pump'
+      }
+    ],
+    
+    recentActivity: [
+      {
+        id: 1,
+        title: 'Nova Rota Calculada',
+        description: 'Rota otimizada para destino',
+        time: '3 minutos atrás',
+        icon: 'fas fa-route'
+      },
+      {
+        id: 2,
+        title: 'Tráfego Atualizado',
+        description: 'Condições de tráfego atualizadas',
+        time: '5 minutos atrás',
+        icon: 'fas fa-traffic-light'
+      },
+      {
+        id: 3,
+        title: 'Desvio Aplicado',
+        description: 'Rota alterada devido a obstáculo',
+        time: '10 minutos atrás',
+        icon: 'fas fa-arrow-right'
+      }
+    ],
+    
+    systemStatus: [
+      {
+        id: 'api',
+        name: 'API Wayfinder',
+        description: 'Serviço principal de navegação',
+        status: 'online',
+        port: 'Port 3717'
+      },
+      {
+        id: 'database',
+        name: 'PostgreSQL',
+        description: 'Banco de dados de rotas',
+        status: 'online',
+        port: 'Port 5432'
+      },
+      {
+        id: 'gps',
+        name: 'Sistema GPS',
+        description: 'Serviço de localização',
+        status: 'online',
+        port: 'Port 3718'
+      }
+    ],
+    
+    configurations: [
+      {
+        id: 'route-preference',
+        name: 'Preferência de Rota',
+        value: 'Mais Rápida'
+      },
+      {
+        id: 'traffic-updates',
+        name: 'Atualizações de Tráfego',
+        value: 'A cada 5 minutos'
+      },
+      {
+        id: 'fuel-efficiency',
+        name: 'Modo Econômico',
+        value: 'Ativado'
+      }
+    ],
+    
+    actions: [
+      {
+        id: 'calculate-route',
+        title: 'Calcular Rota',
+        description: 'Criar nova rota',
+        icon: 'fas fa-route',
+        handler: () => console.log('Calcular rota')
+      },
+      {
+        id: 'view-traffic',
+        title: 'Ver Tráfego',
+        description: 'Condições de tráfego',
+        icon: 'fas fa-traffic-light',
+        handler: () => console.log('Ver tráfego')
+      },
+      {
+        id: 'manage-routes',
+        title: 'Gerenciar Rotas',
+        description: 'Histórico de navegação',
+        icon: 'fas fa-list',
+        handler: () => console.log('Gerenciar rotas')
+      }
+    ],
+    
+    primaryAction: {
+      text: 'Calcular Rota',
+      icon: 'fas fa-route',
+      handler: () => console.log('Calcular rota')
+    }
+  },
+
+  // ========================================
   // DOCK - SISTEMA DE DOCKING
   // ========================================
   dock: {
@@ -749,17 +1163,17 @@ export const serviceConfigs = {
       },
       {
         id: 2,
-        title: 'Transferência Concluída',
-        description: 'Dados sincronizados com sucesso',
-        time: '5 minutos atrás',
-        icon: 'fas fa-check'
+        title: 'Recurso Desconectado',
+        description: 'Dispositivo removido do dock',
+        time: '10 minutos atrás',
+        icon: 'fas fa-minus'
       },
       {
         id: 3,
-        title: 'Manutenção Programada',
-        description: 'Atualização de firmware concluída',
+        title: 'Atualização de Firmware',
+        description: 'Firmware atualizado com sucesso',
         time: '1 hora atrás',
-        icon: 'fas fa-tools'
+        icon: 'fas fa-sync-alt'
       }
     ],
     
@@ -769,7 +1183,7 @@ export const serviceConfigs = {
         name: 'API Dock',
         description: 'Serviço principal de docking',
         status: 'online',
-        port: 'Port 3709'
+        port: 'Port 3710'
       },
       {
         id: 'database',
@@ -779,9 +1193,9 @@ export const serviceConfigs = {
         port: 'Port 5432'
       },
       {
-        id: 'redis',
+        id: 'cache',
         name: 'Redis',
-        description: 'Cache de conexões',
+        description: 'Cache de sessões',
         status: 'online',
         port: 'Port 6379'
       }
@@ -789,50 +1203,50 @@ export const serviceConfigs = {
     
     configurations: [
       {
-        id: 'max-connections',
-        name: 'Máximo de Conexões',
-        value: '50 simultâneas'
+        id: 'max-docks',
+        name: 'Máximo de Docks',
+        value: '20 simultâneos'
       },
       {
-        id: 'auto-dock',
-        name: 'Docking Automático',
-        value: 'Ativado'
+        id: 'auto-update',
+        name: 'Atualização Automática',
+        value: 'Ativada'
       },
       {
-        id: 'sync-interval',
-        name: 'Intervalo de Sincronização',
-        value: '30 segundos'
+        id: 'alert-threshold',
+        name: 'Limite de Alerta',
+        value: '80% de uso'
       }
     ],
     
     actions: [
       {
-        id: 'add-resource',
-        title: 'Adicionar Recurso',
-        description: 'Conectar novo dispositivo',
+        id: 'add-dock',
+        title: 'Adicionar Dock',
+        description: 'Registrar novo dock',
         icon: 'fas fa-plus',
-        handler: () => console.log('Adicionar recurso')
+        handler: () => console.log('Adicionar dock')
       },
       {
-        id: 'manage-docks',
-        title: 'Gerenciar Docks',
-        description: 'Configurar pontos de docking',
-        icon: 'fas fa-cog',
-        handler: () => console.log('Gerenciar docks')
+        id: 'remove-dock',
+        title: 'Remover Dock',
+        description: 'Excluir dock existente',
+        icon: 'fas fa-minus',
+        handler: () => console.log('Remover dock')
       },
       {
-        id: 'view-resources',
-        title: 'Ver Recursos',
-        description: 'Listar dispositivos conectados',
-        icon: 'fas fa-list',
-        handler: () => console.log('Ver recursos')
+        id: 'update-firmware',
+        title: 'Atualizar Firmware',
+        description: 'Atualizar firmware dos dispositivos',
+        icon: 'fas fa-sync-alt',
+        handler: () => console.log('Atualizar firmware')
       }
     ],
     
     primaryAction: {
-      text: 'Adicionar Recurso',
+      text: 'Adicionar Dock',
       icon: 'fas fa-plus',
-      handler: () => console.log('Adicionar recurso')
+      handler: () => console.log('Adicionar dock')
     }
   },
 
@@ -975,144 +1389,6 @@ export const serviceConfigs = {
   },
 
   // ========================================
-  // MAPMAKER - CRIAÇÃO DE MAPAS
-  // ========================================
-  mapmaker: {
-    serviceName: 'Mapmaker',
-    serviceDescription: 'Sistema de Criação e Gestão de Mapas',
-    serviceIcon: 'fas fa-map-marked-alt',
-    serviceStatus: 'online',
-    statusText: 'ONLINE',
-    
-    metrics: [
-      {
-        id: 'active-maps',
-        title: 'Mapas Ativos',
-        value: '156',
-        label: 'Mapas em Uso',
-        icon: 'fas fa-map'
-      },
-      {
-        id: 'total-layers',
-        title: 'Camadas Totais',
-        value: '2.847',
-        label: 'Camadas Criadas',
-        icon: 'fas fa-layer-group'
-      },
-      {
-        id: 'storage-used',
-        title: 'Armazenamento',
-        value: '45.2GB',
-        label: 'Espaço Utilizado',
-        icon: 'fas fa-hdd'
-      },
-      {
-        id: 'processing-time',
-        title: 'Tempo de Processamento',
-        value: '1.8s',
-        label: 'Média por Mapa',
-        icon: 'fas fa-stopwatch'
-      }
-    ],
-    
-    recentActivity: [
-      {
-        id: 1,
-        title: 'Mapa Criado',
-        description: 'Novo mapa de rotas criado',
-        time: '3 minutos atrás',
-        icon: 'fas fa-plus'
-      },
-      {
-        id: 2,
-        title: 'Camada Adicionada',
-        description: 'Camada de tráfego atualizada',
-        time: '10 minutos atrás',
-        icon: 'fas fa-layer-group'
-      },
-      {
-        id: 3,
-        title: 'Exportação Concluída',
-        description: 'Mapa exportado em PDF',
-        time: '1 hora atrás',
-        icon: 'fas fa-download'
-      }
-    ],
-    
-    systemStatus: [
-      {
-        id: 'api',
-        name: 'API Mapmaker',
-        description: 'Serviço principal de mapas',
-        status: 'online',
-        port: 'Port 3712'
-      },
-      {
-        id: 'database',
-        name: 'PostgreSQL',
-        description: 'Banco de dados geoespacial',
-        status: 'online',
-        port: 'Port 5432'
-      },
-      {
-        id: 'tile-server',
-        name: 'Tile Server',
-        description: 'Servidor de tiles de mapas',
-        status: 'online',
-        port: 'Port 3713'
-      }
-    ],
-    
-    configurations: [
-      {
-        id: 'max-maps',
-        name: 'Máximo de Mapas',
-        value: '1.000 simultâneos'
-      },
-      {
-        id: 'tile-format',
-        name: 'Formato de Tiles',
-        value: 'PNG 256x256'
-      },
-      {
-        id: 'cache-size',
-        name: 'Tamanho do Cache',
-        value: '10GB'
-      }
-    ],
-    
-    actions: [
-      {
-        id: 'create-map',
-        title: 'Criar Mapa',
-        description: 'Criar novo mapa',
-        icon: 'fas fa-plus',
-        handler: () => console.log('Criar mapa')
-      },
-      {
-        id: 'import-data',
-        title: 'Importar Dados',
-        description: 'Importar dados geoespaciais',
-        icon: 'fas fa-upload',
-        handler: () => console.log('Importar dados')
-      },
-      {
-        id: 'view-maps',
-        title: 'Ver Mapas',
-        description: 'Listar todos os mapas',
-        icon: 'fas fa-list',
-        handler: () => console.log('Ver mapas')
-      }
-    ],
-    
-    primaryAction: {
-      text: 'Criar Mapa',
-      icon: 'fas fa-plus',
-      handler: () => console.log('Criar mapa')
-    }
-  },
-
-  // ========================================
   // QUARTER - GESTÃO DE USUÁRIOS
   // ========================================
   quarter: {
@@ -1247,144 +1523,6 @@ export const serviceConfigs = {
       text: 'Adicionar Usuário',
       icon: 'fas fa-user-plus',
       handler: () => console.log('Adicionar usuário')
-    }
-  },
-
-  // ========================================
-  // SEAGULL - VIGILÂNCIA
-  // ========================================
-  seagull: {
-    serviceName: 'Seagull',
-    serviceDescription: 'Sistema de Vigilância e Monitoramento',
-    serviceIcon: 'fas fa-eye',
-    serviceStatus: 'online',
-    statusText: 'ONLINE',
-    
-    metrics: [
-      {
-        id: 'active-cameras',
-        title: 'Câmeras Ativas',
-        value: '24',
-        label: 'Dispositivos Online',
-        icon: 'fas fa-video'
-      },
-      {
-        id: 'detection-rate',
-        title: 'Taxa de Detecção',
-        value: '98.5%',
-        label: 'Precisão de Detecção',
-        icon: 'fas fa-bullseye'
-      },
-      {
-        id: 'alerts-today',
-        title: 'Alertas Hoje',
-        value: '47',
-        label: 'Eventos Detectados',
-        icon: 'fas fa-bell'
-      },
-      {
-        id: 'storage-used',
-        title: 'Armazenamento',
-        value: '2.3TB',
-        label: 'Gravações Salvadas',
-        icon: 'fas fa-hdd'
-      }
-    ],
-    
-    recentActivity: [
-      {
-        id: 1,
-        title: 'Movimento Detectado',
-        description: 'Atividade detectada na câmera 3',
-        time: '2 minutos atrás',
-        icon: 'fas fa-running'
-      },
-      {
-        id: 2,
-        title: 'Alerta Processado',
-        description: 'Análise de segurança concluída',
-        time: '5 minutos atrás',
-        icon: 'fas fa-shield-check'
-      },
-      {
-        id: 3,
-        title: 'Backup Realizado',
-        description: 'Gravações salvas automaticamente',
-        time: '1 hora atrás',
-        icon: 'fas fa-save'
-      }
-    ],
-    
-    systemStatus: [
-      {
-        id: 'api',
-        name: 'API Seagull',
-        description: 'Serviço principal de vigilância',
-        status: 'online',
-        port: 'Port 3715'
-      },
-      {
-        id: 'database',
-        name: 'PostgreSQL',
-        description: 'Banco de dados de eventos',
-        status: 'online',
-        port: 'Port 5432'
-      },
-      {
-        id: 'storage',
-        name: 'Sistema de Storage',
-        description: 'Armazenamento de gravações',
-        status: 'online',
-        port: 'Port 3716'
-      }
-    ],
-    
-    configurations: [
-      {
-        id: 'recording-quality',
-        name: 'Qualidade de Gravação',
-        value: '1080p HD'
-      },
-      {
-        id: 'motion-sensitivity',
-        name: 'Sensibilidade de Movimento',
-        value: 'Média'
-      },
-      {
-        id: 'retention-period',
-        name: 'Período de Retenção',
-        value: '30 dias'
-      }
-    ],
-    
-    actions: [
-      {
-        id: 'view-cameras',
-        title: 'Ver Câmeras',
-        description: 'Acessar feeds ao vivo',
-        icon: 'fas fa-video',
-        handler: () => console.log('Ver câmeras')
-      },
-      {
-        id: 'configure-alerts',
-        title: 'Configurar Alertas',
-        description: 'Ajustar detecções',
-        icon: 'fas fa-cog',
-        handler: () => console.log('Configurar alertas')
-      },
-      {
-        id: 'view-recordings',
-        title: 'Ver Gravações',
-        description: 'Histórico de eventos',
-        icon: 'fas fa-history',
-        handler: () => console.log('Ver gravações')
-      }
-    ],
-    
-    primaryAction: {
-      text: 'Ver Câmeras',
-      icon: 'fas fa-video',
-      handler: () => console.log('Ver câmeras')
     }
   },
 
@@ -1661,144 +1799,6 @@ export const serviceConfigs = {
       text: 'Executar Missão',
       icon: 'fas fa-rocket',
       handler: () => console.log('Executar missão')
-    }
-  },
-
-  // ========================================
-  // WAYFINDER - NAVEGAÇÃO
-  // ========================================
-  wayfinder: {
-    serviceName: 'Wayfinder',
-    serviceDescription: 'Sistema de Navegação e Roteamento',
-    serviceIcon: 'fas fa-route',
-    serviceStatus: 'online',
-    statusText: 'ONLINE',
-    
-    metrics: [
-      {
-        id: 'active-routes',
-        title: 'Rotas Ativas',
-        value: '156',
-        label: 'Navegações em Andamento',
-        icon: 'fas fa-route'
-      },
-      {
-        id: 'avg-travel-time',
-        title: 'Tempo Médio',
-        value: '23min',
-        label: 'Tempo de Viagem',
-        icon: 'fas fa-clock'
-      },
-      {
-        id: 'traffic-score',
-        title: 'Score de Tráfego',
-        value: '8.5/10',
-        label: 'Condições de Tráfego',
-        icon: 'fas fa-chart-line'
-      },
-      {
-        id: 'fuel-efficiency',
-        title: 'Eficiência',
-        value: '92%',
-        label: 'Economia de Combustível',
-        icon: 'fas fa-gas-pump'
-      }
-    ],
-    
-    recentActivity: [
-      {
-        id: 1,
-        title: 'Nova Rota Calculada',
-        description: 'Rota otimizada para destino',
-        time: '3 minutos atrás',
-        icon: 'fas fa-route'
-      },
-      {
-        id: 2,
-        title: 'Tráfego Atualizado',
-        description: 'Condições de tráfego atualizadas',
-        time: '5 minutos atrás',
-        icon: 'fas fa-traffic-light'
-      },
-      {
-        id: 3,
-        title: 'Desvio Aplicado',
-        description: 'Rota alterada devido a obstáculo',
-        time: '10 minutos atrás',
-        icon: 'fas fa-arrow-right'
-      }
-    ],
-    
-    systemStatus: [
-      {
-        id: 'api',
-        name: 'API Wayfinder',
-        description: 'Serviço principal de navegação',
-        status: 'online',
-        port: 'Port 3717'
-      },
-      {
-        id: 'database',
-        name: 'PostgreSQL',
-        description: 'Banco de dados de rotas',
-        status: 'online',
-        port: 'Port 5432'
-      },
-      {
-        id: 'gps',
-        name: 'Sistema GPS',
-        description: 'Serviço de localização',
-        status: 'online',
-        port: 'Port 3718'
-      }
-    ],
-    
-    configurations: [
-      {
-        id: 'route-preference',
-        name: 'Preferência de Rota',
-        value: 'Mais Rápida'
-      },
-      {
-        id: 'traffic-updates',
-        name: 'Atualizações de Tráfego',
-        value: 'A cada 5 minutos'
-      },
-      {
-        id: 'fuel-efficiency',
-        name: 'Modo Econômico',
-        value: 'Ativado'
-      }
-    ],
-    
-    actions: [
-      {
-        id: 'calculate-route',
-        title: 'Calcular Rota',
-        description: 'Criar nova rota',
-        icon: 'fas fa-route',
-        handler: () => console.log('Calcular rota')
-      },
-      {
-        id: 'view-traffic',
-        title: 'Ver Tráfego',
-        description: 'Condições de tráfego',
-        icon: 'fas fa-traffic-light',
-        handler: () => console.log('Ver tráfego')
-      },
-      {
-        id: 'manage-routes',
-        title: 'Gerenciar Rotas',
-        description: 'Histórico de navegação',
-        icon: 'fas fa-list',
-        handler: () => console.log('Gerenciar rotas')
-      }
-    ],
-    
-    primaryAction: {
-      text: 'Calcular Rota',
-      icon: 'fas fa-route',
-      handler: () => console.log('Calcular rota')
     }
   }
 }

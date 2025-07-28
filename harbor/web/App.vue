@@ -287,13 +287,42 @@
               </ul>
             </li>
             
+            <!-- Dock -->
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('dock')">
+                <div class="nav-icon">
+                  <i class="fas fa-link"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Dock</div>
+                  <div class="service-subtitle">Sistema de Docking</div>
+                </div>
+                <i :class="openSubmenus.dock ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </a>
+              <ul class="nav flex-column submenu" :class="{ show: openSubmenus.dock }">
+                <li class="nav-item">
+                  <router-link class="nav-link" to="/dock/status" @click="handleNavClick">
+                    <div class="nav-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">Status</div>
+                      <div class="service-subtitle">Visão geral do serviço</div>
+                    </div>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+            
             <!-- Beacon -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('beacon')">
-                <div class="nav-icon"><i class="fas fa-broadcast-tower"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-broadcast-tower"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Beacon</div>
-                  <div class="service-subtitle">Sinalização e Comunicação</div>
+                  <div class="service-subtitle">Sistema de Sinalização</div>
                 </div>
                 <i :class="openSubmenus.beacon ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
@@ -315,10 +344,12 @@
             <!-- Echo -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('echo')">
-                <div class="nav-icon"><i class="fas fa-wave-square"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-comments"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Echo</div>
-                  <div class="service-subtitle">Chat e Comunicação</div>
+                  <div class="service-subtitle">Sistema de Comunicação</div>
                 </div>
                 <i :class="openSubmenus.echo ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
@@ -340,10 +371,12 @@
             <!-- Guardian -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('guardian')">
-                <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Guardian</div>
-                  <div class="service-subtitle">Segurança e Proteção</div>
+                  <div class="service-subtitle">Sistema de Segurança</div>
                 </div>
                 <i :class="openSubmenus.guardian ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
@@ -365,7 +398,9 @@
             <!-- Mapmaker -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('mapmaker')">
-                <div class="nav-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-map-marked-alt"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Mapmaker</div>
                   <div class="service-subtitle">Criação de Mapas</div>
@@ -390,10 +425,12 @@
             <!-- Seagull -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('seagull')">
-                <div class="nav-icon"><i class="fas fa-eye"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-eye"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Seagull</div>
-                  <div class="service-subtitle">Vigilância e Monitoramento</div>
+                  <div class="service-subtitle">Sistema de Vigilância</div>
                 </div>
                 <i :class="openSubmenus.seagull ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
@@ -415,10 +452,12 @@
             <!-- Wayfinder -->
             <li class="nav-item">
               <a class="nav-link" href="#" @click.prevent="handleSubmenuClick('wayfinder')">
-                <div class="nav-icon"><i class="fas fa-route"></i></div>
+                <div class="nav-icon">
+                  <i class="fas fa-route"></i>
+                </div>
                 <div class="nav-text">
                   <div class="nav-title">Wayfinder</div>
-                  <div class="service-subtitle">Navegação e Orientação</div>
+                  <div class="service-subtitle">Sistema de Navegação</div>
                 </div>
                 <i :class="openSubmenus.wayfinder ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
               </a>
@@ -436,6 +475,12 @@
                 </li>
               </ul>
             </li>
+            
+
+            
+
+            
+
           </ul>
         </div>
         
@@ -517,7 +562,7 @@
 </template>
 
 <script>
-import { getServiceInfo, getAllServices, hasServiceView } from './services.js'
+import { services } from './services.js'
 
 export default {
   name: 'App',
@@ -530,13 +575,14 @@ export default {
       },
       error: null,
       currentView: 'dashboard',
-      services: getAllServices(),
+      services: services,
       sidebarCollapsed: false,
       openSubmenus: {
         skipper: false,
         ledger: false,
         tollgate: false,
         quarter: false,
+        dock: false,
         beacon: false,
         echo: false,
         guardian: false,
@@ -604,6 +650,7 @@ export default {
         this.openSubmenus.ledger = false;
         this.openSubmenus.tollgate = false;
         this.openSubmenus.quarter = false;
+        this.openSubmenus.dock = false;
         this.openSubmenus.beacon = false;
         this.openSubmenus.echo = false;
         this.openSubmenus.guardian = false;

@@ -12,12 +12,22 @@ export default [
     name: 'Diver',
     component: () => import('../../diver/web/src/views/DiverView.vue')
   },
+  {
+    path: '/diver/status',
+    name: 'DiverStatus',
+    component: () => import('../../diver/web/src/views/StatusView.vue')
+  },
   
   // Fisher - Pesca de dados
   {
     path: '/fisher',
     name: 'Fisher',
     component: () => import('../../fisher/web/src/views/FisherView.vue')
+  },
+  {
+    path: '/fisher/status',
+    name: 'FisherStatus',
+    component: () => import('../../fisher/web/src/views/StatusView.vue')
   },
   
   // Skipper
@@ -105,6 +115,90 @@ export default [
   {
     path: '/quarter/status',
     name: 'QuarterStatus',
-    component: () => import('../../quarter/web/src/views/Dashboard.vue')
+    component: () => import('../../quarter/web/src/views/StatusView.vue')
+  },
+  
+  // Dock
+  {
+    path: '/dock',
+    name: 'Dock',
+    component: () => import('../../dock/views/DockView.vue')
+  },
+  {
+    path: '/dock/status',
+    name: 'DockStatus',
+    component: () => import('../../dock/views/StatusView.vue')
+  },
+  
+  // Beacon
+  {
+    path: '/beacon',
+    name: 'Beacon',
+    component: () => import('../../beacon/views/BeaconView.vue')
+  },
+  {
+    path: '/beacon/status',
+    name: 'BeaconStatus',
+    component: () => import('../../beacon/views/StatusView.vue')
+  },
+  
+  // Echo
+  {
+    path: '/echo',
+    name: 'Echo',
+    component: () => import('../../echo/views/EchoView.vue')
+  },
+  {
+    path: '/echo/status',
+    name: 'EchoStatus',
+    component: () => import('../../echo/views/StatusView.vue')
+  },
+  
+  // Guardian
+  {
+    path: '/guardian',
+    name: 'Guardian',
+    component: () => import('../../guardian/views/GuardianView.vue')
+  },
+  {
+    path: '/guardian/status',
+    name: 'GuardianStatus',
+    component: () => import('../../guardian/views/StatusView.vue')
+  },
+  
+  // Mapmaker
+  {
+    path: '/mapmaker',
+    name: 'Mapmaker',
+    component: () => import('../../mapmaker/views/MapmakerView.vue')
+  },
+  {
+    path: '/mapmaker/status',
+    name: 'MapmakerStatus',
+    component: () => import('../../mapmaker/views/StatusView.vue')
+  },
+  
+  // Seagull
+  {
+    path: '/seagull',
+    name: 'Seagull',
+    component: () => import('../../seagull/views/SeagullView.vue')
+  },
+  {
+    path: '/seagull/status',
+    name: 'SeagullStatus',
+    component: () => import('../../seagull/views/StatusView.vue')
+  },
+  
+  // Wayfinder
+  {
+    path: '/wayfinder',
+    name: 'Wayfinder',
+    component: () => import('../../wayfinder/views/WayfinderView.vue')
+  },
+  {
+    path: '/wayfinder/status',
+    name: 'WayfinderStatus',
+    component: () => import('../../wayfinder/views/StatusView.vue')
   }
 ] 
