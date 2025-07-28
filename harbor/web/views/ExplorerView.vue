@@ -105,17 +105,68 @@
 
         <!-- Histórico de Pesquisas -->
         <div v-if="searchHistory.length > 0 && !productResults.length" class="history-section">
-          <h3>Pesquisas Recentes</h3>
-          <div class="history-list">
+          <div class="results-header">
+            <h3>Pesquisas Recentes</h3>
+            <button @click="clearHistory" class="clear-button">
+              <i class="fas fa-trash"></i>
+              Limpar Histórico
+            </button>
+          </div>
+          
+          <div class="results-grid">
             <div
               v-for="item in searchHistory"
               :key="item.id"
               @click="loadHistoryItem(item)"
-              class="history-item"
+              class="service-card history-card"
             >
-              <i class="fas fa-history"></i>
-              <span>{{ item.query }}</span>
-              <small class="history-date">{{ formatDate(item.date) }}</small>
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-history"></i>
+                </div>
+                <div class="card-title">
+                  <h4>{{ item.query }}</h4>
+                  <span class="card-subtitle">Pesquisa Anterior</span>
+                </div>
+                <div class="card-actions">
+                  <button @click.stop="loadHistoryItem(item)" class="btn btn-sm btn-primary">
+                    <i class="fas fa-search"></i>
+                  </button>
+                  <button @click.stop="removeHistoryItem(item)" class="btn btn-sm btn-danger">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card-content">
+                <div class="card-meta">
+                  <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>{{ formatDate(item.date) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ formatTime(item.date) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="fas fa-search"></i>
+                    <span>{{ item.query.length }} caracteres</span>
+                  </div>
+                </div>
+                
+                <div class="card-details">
+                  <div class="detail-item">
+                    <strong>Tipo:</strong> Pesquisa de Produto
+                  </div>
+                  <div class="detail-item">
+                    <strong>Status:</strong> 
+                    <span class="status-badge info">
+                      <i class="fas fa-check-circle"></i>
+                      Concluída
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -311,10 +362,21 @@ export default {
       this.addToHistory(this.searchQuery)
     },
 
-    clearProductResults() {
-      this.productResults = []
-      this.searchQuery = ''
-    },
+         clearProductResults() {
+       this.productResults = []
+       this.searchQuery = ''
+     },
+
+     clearHistory() {
+       this.searchHistory = []
+     },
+
+     removeHistoryItem(item) {
+       const index = this.searchHistory.findIndex(historyItem => historyItem.id === item.id)
+       if (index > -1) {
+         this.searchHistory.splice(index, 1)
+       }
+     },
 
     askDiverAboutProduct(product) {
       this.showDiverChat = true
@@ -1010,6 +1072,203 @@ export default {
 
 .send-button i {
   font-size: 1.1rem;
+}
+
+/* Estilos para o histórico com service-cards */
+.history-section {
+  margin-top: 30px;
+}
+
+.history-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #8b5cf6;
+}
+
+.history-card .card-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.history-card .card-subtitle {
+  color: #a78bfa;
+  font-size: 0.8rem;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+/* Estilos para service-cards */
+.results-section {
+  margin-top: 30px;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.results-header h3 {
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.clear-button {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.clear-button:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.card-title h4 {
+  color: #e2e8f0;
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.card-subtitle {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.card-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.btn-secondary {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.card-content {
+  color: #e2e8f0;
+}
+
+.card-description {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.card-meta {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-details {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
