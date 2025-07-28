@@ -1549,25 +1549,33 @@ export default {
 .config-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0.75rem;
   background: rgba(15, 23, 42, 0.3);
   border-radius: 0.5rem;
   border: 1px solid #475569;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .config-label {
   color: #e2e8f0;
   font-weight: 600;
-  flex: 1;
+  flex: 0 0 200px;
+  min-width: 200px;
 }
 
 .config-value {
   color: #94a3b8;
   font-size: 0.875rem;
-  flex: 2;
-  text-align: center;
+  flex: 1;
+  text-align: left;
   font-family: 'Courier New', monospace;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 300px;
+  line-height: 1.4;
 }
 
 .config-status {
@@ -1575,8 +1583,9 @@ export default {
   font-weight: 600;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  flex: 1;
+  flex: 0 0 auto;
   text-align: center;
+  white-space: nowrap;
 }
 
 .config-status.online {
