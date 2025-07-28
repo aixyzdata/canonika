@@ -1,23 +1,23 @@
 <template>
   <CanonikaViewTemplate
     title="Fisher"
-    description="Tripulante de Pesca de Dados"
+    description="Tripulante de Pesca de Dados - Status Geral"
     header-icon="fas fa-fish"
     status-text="ONLINE"
     :primary-action="{
-      text: 'Executar Missão',
-      icon: 'fas fa-rocket',
-      handler: openMissao
+      text: 'Atualizar Status',
+      icon: 'fas fa-sync-alt',
+      handler: refreshData
     }"
     @refresh="refreshData"
   >
     <div class="service-cards">
-      <!-- Missões Executadas -->
+      <!-- Status Geral do Fisher -->
       <div class="service-card">
         <div class="card-header">
-          <h3>Missões Executadas</h3>
+          <h3>Status Geral</h3>
           <div class="card-icon">
-            <i class="fas fa-rocket"></i>
+            <i class="fas fa-chart-line"></i>
           </div>
         </div>
         <div class="card-content">
@@ -37,6 +37,30 @@
             <div class="detail-item">
               <span class="detail-label">Taxa de Sucesso:</span>
               <span class="detail-value">{{ config.metrics[3].value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fontes de Dados -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Fontes de Dados</h3>
+          <div class="card-icon">
+            <i class="fas fa-database"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="plans-grid">
+            <div 
+              v-for="source in dataSources" 
+              :key="source.id" 
+              class="plan-item"
+              @click="openDataSource(source)"
+            >
+              <div class="plan-name">{{ source.name }}</div>
+              <div class="plan-price">{{ source.description }}</div>
+              <div class="plan-credits">{{ source.status }}</div>
             </div>
           </div>
         </div>
@@ -68,30 +92,6 @@
         </div>
       </div>
 
-      <!-- Ferramentas Disponíveis -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Ferramentas</h3>
-          <div class="card-icon">
-            <i class="fas fa-tools"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="plans-grid">
-            <div 
-              v-for="action in config.actions" 
-              :key="action.id" 
-              class="plan-item"
-              @click="action.handler"
-            >
-              <div class="plan-name">{{ action.name }}</div>
-              <div class="plan-price">{{ action.description }}</div>
-              <div class="plan-credits">{{ action.status }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Status do Sistema -->
       <div class="service-card">
         <div class="card-header">
@@ -101,75 +101,24 @@
           </div>
         </div>
         <div class="card-content">
-          <div class="alerts-list">
-            <div v-for="status in config.systemStatus" :key="status.id" class="alert-item info">
-              <div class="alert-icon">
-                <i class="fas fa-check"></i>
-              </div>
-              <div class="alert-content">
-                <div class="alert-title">{{ status.name }}</div>
-                <div class="alert-message">{{ status.description }}</div>
-                <div class="alert-time">{{ status.port }}</div>
-              </div>
+          <div class="system-status">
+            <div class="status-item">
+              <span class="status-label">API Status:</span>
+              <span class="status-value online">ONLINE</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">Database:</span>
+              <span class="status-value online">CONECTADO</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">Cache:</span>
+              <span class="status-value online">ATIVO</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">Última Sincronização:</span>
+              <span class="status-value">{{ lastSync }}</span>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de Missão -->
-    <div v-if="showMissaoModal" class="modal-overlay" @click="closeMissaoModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>🚀 Executar Missão de Pesca</h3>
-          <button @click="closeMissaoModal" class="modal-close">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="executeMission" class="canonika-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="source">Fonte de Dados</label>
-                <select
-                  id="source"
-                  v-model="missionForm.source"
-                  class="form-control"
-                  :disabled="isLoading"
-                >
-                  <option value="">Selecione uma fonte...</option>
-                  <option value="receita-federal">Receita Federal - CNPJs</option>
-                  <option value="open-food-facts">Open Food Facts</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label for="missionType">Tipo de Missão</label>
-                <select
-                  id="missionType"
-                  v-model="missionForm.missionType"
-                  class="form-control"
-                  :disabled="isLoading"
-                >
-                  <option value="incremental">Incremental (Apenas atualizações)</option>
-                  <option value="full">Completa (Todos os dados)</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="form-actions">
-              <button 
-                type="submit" 
-                class="btn btn-primary"
-                :disabled="!missionForm.source || isLoading"
-              >
-                <i class="fas fa-rocket"></i>
-                {{ isLoading ? 'Executando...' : '🚀 Executar Missão' }}
-              </button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
@@ -177,193 +126,149 @@
 </template>
 
 <script>
-import { serviceConfigs } from '../../../../shared/config/status-configs.js'
-import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
-
 export default {
   name: 'FisherView',
-  components: {
-    CanonikaViewTemplate
-  },
   data() {
     return {
-      config: serviceConfigs.fisher,
-      showMissaoModal: false,
-      missionForm: {
-        source: '',
-        missionType: 'incremental'
-      },
-      isLoading: false
+      lastSync: '2024-01-15 14:30:00',
+      dataSources: [
+        {
+          id: 1,
+          name: 'SEFAZ',
+          description: 'Dados da Receita Federal',
+          status: 'ATIVO',
+          type: 'sefaz'
+        },
+        {
+          id: 2,
+          name: 'Marketplaces',
+          description: 'E-commerce e Marketplaces',
+          status: 'ATIVO',
+          type: 'marketplaces'
+        },
+        {
+          id: 3,
+          name: 'APIs Externas',
+          description: 'APIs de terceiros',
+          status: 'ATIVO',
+          type: 'apis'
+        },
+        {
+          id: 4,
+          name: 'Bancos de Dados',
+          description: 'Bases de dados internas',
+          status: 'ATIVO',
+          type: 'databases'
+        },
+        {
+          id: 5,
+          name: 'Web Scraping',
+          description: 'Coleta de dados web',
+          status: 'ATIVO',
+          type: 'scraping'
+        },
+        {
+          id: 6,
+          name: 'Arquivos Locais',
+          description: 'CSV, Excel, XML',
+          status: 'ATIVO',
+          type: 'files'
+        }
+      ],
+      config: {
+        metrics: [
+          { value: '1,247', label: 'Missões Executadas' },
+          { value: '2.5M', label: 'Dados Processados' },
+          { value: '6', label: 'Fontes Ativas' },
+          { value: '98.5%', label: 'Taxa de Sucesso' }
+        ],
+        recentActivity: [
+          {
+            id: 1,
+            title: 'Sincronização SEFAZ',
+            description: '2.1K registros processados',
+            time: '2 min atrás',
+            icon: 'fas fa-sync'
+          },
+          {
+            id: 2,
+            title: 'Atualização Marketplaces',
+            description: '1.8K produtos atualizados',
+            time: '15 min atrás',
+            icon: 'fas fa-shopping-cart'
+          },
+          {
+            id: 3,
+            title: 'Backup Automático',
+            description: 'Database backup realizado',
+            time: '1 hora atrás',
+            icon: 'fas fa-database'
+          },
+          {
+            id: 4,
+            title: 'Limpeza de Cache',
+            description: 'Cache limpo com sucesso',
+            time: '2 horas atrás',
+            icon: 'fas fa-broom'
+          }
+        ]
+      }
     }
   },
   methods: {
     refreshData() {
+      console.log('Refreshing Fisher status...')
       // Implementar refresh dos dados
-      console.log('Refreshing Fisher data...')
     },
-    openMissao() {
-      this.showMissaoModal = true
-    },
-    closeMissaoModal() {
-      this.showMissaoModal = false
-      this.missionForm = {
-        source: '',
-        missionType: 'incremental'
-      }
-    },
-    async executeMission() {
-      if (!this.missionForm.source) return
-      
-      this.isLoading = true
-      
-      try {
-        // Simular execução de missão
-        await new Promise(resolve => setTimeout(resolve, 3000))
-        
-        // Aqui você implementaria a chamada real para a API do Fisher
-        console.log('Executando missão:', this.missionForm)
-        
-        // Fechar modal após sucesso
-        this.closeMissaoModal()
-        
-      } catch (error) {
-        console.error('Erro na missão:', error)
-      } finally {
-        this.isLoading = false
-      }
+    openDataSource(source) {
+      // Navegar para a tela específica da fonte de dados
+      console.log('Abrindo fonte de dados:', source)
+      // Aqui você implementaria a navegação para a tela específica
+      // Por exemplo: this.$router.push(`/fisher/${source.type}`)
     }
   }
 }
 </script>
 
 <style scoped>
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+.system-status {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.modal-content {
-  background: #1e293b;
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal-header {
+.status-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
 }
 
-.modal-header h3 {
-  color: #e2e8f0;
-  margin: 0;
+.status-item:last-child {
+  border-bottom: none;
 }
 
-.modal-close {
-  background: none;
-  border: none;
+.status-label {
   color: #94a3b8;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.5rem;
+  font-weight: 500;
 }
 
-.modal-close:hover {
-  color: #e2e8f0;
-}
-
-.canonika-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  color: #e2e8f0;
+.status-value {
   font-weight: 600;
-  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
 }
 
-.form-control {
-  background: #334155;
-  border: 1px solid #475569;
-  color: #e2e8f0;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+.status-value.online {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-control:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  transform: translateY(-1px);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.status-value.offline {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 </style>
 
