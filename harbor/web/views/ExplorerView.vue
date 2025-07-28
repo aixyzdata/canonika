@@ -286,10 +286,8 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal de Detalhes do Produto -->
-  <Teleport to="body">
+    <!-- Modal de Detalhes do Produto -->
     <div v-if="showProductDetails && selectedProduct" class="product-details-modal">
       <div class="modal-overlay" @click="closeProductDetails"></div>
       <div class="modal-content">
@@ -417,7 +415,7 @@
         </div>
       </div>
     </div>
-  </Teleport>
+  </div>
 </template>
 
 <script>
@@ -1787,41 +1785,41 @@ export default {
 
    /* Modal de Detalhes */
    .product-details-modal {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100vw;
-     height: 100vh;
-     z-index: 9999;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     pointer-events: auto;
+     position: fixed !important;
+     top: 0 !important;
+     left: 0 !important;
+     width: 100vw !important;
+     height: 100vh !important;
+     z-index: 99999 !important;
+     display: flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+     pointer-events: auto !important;
    }
 
    .modal-overlay {
-     position: absolute;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background: rgba(0, 0, 0, 0.8);
-     backdrop-filter: blur(5px);
-     pointer-events: auto;
+     position: absolute !important;
+     top: 0 !important;
+     left: 0 !important;
+     width: 100% !important;
+     height: 100% !important;
+     background: rgba(0, 0, 0, 0.8) !important;
+     backdrop-filter: blur(5px) !important;
+     pointer-events: auto !important;
    }
 
    .modal-content {
-     position: relative;
-     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-     border: 1px solid #475569;
-     border-radius: 15px;
-     max-width: 900px;
-     width: 90%;
-     max-height: 85vh;
-     overflow-y: auto;
-     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-     z-index: 10000;
-     pointer-events: auto;
+     position: relative !important;
+     background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+     border: 1px solid #475569 !important;
+     border-radius: 15px !important;
+     max-width: 900px !important;
+     width: 90% !important;
+     max-height: 85vh !important;
+     overflow-y: auto !important;
+     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+     z-index: 100000 !important;
+     pointer-events: auto !important;
    }
 
    .modal-header {
