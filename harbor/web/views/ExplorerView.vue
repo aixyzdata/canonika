@@ -41,7 +41,7 @@
               @keyup.enter="performProductSearch"
               type="text"
               class="search-input"
-              placeholder="Digite o nome do produto, código de barras..."
+              placeholder="Digite o nome do produto, EAN, SKU ou descrição..."
             />
             <button @click="performProductSearch" class="search-button">
               <i class="fas fa-search"></i>
@@ -49,176 +49,163 @@
           </div>
         </div>
 
-        <!-- Resultados de Produtos -->
-        <div v-if="productResults.length > 0" class="results-section">
-          <div class="results-header">
-            <h3>Produtos Canônicos Encontrados ({{ productResults.length }})</h3>
-            <button @click="clearProductResults" class="clear-button">
-              <i class="fas fa-times"></i>
+        <!-- Pesquisas Recentes (Sempre Visível) -->
+        <div v-if="searchHistory.length > 0" class="recent-searches-section">
+          <div class="section-header">
+            <h3><i class="fas fa-clock"></i> Pesquisas Recentes</h3>
+            <button @click="clearHistory" class="clear-button">
+              <i class="fas fa-trash"></i>
               Limpar
             </button>
           </div>
           
-          <div class="results-grid">
+          <div class="recent-searches-grid">
             <div
-              v-for="product in productResults"
-              :key="product.id"
-              class="service-card product-card"
+              v-for="item in searchHistory"
+              :key="item.id"
+              @click="loadHistoryItem(item)"
+              class="recent-search-card"
             >
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-box"></i>
+              <div class="search-card-content">
+                <div class="search-icon-small">
+                  <i class="fas fa-search"></i>
                 </div>
-                <div class="card-title">
-                  <h4>{{ product.name }}</h4>
-                  <span class="card-subtitle">{{ product.brand }} • {{ product.category }}</span>
+                <div class="search-info">
+                  <h4>{{ item.query }}</h4>
+                  <p>{{ formatDate(item.date) }} • {{ formatTime(item.date) }}</p>
                 </div>
-                <div class="card-actions">
-                  <button @click="viewProductDetails(product)" class="btn btn-sm btn-primary">
-                    <i class="fas fa-eye"></i>
-                    Detalhes
+                <div class="search-actions">
+                  <button @click.stop="loadHistoryItem(item)" class="btn-recent-search">
+                    <i class="fas fa-arrow-right"></i>
                   </button>
-                  <button @click="askDiverAboutProduct(product)" class="btn btn-sm btn-success">
-                    <i class="fas fa-question"></i>
-                    Diver
-                  </button>
-                </div>
-              </div>
-              
-              <div class="card-content">
-                <p class="card-description">{{ product.description }}</p>
-                
-                <div class="card-meta">
-                  <div class="meta-item">
-                    <i class="fas fa-barcode"></i>
-                    <span>EAN: {{ product.ean }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    <span>SKU: {{ product.sku || 'N/A' }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <i class="fas fa-building"></i>
-                    <span>{{ product.manufacturer }}</span>
-                  </div>
-                </div>
-                
-                <div class="card-details">
-                  <div class="detail-row">
-                    <div class="detail-item">
-                      <strong>NCM:</strong> {{ product.ncm || 'N/A' }}
-                    </div>
-                    <div class="detail-item">
-                      <strong>CEST:</strong> {{ product.cest || 'N/A' }}
-                    </div>
-                  </div>
-                  <div class="detail-row">
-                    <div class="detail-item">
-                      <strong>Dimensões:</strong> {{ product.length_cm }}x{{ product.width_cm }}x{{ product.height_cm }}cm
-                    </div>
-                    <div class="detail-item">
-                      <strong>Peso:</strong> {{ product.weight_kg }}kg
-                    </div>
-                  </div>
-                  <div class="detail-row">
-                    <div class="detail-item">
-                      <strong>Material:</strong> {{ product.material || 'N/A' }}
-                    </div>
-                    <div class="detail-item">
-                      <strong>Cor:</strong> {{ product.color || 'N/A' }}
-                    </div>
-                  </div>
-                  <div class="detail-row">
-                    <div class="detail-item">
-                      <strong>Status:</strong> 
-                      <span class="status-badge success">
-                        <i class="fas fa-check-circle"></i>
-                        {{ product.status || 'Ativo' }}
-                      </span>
-                    </div>
-                    <div class="detail-item">
-                      <strong>Atualizado:</strong> {{ formatDate(product.updated_at) }}
-                    </div>
-                  </div>
-                </div>
-                
-                <div v-if="product.tags && product.tags.length > 0" class="tags-section">
-                  <h5>Tags:</h5>
-                  <div class="tags-list">
-                    <span v-for="tag in product.tags" :key="tag" class="tag">
-                      {{ tag }}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Histórico de Pesquisas -->
-        <div v-if="searchHistory.length > 0 && !productResults.length" class="history-section">
+        <!-- Resultados de Pesquisa (Destaque Principal) -->
+        <div v-if="productResults.length > 0" class="search-results-section">
           <div class="results-header">
-            <h3>Pesquisas Recentes</h3>
-            <button @click="clearHistory" class="clear-button">
-              <i class="fas fa-trash"></i>
-              Limpar Histórico
+            <div class="results-title">
+              <h2><i class="fas fa-star"></i> Resultados Encontrados</h2>
+              <span class="results-count">{{ productResults.length }} produto{{ productResults.length > 1 ? 's' : '' }} canônico{{ productResults.length > 1 ? 's' : '' }}</span>
+            </div>
+            <button @click="clearProductResults" class="clear-button">
+              <i class="fas fa-times"></i>
+              Limpar Resultados
             </button>
           </div>
           
-          <div class="results-grid">
+          <div class="results-showcase">
             <div
-              v-for="item in searchHistory"
-              :key="item.id"
-              @click="loadHistoryItem(item)"
-              class="service-card history-card"
+              v-for="product in productResults"
+              :key="product.id"
+              class="product-showcase-card"
             >
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-history"></i>
+              <div class="product-header">
+                <div class="product-badge">
+                  <i class="fas fa-box"></i>
                 </div>
-                <div class="card-title">
-                  <h4>{{ item.query }}</h4>
-                  <span class="card-subtitle">Pesquisa Anterior</span>
+                <div class="product-title">
+                  <h3>{{ product.name }}</h3>
+                  <div class="product-meta">
+                    <span class="brand">{{ product.brand }}</span>
+                    <span class="category">{{ product.category }}</span>
+                  </div>
                 </div>
-                <div class="card-actions">
-                  <button @click.stop="loadHistoryItem(item)" class="btn btn-sm btn-primary">
-                    <i class="fas fa-search"></i>
+                <div class="product-actions">
+                  <button @click="viewProductDetails(product)" class="btn-action primary">
+                    <i class="fas fa-eye"></i>
+                    Ver Detalhes
                   </button>
-                  <button @click.stop="removeHistoryItem(item)" class="btn btn-sm btn-danger">
-                    <i class="fas fa-times"></i>
+                  <button @click="askDiverAboutProduct(product)" class="btn-action secondary">
+                    <i class="fas fa-robot"></i>
+                    Perguntar ao Diver
                   </button>
                 </div>
               </div>
               
-              <div class="card-content">
-                <div class="card-meta">
-                  <div class="meta-item">
-                    <i class="fas fa-calendar"></i>
-                    <span>{{ formatDate(item.date) }}</span>
+              <div class="product-content">
+                <p class="product-description">{{ product.description }}</p>
+                
+                <div class="product-highlights">
+                  <div class="highlight-item">
+                    <i class="fas fa-barcode"></i>
+                    <span><strong>EAN:</strong> {{ product.ean }}</span>
                   </div>
-                  <div class="meta-item">
-                    <i class="fas fa-clock"></i>
-                    <span>{{ formatTime(item.date) }}</span>
+                  <div class="highlight-item">
+                    <i class="fas fa-tag"></i>
+                    <span><strong>SKU:</strong> {{ product.sku || 'N/A' }}</span>
                   </div>
-                  <div class="meta-item">
-                    <i class="fas fa-search"></i>
-                    <span>{{ item.query.length }} caracteres</span>
+                  <div class="highlight-item">
+                    <i class="fas fa-building"></i>
+                    <span><strong>Fabricante:</strong> {{ product.manufacturer }}</span>
                   </div>
                 </div>
                 
-                <div class="card-details">
-                  <div class="detail-item">
-                    <strong>Tipo:</strong> Pesquisa de Produto
-                  </div>
-                  <div class="detail-item">
-                    <strong>Status:</strong> 
-                    <span class="status-badge info">
-                      <i class="fas fa-check-circle"></i>
-                      Concluída
-                    </span>
+                <div class="product-specs">
+                  <div class="specs-grid">
+                    <div class="spec-item">
+                      <span class="spec-label">NCM</span>
+                      <span class="spec-value">{{ product.ncm || 'N/A' }}</span>
+                    </div>
+                    <div class="spec-item">
+                      <span class="spec-label">CEST</span>
+                      <span class="spec-value">{{ product.cest || 'N/A' }}</span>
+                    </div>
+                    <div class="spec-item">
+                      <span class="spec-label">Dimensões</span>
+                      <span class="spec-value">{{ product.length_cm }}×{{ product.width_cm }}×{{ product.height_cm }}cm</span>
+                    </div>
+                    <div class="spec-item">
+                      <span class="spec-label">Peso</span>
+                      <span class="spec-value">{{ product.weight_kg }}kg</span>
+                    </div>
+                    <div class="spec-item">
+                      <span class="spec-label">Material</span>
+                      <span class="spec-value">{{ product.material || 'N/A' }}</span>
+                    </div>
+                    <div class="spec-item">
+                      <span class="spec-label">Cor</span>
+                      <span class="spec-value">{{ product.color || 'N/A' }}</span>
+                    </div>
                   </div>
                 </div>
+                
+                <div v-if="product.tags && product.tags.length > 0" class="product-tags">
+                  <span v-for="tag in product.tags" :key="tag" class="tag-chip">
+                    {{ tag }}
+                  </span>
+                </div>
+                
+                <div class="product-status">
+                  <span class="status-indicator success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ product.status || 'Ativo' }}
+                  </span>
+                  <span class="last-updated">
+                    Atualizado em {{ formatDate(product.updated_at) }}
+                  </span>
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado Vazio - Sugestões -->
+        <div v-if="!productResults.length && !searchQuery" class="empty-state">
+          <div class="empty-content">
+            <div class="empty-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3>Pesquise Produtos Canônicos</h3>
+            <p>Digite o nome, EAN, SKU ou descrição do produto que deseja encontrar</p>
+            <div class="search-suggestions">
+              <span class="suggestion">iPhone 15 Pro</span>
+              <span class="suggestion">Samsung Galaxy</span>
+              <span class="suggestion">MacBook Air</span>
+              <span class="suggestion">190199267471</span>
             </div>
           </div>
         </div>
@@ -1493,6 +1480,440 @@ export default {
    border-radius: 12px;
    font-size: 0.8rem;
    font-weight: 500;
+ }
+
+ /* Estilos para Pesquisas Recentes */
+ .recent-searches-section {
+   margin-top: 30px;
+   margin-bottom: 40px;
+ }
+
+ .section-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 20px;
+ }
+
+ .section-header h3 {
+   color: #e2e8f0;
+   margin: 0;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   font-size: 1.3rem;
+ }
+
+ .recent-searches-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+   gap: 15px;
+ }
+
+ .recent-search-card {
+   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+   border: 1px solid #475569;
+   border-radius: 12px;
+   padding: 20px;
+   cursor: pointer;
+   transition: all 0.3s ease;
+   position: relative;
+   overflow: hidden;
+ }
+
+ .recent-search-card::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   height: 3px;
+   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+ }
+
+ .recent-search-card:hover {
+   transform: translateY(-3px);
+   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+   border-color: #8b5cf6;
+ }
+
+ .search-card-content {
+   display: flex;
+   align-items: center;
+   gap: 15px;
+ }
+
+ .search-icon-small {
+   width: 40px;
+   height: 40px;
+   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+   border-radius: 10px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: white;
+   font-size: 1rem;
+ }
+
+ .search-info {
+   flex: 1;
+ }
+
+ .search-info h4 {
+   color: #e2e8f0;
+   margin: 0 0 5px 0;
+   font-size: 1.1rem;
+ }
+
+ .search-info p {
+   color: #94a3b8;
+   margin: 0;
+   font-size: 0.9rem;
+ }
+
+ .search-actions {
+   display: flex;
+   gap: 8px;
+ }
+
+ .btn-recent-search {
+   background: rgba(139, 92, 246, 0.1);
+   color: #8b5cf6;
+   border: 1px solid rgba(139, 92, 246, 0.2);
+   border-radius: 8px;
+   padding: 8px 12px;
+   cursor: pointer;
+   transition: all 0.2s ease;
+ }
+
+ .btn-recent-search:hover {
+   background: rgba(139, 92, 246, 0.2);
+   transform: scale(1.05);
+ }
+
+ /* Estilos para Resultados de Pesquisa */
+ .search-results-section {
+   margin-top: 40px;
+ }
+
+ .results-title {
+   display: flex;
+   align-items: center;
+   gap: 15px;
+ }
+
+ .results-title h2 {
+   color: #e2e8f0;
+   margin: 0;
+   font-size: 1.8rem;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+ }
+
+ .results-count {
+   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+   color: white;
+   padding: 6px 12px;
+   border-radius: 20px;
+   font-size: 0.9rem;
+   font-weight: 600;
+ }
+
+ .results-showcase {
+   display: flex;
+   flex-direction: column;
+   gap: 25px;
+   margin-top: 25px;
+ }
+
+ .product-showcase-card {
+   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+   border: 1px solid #475569;
+   border-radius: 16px;
+   padding: 25px;
+   transition: all 0.3s ease;
+   position: relative;
+   overflow: hidden;
+ }
+
+ .product-showcase-card::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   height: 4px;
+   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+ }
+
+ .product-showcase-card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+   border-color: #3b82f6;
+ }
+
+ .product-header {
+   display: flex;
+   align-items: center;
+   gap: 20px;
+   margin-bottom: 20px;
+ }
+
+ .product-badge {
+   width: 60px;
+   height: 60px;
+   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+   border-radius: 12px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: white;
+   font-size: 1.5rem;
+ }
+
+ .product-title h3 {
+   color: #e2e8f0;
+   margin: 0 0 8px 0;
+   font-size: 1.4rem;
+   font-weight: 600;
+ }
+
+ .product-meta {
+   display: flex;
+   gap: 15px;
+ }
+
+ .brand {
+   background: rgba(59, 130, 246, 0.1);
+   color: #3b82f6;
+   padding: 4px 8px;
+   border-radius: 6px;
+   font-size: 0.8rem;
+   font-weight: 600;
+ }
+
+ .category {
+   background: rgba(16, 185, 129, 0.1);
+   color: #10b981;
+   padding: 4px 8px;
+   border-radius: 6px;
+   font-size: 0.8rem;
+   font-weight: 600;
+ }
+
+ .product-actions {
+   margin-left: auto;
+   display: flex;
+   gap: 12px;
+ }
+
+ .btn-action {
+   padding: 10px 16px;
+   border: none;
+   border-radius: 8px;
+   cursor: pointer;
+   font-size: 0.9rem;
+   font-weight: 600;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   transition: all 0.2s ease;
+ }
+
+ .btn-action.primary {
+   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+   color: white;
+ }
+
+ .btn-action.secondary {
+   background: rgba(16, 185, 129, 0.1);
+   color: #10b981;
+   border: 1px solid rgba(16, 185, 129, 0.2);
+ }
+
+ .btn-action:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+ }
+
+ .product-content {
+   color: #e2e8f0;
+ }
+
+ .product-description {
+   margin-bottom: 20px;
+   line-height: 1.6;
+   font-size: 1rem;
+   color: #cbd5e1;
+ }
+
+ .product-highlights {
+   display: flex;
+   gap: 25px;
+   margin-bottom: 25px;
+   padding: 20px;
+   background: rgba(15, 23, 42, 0.3);
+   border-radius: 12px;
+ }
+
+ .highlight-item {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 0.9rem;
+   color: #94a3b8;
+ }
+
+ .highlight-item i {
+   color: #3b82f6;
+   font-size: 1rem;
+ }
+
+ .product-specs {
+   margin-bottom: 25px;
+ }
+
+ .specs-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   gap: 15px;
+   padding: 20px;
+   background: rgba(15, 23, 42, 0.2);
+   border-radius: 12px;
+ }
+
+ .spec-item {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 10px 15px;
+   background: rgba(30, 41, 59, 0.5);
+   border-radius: 8px;
+ }
+
+ .spec-label {
+   color: #94a3b8;
+   font-size: 0.85rem;
+   font-weight: 600;
+ }
+
+ .spec-value {
+   color: #e2e8f0;
+   font-size: 0.9rem;
+   font-weight: 500;
+ }
+
+ .product-tags {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 8px;
+   margin-bottom: 20px;
+ }
+
+ .tag-chip {
+   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+   color: white;
+   padding: 6px 12px;
+   border-radius: 20px;
+   font-size: 0.8rem;
+   font-weight: 500;
+   transition: all 0.2s ease;
+ }
+
+ .tag-chip:hover {
+   transform: scale(1.05);
+   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+ }
+
+ .product-status {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 15px 20px;
+   background: rgba(15, 23, 42, 0.4);
+   border-radius: 10px;
+ }
+
+ .status-indicator {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   padding: 6px 12px;
+   border-radius: 6px;
+   font-size: 0.85rem;
+   font-weight: 600;
+ }
+
+ .status-indicator.success {
+   background-color: rgba(10, 100, 50, 0.1);
+   color: #10b981;
+   border: 1px solid rgba(10, 100, 50, 0.2);
+ }
+
+ .last-updated {
+   color: #94a3b8;
+   font-size: 0.85rem;
+ }
+
+ /* Estado Vazio */
+ .empty-state {
+   margin-top: 60px;
+   text-align: center;
+ }
+
+ .empty-content {
+   max-width: 500px;
+   margin: 0 auto;
+ }
+
+ .empty-icon {
+   width: 80px;
+   height: 80px;
+   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin: 0 auto 30px;
+   color: white;
+   font-size: 2rem;
+ }
+
+ .empty-content h3 {
+   color: #e2e8f0;
+   margin: 0 0 15px 0;
+   font-size: 1.5rem;
+ }
+
+ .empty-content p {
+   color: #94a3b8;
+   margin: 0 0 30px 0;
+   font-size: 1rem;
+   line-height: 1.5;
+ }
+
+ .search-suggestions {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+   justify-content: center;
+ }
+
+ .suggestion {
+   background: rgba(59, 130, 246, 0.1);
+   color: #3b82f6;
+   padding: 8px 16px;
+   border-radius: 20px;
+   font-size: 0.9rem;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   border: 1px solid rgba(59, 130, 246, 0.2);
+ }
+
+ .suggestion:hover {
+   background: rgba(59, 130, 246, 0.2);
+   transform: translateY(-1px);
  }
 
  @media (max-width: 768px) {
