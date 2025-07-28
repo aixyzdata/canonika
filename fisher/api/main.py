@@ -427,9 +427,32 @@ class FisherService:
     async def download_cnpj_file(self, filename: str) -> Dict[str, Any]:
         """Download real de um arquivo CNPJ da Receita Federal"""
         try:
-            # URL da fonte oficial
-            base_url = "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/"
-            file_url = urljoin(base_url, filename)
+            # Primeiro, buscar a lista de arquivos para obter a URL correta
+            files_list = await self.get_real_cnpj_files_list()
+            
+            if files_list["status"] != "success":
+                return {
+                    "status": "error",
+                    "filename": filename,
+                    "error": "Não foi possível obter a lista de arquivos"
+                }
+            
+            # Encontrar o arquivo específico na lista
+            file_info = None
+            for file in files_list["files"]:
+                if file["filename"] == filename:
+                    file_info = file
+                    break
+            
+            if not file_info:
+                return {
+                    "status": "error",
+                    "filename": filename,
+                    "error": f"Arquivo {filename} não encontrado na lista de arquivos disponíveis"
+                }
+            
+            # Usar a URL completa do arquivo
+            file_url = file_info["url"]
             
             # Diretório local
             cnpj_dir = self.data_dir / "cnpj"
