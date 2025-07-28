@@ -254,23 +254,6 @@
               </div>
             </div>
             
-            <div class="nfe-section">
-              <h4>Análise do Diver</h4>
-              <div class="diver-analysis">
-                <div class="analysis-item">
-                  <i class="fas fa-check-circle text-success"></i>
-                  <span>Produtos identificados e categorizados</span>
-                </div>
-                <div class="analysis-item">
-                  <i class="fas fa-check-circle text-success"></i>
-                  <span>Empresas validadas na base de dados</span>
-                </div>
-                <div class="analysis-item">
-                  <i class="fas fa-info-circle text-info"></i>
-                  <span>Dados canonizados para uso interno</span>
-                </div>
-              </div>
-            </div>
           </div>
           
           <div class="action-buttons">
@@ -286,8 +269,9 @@
         </div>
       </div>
     </div>
+  </div>
 
-      <!-- Modal de Detalhes do Produto -->
+  <!-- Modal de Detalhes do Produto -->
   <div v-if="showProductDetails" class="modal-overlay" @click="closeProductDetails">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
@@ -414,7 +398,6 @@
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -600,27 +583,10 @@ export default {
           { id: 3, name: 'Produto C', description: 'Descrição do Produto C', quantity: 3, unitPrice: 5.75, totalPrice: 17.25 }
         ]
       }
-      this.showDiverChat = true
-      this.diverMessages.push({
-        id: Date.now(),
-        text: 'Carregando NFe Fake...',
-        type: 'diver',
-        timestamp: new Date().toISOString()
-      })
-      setTimeout(() => {
-        this.diverMessages.push({
-          id: Date.now() + 1,
-          text: `NFe Fake carregada com sucesso! Número: ${this.canonizedNFe.number}, Valor Total: R$ ${this.canonizedNFe.totalValue}.`,
-          type: 'diver',
-          timestamp: new Date().toISOString()
-        })
-      }, 1000)
     },
 
     clearCanonization() {
       this.canonizedNFe = null
-      this.diverMessages = []
-      this.chatInput = ''
     },
 
     handleFileDrop(event) {
@@ -668,21 +634,6 @@ export default {
           { id: 3, name: 'Produto C', description: 'Descrição do Produto C', quantity: 3, unitPrice: 5.75, totalPrice: 17.25 }
         ]
       }
-      this.showDiverChat = true
-      this.diverMessages.push({
-        id: Date.now(),
-        text: 'XML processado. Iniciando canonização...',
-        type: 'diver',
-        timestamp: new Date().toISOString()
-      })
-      setTimeout(() => {
-        this.diverMessages.push({
-          id: Date.now() + 1,
-          text: `Canonização concluída! Número: ${this.canonizedNFe.number}, Valor Total: R$ ${this.canonizedNFe.totalValue}.`,
-          type: 'diver',
-          timestamp: new Date().toISOString()
-        })
-      }, 2000)
     },
 
     formatDate(dateString) {
@@ -1072,160 +1023,6 @@ export default {
   justify-content: space-between;
   margin-top: 20px;
 }
-
-.diver-chat {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 350px;
-  height: 450px;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-bottom: 1px solid #475569;
-}
-
-.chat-header h4 {
-  color: white;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chat-header i {
-  font-size: 1.2rem;
-  color: white;
-}
-
-.close-chat {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  color: white;
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
-}
-
-.close-chat:hover {
-  transform: scale(1.1);
-}
-
-.chat-messages {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding: 15px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.message {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.message.human {
-  flex-direction: row-reverse;
-}
-
-.message.diver {
-  flex-direction: row;
-}
-
-.message-content {
-  max-width: 80%;
-  padding: 10px 15px;
-  border-radius: 10px;
-  position: relative;
-}
-
-.message.human .message-content {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.message.diver .message-content {
-  background-color: #475569;
-  color: #e2e8f0;
-}
-
-.message-text {
-  margin-bottom: 5px;
-  line-height: 1.4;
-}
-
-.message-time {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  text-align: right;
-}
-
-.message.human .message-time {
-  text-align: left;
-}
-
-.chat-input {
-  display: flex;
-  padding: 15px 20px;
-  background: #263238;
-  border-top: 1px solid #475569;
-}
-
-.chat-input-field {
-  flex-grow: 1;
-  padding: 10px 15px;
-  border: 1px solid #475569;
-  border-radius: 20px;
-  background: #374151;
-  color: #e2e8f0;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.chat-input-field:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.send-button {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.send-button:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  transform: translateY(-1px);
-}
-
-.send-button i {
-  font-size: 1.1rem;
-}
-
-
 
 /* Estilos para service-cards */
 .results-section {
@@ -1783,14 +1580,7 @@ export default {
     grid-template-columns: 1fr;
   }
   
-  .diver-chat {
-    width: 90%;
-    height: 60%;
-    bottom: 10px;
-    right: 10px;
-     }
-
-   /* Modal de Detalhes do Produto */
+  /* Modal de Detalhes do Produto */
    .modal-overlay {
      position: fixed;
      top: 0;
