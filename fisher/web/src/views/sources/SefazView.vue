@@ -1507,9 +1507,12 @@ export default {
 
 .cnpj-files-table-container {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
   border-radius: 0.5rem;
   border: 1px solid #475569;
   margin-top: 1rem;
+  background: rgba(15, 23, 42, 0.3);
 }
 
 .cnpj-files-table {
@@ -1518,6 +1521,13 @@ export default {
   background: rgba(15, 23, 42, 0.3);
   border-radius: 0.5rem;
   overflow: hidden;
+}
+
+.cnpj-files-table thead {
+  position: sticky;
+  top: 0;
+  background: rgba(15, 23, 42, 0.8);
+  z-index: 10;
 }
 
 .cnpj-files-table th,
@@ -1529,14 +1539,39 @@ export default {
 }
 
 .cnpj-files-table th {
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.8);
   font-weight: 600;
   color: #94a3b8;
   font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.cnpj-files-table tbody tr:hover {
+  background: rgba(15, 23, 42, 0.2);
 }
 
 .cnpj-files-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+/* Scroll personalizado */
+.cnpj-files-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.cnpj-files-table-container::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 4px;
+}
+
+.cnpj-files-table-container::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.cnpj-files-table-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .checkbox-col {
