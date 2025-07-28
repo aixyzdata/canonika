@@ -119,9 +119,9 @@
                     <i class="fas fa-eye"></i>
                     Ver Detalhes
                   </button>
-                  <button @click="askDiverAboutProduct(product)" class="btn-action secondary">
-                    <i class="fas fa-robot"></i>
-                    Perguntar ao Diver
+                  <button @click="viewProductDetails(product)" class="btn-action secondary">
+                    <i class="fas fa-eye"></i>
+                    Ver Detalhes
                   </button>
                 </div>
               </div>
@@ -311,9 +311,9 @@
           </div>
           
           <div class="action-buttons">
-            <button @click="askDiverAboutNFe" class="btn btn-success">
-              <i class="fas fa-question"></i>
-              Perguntar ao Diver
+            <button @click="viewNFeDetails" class="btn btn-success">
+              <i class="fas fa-eye"></i>
+              Ver Detalhes
             </button>
             <button @click="clearCanonization" class="btn btn-secondary">
               <i class="fas fa-times"></i>
@@ -323,39 +323,132 @@
         </div>
       </div>
 
-      <!-- Chat com Diver -->
-      <div v-if="showDiverChat" class="diver-chat">
-        <div class="chat-header">
-          <h4><i class="fas fa-robot"></i> Diver - Assistente IA</h4>
-          <button @click="closeDiverChat" class="close-chat">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <div class="chat-messages">
-          <div
-            v-for="message in diverMessages"
-            :key="message.id"
-            :class="['message', message.type]"
-          >
-            <div class="message-content">
-              <div class="message-text">{{ message.text }}</div>
-              <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+      <!-- Modal de Detalhes do Produto -->
+      <div v-if="showProductDetails && selectedProduct" class="product-details-modal">
+        <div class="modal-overlay" @click="closeProductDetails"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3><i class="fas fa-box"></i> {{ selectedProduct.name }}</h3>
+            <button @click="closeProductDetails" class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="product-info-grid">
+              <!-- Informações Básicas -->
+              <div class="info-section">
+                <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="label">EAN:</span>
+                    <span class="value">{{ selectedProduct.ean }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">SKU:</span>
+                    <span class="value">{{ selectedProduct.sku || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Marca:</span>
+                    <span class="value">{{ selectedProduct.brand || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Fabricante:</span>
+                    <span class="value">{{ selectedProduct.manufacturer || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Categoria:</span>
+                    <span class="value">{{ selectedProduct.category || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Status:</span>
+                    <span class="value status-badge">{{ selectedProduct.status || 'Ativo' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Especificações Técnicas -->
+              <div class="info-section">
+                <h4><i class="fas fa-cogs"></i> Especificações Técnicas</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="label">NCM:</span>
+                    <span class="value">{{ selectedProduct.ncm || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">CEST:</span>
+                    <span class="value">{{ selectedProduct.cest || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Dimensões:</span>
+                    <span class="value">{{ selectedProduct.length_cm }}×{{ selectedProduct.width_cm }}×{{ selectedProduct.height_cm }}cm</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Peso:</span>
+                    <span class="value">{{ selectedProduct.weight_kg }}kg</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Material:</span>
+                    <span class="value">{{ selectedProduct.material || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Cor:</span>
+                    <span class="value">{{ selectedProduct.color || 'N/A' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Características -->
+              <div class="info-section">
+                <h4><i class="fas fa-tags"></i> Características</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="label">Tamanho:</span>
+                    <span class="value">{{ selectedProduct.size || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Gênero:</span>
+                    <span class="value">{{ selectedProduct.gender || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Faixa Etária:</span>
+                    <span class="value">{{ selectedProduct.age_group || 'N/A' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Subcategorias:</span>
+                    <span class="value">{{ selectedProduct.subcategories ? selectedProduct.subcategories.join(', ') : 'N/A' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tags -->
+              <div v-if="selectedProduct.tags && selectedProduct.tags.length > 0" class="info-section">
+                <h4><i class="fas fa-tags"></i> Tags</h4>
+                <div class="tags-container">
+                  <span v-for="tag in selectedProduct.tags" :key="tag" class="tag">
+                    {{ tag }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Descrição -->
+              <div v-if="selectedProduct.description" class="info-section">
+                <h4><i class="fas fa-align-left"></i> Descrição</h4>
+                <p class="description">{{ selectedProduct.description }}</p>
+              </div>
+
+              <!-- Atualização -->
+              <div class="info-section">
+                <h4><i class="fas fa-clock"></i> Informações de Atualização</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="label">Última Atualização:</span>
+                    <span class="value">{{ formatDate(selectedProduct.updated_at) }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="chat-input">
-          <input
-            v-model="chatInput"
-            @keyup.enter="sendMessageToDiver"
-            type="text"
-            placeholder="Digite sua pergunta..."
-            class="chat-input-field"
-          />
-          <button @click="sendMessageToDiver" class="send-button">
-            <i class="fas fa-paper-plane"></i>
-          </button>
         </div>
       </div>
     </div>
@@ -375,14 +468,8 @@ export default {
       ],
       activeJourney: 'search', // 'search' or 'canonize'
       canonizedNFe: null,
-      showDiverChat: false,
-      diverMessages: [],
-      chatInput: '',
-      diver: {
-        name: 'Diver',
-        avatar: 'https://via.placeholder.com/50',
-        isHuman: false
-      }
+      showProductDetails: false,
+      selectedProduct: null
     }
   },
   methods: {
@@ -390,7 +477,7 @@ export default {
       console.log('🔍 Executando pesquisa:', this.searchQuery)
       if (!this.searchQuery.trim()) return
       
-      // Simular pesquisa de produtos canônicos
+      // Simular pesquisa de produtos canônicos com todos os atributos do schema
       this.productResults = [
         {
           id: 1,
@@ -523,67 +610,17 @@ export default {
        }
      },
 
-    askDiverAboutProduct(product) {
-      this.showDiverChat = true
-      this.diverMessages.push({
-        id: Date.now(),
-        text: `Você gostaria de saber mais sobre o produto "${product.name}"?`,
-        type: 'human',
-        timestamp: new Date().toISOString()
-      })
-      this.diverMessages.push({
-        id: Date.now() + 1,
-        text: `Este produto é da categoria "${product.category}" e é da marca "${product.brand}". Ele tem EAN ${product.ean} e SKU ${product.sku}.`,
-        type: 'diver',
-        timestamp: new Date().toISOString()
-      })
-    },
-
     viewProductDetails(product) {
-      this.showDiverChat = true
-      this.diverMessages.push({
-        id: Date.now(),
-        text: `Detalhes completos do produto: ${product.name}`,
-        type: 'human',
-        timestamp: new Date().toISOString()
-      })
-      this.diverMessages.push({
-        id: Date.now() + 1,
-        text: `📱 **${product.name}**\n\n` +
-              `**Informações Básicas:**\n` +
-              `• EAN: ${product.ean}\n` +
-              `• SKU: ${product.sku}\n` +
-              `• Marca: ${product.brand}\n` +
-              `• Fabricante: ${product.manufacturer}\n` +
-              `• Categoria: ${product.category}\n\n` +
-              `**Especificações Técnicas:**\n` +
-              `• NCM: ${product.ncm}\n` +
-              `• CEST: ${product.cest}\n` +
-              `• Dimensões: ${product.length_cm}x${product.width_cm}x${product.height_cm}cm\n` +
-              `• Peso: ${product.weight_kg}kg\n` +
-              `• Material: ${product.material}\n` +
-              `• Cor: ${product.color}\n\n` +
-              `**Status:** ${product.status} (Atualizado em ${this.formatDate(product.updated_at)})`,
-        type: 'diver',
-        timestamp: new Date().toISOString()
-      })
+      this.selectedProduct = product
+      this.showProductDetails = true
     },
 
-    askDiverAboutNFe() {
-      this.showDiverChat = true
-      this.diverMessages.push({
-        id: Date.now(),
-        text: 'Você gostaria de saber mais sobre a nota fiscal que acabou de canonizar?',
-        type: 'human',
-        timestamp: new Date().toISOString()
-      })
-      this.diverMessages.push({
-        id: Date.now() + 1,
-        text: `A nota fiscal Nº ${this.canonizedNFe.number} de emissão ${this.formatDate(this.canonizedNFe.issueDate)} tem um valor total de R$ ${this.canonizedNFe.totalValue}. A empresa emitente é ${this.canonizedNFe.issuer.name} (CNPJ: ${this.canonizedNFe.issuer.cnpj}).`,
-        type: 'diver',
-        timestamp: new Date().toISOString()
-      })
+    closeProductDetails() {
+      this.showProductDetails = false
+      this.selectedProduct = null
     },
+
+
 
     loadFakeNFe() {
       this.canonizedNFe = {
@@ -710,11 +747,7 @@ export default {
       })
     },
 
-    closeDiverChat() {
-      this.showDiverChat = false
-      this.diverMessages = []
-      this.chatInput = ''
-    },
+
 
     addToHistory(query) {
       const existingIndex = this.searchHistory.findIndex(item => item.query === query)
@@ -1941,6 +1974,168 @@ export default {
     height: 60%;
     bottom: 10px;
     right: 10px;
-  }
+     }
+
+   /* Modal de Detalhes */
+   .product-details-modal {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     z-index: 1000;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+   }
+
+   .modal-overlay {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.8);
+     backdrop-filter: blur(5px);
+   }
+
+   .modal-content {
+     position: relative;
+     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+     border: 1px solid #475569;
+     border-radius: 15px;
+     max-width: 800px;
+     width: 90%;
+     max-height: 90vh;
+     overflow-y: auto;
+     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+   }
+
+   .modal-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 25px 30px;
+     border-bottom: 1px solid #475569;
+   }
+
+   .modal-header h3 {
+     color: #e2e8f0;
+     margin: 0;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+   }
+
+   .close-modal {
+     background: none;
+     border: none;
+     color: #94a3b8;
+     font-size: 1.2rem;
+     cursor: pointer;
+     padding: 8px;
+     border-radius: 6px;
+     transition: all 0.2s ease;
+   }
+
+   .close-modal:hover {
+     color: #e2e8f0;
+     background: rgba(148, 163, 184, 0.1);
+   }
+
+   .modal-body {
+     padding: 30px;
+   }
+
+   .product-info-grid {
+     display: grid;
+     gap: 30px;
+   }
+
+   .info-section {
+     background: rgba(15, 23, 42, 0.3);
+     border-radius: 10px;
+     padding: 20px;
+     border: 1px solid #475569;
+   }
+
+   .info-section h4 {
+     color: #e2e8f0;
+     margin: 0 0 15px 0;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     font-size: 1.1rem;
+   }
+
+   .info-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+     gap: 15px;
+   }
+
+   .info-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 10px 0;
+     border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+   }
+
+   .info-item:last-child {
+     border-bottom: none;
+   }
+
+   .label {
+     color: #94a3b8;
+     font-weight: 500;
+     font-size: 0.9rem;
+   }
+
+   .value {
+     color: #e2e8f0;
+     font-weight: 600;
+     text-align: right;
+   }
+
+   .status-badge {
+     background: rgba(10, 100, 50, 0.1);
+     color: #10b981;
+     padding: 4px 8px;
+     border-radius: 4px;
+     font-size: 0.8rem;
+   }
+
+   .tags-container {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 8px;
+   }
+
+   .tag {
+     background: rgba(59, 130, 246, 0.1);
+     color: #3b82f6;
+     padding: 4px 12px;
+     border-radius: 12px;
+     font-size: 0.8rem;
+     border: 1px solid rgba(59, 130, 246, 0.2);
+   }
+
+   .description {
+     color: #e2e8f0;
+     line-height: 1.6;
+     margin: 0;
+   }
+
+   @media (max-width: 768px) {
+     .modal-content {
+       width: 95%;
+       margin: 10px;
+     }
+     
+     .info-grid {
+       grid-template-columns: 1fr;
+     }
+   }
 }
 </style> 
