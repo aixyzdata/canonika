@@ -53,18 +53,6 @@
         
         <div class="sidebar-nav">
           <ul class="nav flex-column">
-            <li class="nav-item">
-              <router-link class="nav-link" to="/" @click="handleNavClick">
-                <div class="nav-icon">
-                  <i class="fas fa-tachometer-alt"></i>
-                </div>
-                <div class="nav-text">
-                  <div class="nav-title">Dashboard</div>
-                  <div class="service-subtitle">Visão Geral</div>
-                </div>
-              </router-link>
-            </li>
-            
             <!-- Explorer -->
             <li class="nav-item">
               <router-link class="nav-link" to="/explorer" @click="handleNavClick">
@@ -74,6 +62,18 @@
                 <div class="nav-text">
                   <div class="nav-title">Explorer</div>
                   <div class="service-subtitle">Pesquisa e Exploração</div>
+                </div>
+              </router-link>
+            </li>
+            
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" @click="handleNavClick">
+                <div class="nav-icon">
+                  <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Dashboard</div>
+                  <div class="service-subtitle">Visão Geral</div>
                 </div>
               </router-link>
             </li>
