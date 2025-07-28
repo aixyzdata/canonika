@@ -562,28 +562,35 @@ export default {
     async refreshFileList() {
       console.log('Refreshing CNPJ file list...')
       try {
-        const response = await fetch(`${this.apiBaseUrl}/cnpj/files/status`)
+        // Usar endpoint real que busca da fonte oficial
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/files/refresh`)
         const data = await response.json()
         
         if (data.status === 'success') {
           this.cnpjFiles = data.files.map(file => ({
             id: file.filename,
-            monthYear: this.extractMonthYear(file.filename),
+            monthYear: file.month_year || this.extractMonthYear(file.filename),
             filename: file.filename,
             size: file.size,
             status: file.status,
-            lastUpdated: file.last_updated,
+            lastUpdated: file.last_updated || 'N/A',
             selected: false,
             localPath: file.local_path,
-            processingStatus: file.processing_status || 'pending'
+            processingStatus: file.processing_status || 'pending',
+            url: file.url
           }))
           
           this.updateFileStats()
+          
+          // Adicionar log de sucesso
+          this.addProcessingLog('success', `Lista atualizada: ${data.total_available} arquivos disponíveis, ${data.downloaded} baixados`)
         } else {
           console.error('Erro ao obter status dos arquivos:', data.error)
+          this.addProcessingLog('error', `Erro ao atualizar lista: ${data.error}`)
         }
       } catch (error) {
         console.error('Erro na comunicação com API:', error)
+        this.addProcessingLog('error', `Erro de conexão: ${error.message}`)
         // Fallback para dados mockados
         this.loadMockData()
       }

@@ -23,6 +23,7 @@ import uvicorn
 import httpx
 from urllib.parse import urljoin, urlparse
 import re
+from bs4 import BeautifulSoup
 
 from cnpj_processor import CNPJProcessor
 from sqlalchemy import text
@@ -609,6 +610,95 @@ class FisherService:
                 "message": f"Erro ao deletar arquivo: {str(e)}"
             }
 
+    async def get_real_cnpj_files_list(self) -> Dict[str, Any]:
+        """Busca lista real de arquivos CNPJ disponíveis na fonte oficial"""
+        try:
+            # URL da fonte oficial da Receita Federal
+            base_url = "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/"
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(base_url) as response:
+                    if response.status != 200:
+                        raise Exception(f"Erro ao acessar fonte: {response.status}")
+                    
+                    html_content = await response.text()
+                    
+                    # Usar BeautifulSoup para parsear o HTML
+                    soup = BeautifulSoup(html_content, 'html.parser')
+                    
+                    # Encontrar links para arquivos ZIP
+                    file_links = []
+                    for link in soup.find_all('a', href=True):
+                        href = link.get('href')
+                        if href and href.endswith('.zip') and 'CNPJ' in href:
+                            # Extrair informações do arquivo
+                            filename = href.split('/')[-1]
+                            
+                            # Tentar extrair data do nome do arquivo
+                            date_match = re.search(r'CNPJ_(\d{4})_(\d{2})', filename)
+                            if date_match:
+                                year, month = date_match.groups()
+                                month_year = f"{year}-{month}"
+                            else:
+                                month_year = "N/A"
+                            
+                            # Tentar obter informações do arquivo (tamanho, data)
+                            file_info = {
+                                "filename": filename,
+                                "month_year": month_year,
+                                "size": "~2.0GB",  # Tamanho aproximado
+                                "last_updated": "N/A",
+                                "url": base_url + href
+                            }
+                            
+                            file_links.append(file_info)
+                    
+                    # Ordenar por data (mais recente primeiro)
+                    file_links.sort(key=lambda x: x['month_year'], reverse=True)
+                    
+                    # Verificar arquivos baixados localmente
+                    cnpj_dir = self.data_dir / "cnpj"
+                    cnpj_dir.mkdir(exist_ok=True)
+                    
+                    downloaded_files = []
+                    if cnpj_dir.exists():
+                        for file_path in cnpj_dir.glob("*.zip"):
+                            downloaded_files.append(file_path.name)
+                    
+                    # Mapear status de cada arquivo
+                    files_status = []
+                    for file_info in file_links:
+                        filename = file_info["filename"]
+                        is_downloaded = filename in downloaded_files
+                        
+                        files_status.append({
+                            "filename": filename,
+                            "month_year": file_info["month_year"],
+                            "size": file_info["size"],
+                            "last_updated": file_info["last_updated"],
+                            "status": "downloaded" if is_downloaded else "available",
+                            "local_path": str(cnpj_dir / filename) if is_downloaded else None,
+                            "url": file_info["url"]
+                        })
+                    
+                    return {
+                        "status": "success",
+                        "total_available": len(file_links),
+                        "downloaded": len(downloaded_files),
+                        "missing": len(file_links) - len(downloaded_files),
+                        "files": files_status,
+                        "source_url": base_url,
+                        "last_check": datetime.now().isoformat()
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Erro ao buscar lista real de arquivos CNPJ: {str(e)}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "message": "Falha ao conectar com fonte oficial"
+            }
+
 # Instância global do serviço
 fisher_service = FisherService()
 
@@ -798,6 +888,11 @@ async def setup_cnpj_database():
             "status": "error",
             "error": str(e)
         }
+
+@app.get("/cnpj/files/refresh")
+async def refresh_cnpj_files_list():
+    """Atualiza lista de arquivos CNPJ da fonte oficial"""
+    return await fisher_service.get_real_cnpj_files_list()
 
 @app.get("/health")
 async def health_check():
