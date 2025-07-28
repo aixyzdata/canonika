@@ -84,93 +84,88 @@
             </div>
           </div>
 
-          <div class="cnpj-files-grid">
-            <div v-for="file in cnpjFiles" :key="file.id" class="file-card" :class="file.status">
-              <div class="file-card-header">
-                <div class="file-checkbox">
-                  <input 
-                    type="checkbox" 
-                    v-model="file.selected"
-                    :disabled="file.status === 'downloaded'"
-                  >
-                </div>
-                <div class="file-status">
-                  <span class="status-badge" :class="file.status">
-                    {{ getStatusText(file.status) }}
-                  </span>
-                </div>
-              </div>
-              
-              <div class="file-card-content">
-                <div class="file-info">
-                  <div class="file-name">
-                    <i class="fas fa-file-archive"></i>
-                    {{ file.filename }}
-                  </div>
-                  <div class="file-details">
-                    <div class="detail-item">
-                      <span class="detail-label">Mês/Ano:</span>
-                      <span class="detail-value">{{ file.monthYear }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Tamanho:</span>
-                      <span class="detail-value">{{ file.size }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Processamento:</span>
-                      <span class="detail-value">
-                        <span class="status-badge" :class="file.processingStatus || 'pending'">
-                          {{ getProcessingStatusText(file.processingStatus) }}
-                        </span>
-                      </span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Atualizado:</span>
-                      <span class="detail-value">{{ file.lastUpdated }}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="file-actions">
-                  <button 
-                    v-if="file.status === 'available'" 
-                    @click="downloadFile(file)"
-                    class="btn-action btn-small"
-                    title="Baixar arquivo"
-                  >
-                    <i class="fas fa-download"></i>
-                    Baixar
-                  </button>
-                  <button 
-                    v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
-                    @click="processFile(file)"
-                    class="btn-action btn-small"
-                    title="Processar arquivo"
-                  >
-                    <i class="fas fa-cogs"></i>
-                    Processar
-                  </button>
-                  <button 
-                    v-if="file.status === 'downloaded'" 
-                    @click="viewFile(file)"
-                    class="btn-action btn-small"
-                    title="Visualizar arquivo"
-                  >
-                    <i class="fas fa-eye"></i>
-                    Ver
-                  </button>
-                  <button 
-                    v-if="file.status === 'downloaded'" 
-                    @click="deleteFile(file)"
-                    class="btn-action btn-small danger"
-                    title="Excluir arquivo"
-                  >
-                    <i class="fas fa-trash"></i>
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            </div>
+          <!-- Tabela de Arquivos CNPJ -->
+          <div class="cnpj-files-table-container">
+            <table class="cnpj-files-table">
+              <thead>
+                <tr>
+                  <th class="checkbox-col">
+                    <input 
+                      type="checkbox" 
+                      :checked="allSelected" 
+                      @change="toggleSelectAll"
+                      :indeterminate="someSelected"
+                    >
+                  </th>
+                  <th>Mês/Ano</th>
+                  <th>Arquivo</th>
+                  <th>Tamanho</th>
+                  <th>Status</th>
+                  <th>Processamento</th>
+                  <th>Última Atualização</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="file in cnpjFiles" :key="file.id" :class="file.status">
+                  <td class="checkbox-col">
+                    <input 
+                      type="checkbox" 
+                      v-model="file.selected"
+                      :disabled="file.status === 'downloaded'"
+                    >
+                  </td>
+                  <td class="month-col">{{ file.monthYear }}</td>
+                  <td class="filename-col">{{ file.filename }}</td>
+                  <td class="size-col">{{ file.size }}</td>
+                  <td class="status-col">
+                    <span class="status-badge" :class="file.status">
+                      {{ getStatusText(file.status) }}
+                    </span>
+                  </td>
+                  <td class="processing-col">
+                    <span class="status-badge" :class="file.processingStatus || 'pending'">
+                      {{ getProcessingStatusText(file.processingStatus) }}
+                    </span>
+                  </td>
+                  <td class="updated-col">{{ file.lastUpdated }}</td>
+                  <td class="actions-col">
+                    <button 
+                      v-if="file.status === 'available'" 
+                      @click="downloadFile(file)"
+                      class="btn-small"
+                      title="Baixar arquivo"
+                    >
+                      <i class="fas fa-download"></i>
+                    </button>
+                    <button 
+                      v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
+                      @click="processFile(file)"
+                      class="btn-small"
+                      title="Processar arquivo"
+                    >
+                      <i class="fas fa-cogs"></i>
+                    </button>
+                    <button 
+                      v-if="file.status === 'downloaded'" 
+                      @click="viewFile(file)"
+                      class="btn-small"
+                      title="Visualizar arquivo"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button 
+                      v-if="file.status === 'downloaded'" 
+                      @click="deleteFile(file)"
+                      class="btn-small danger"
+                      title="Excluir arquivo"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             
             <div v-if="cnpjFiles.length === 0" class="empty-state">
               <div class="empty-icon">
@@ -1510,11 +1505,72 @@ export default {
   color: #3b82f6;
 }
 
-.cnpj-files-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
-  gap: 1rem;
-  padding: 0.5rem; /* Add some padding to the grid */
+.cnpj-files-table-container {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid #475569;
+  margin-top: 1rem;
+}
+
+.cnpj-files-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.cnpj-files-table th,
+.cnpj-files-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #475569;
+  color: #e2e8f0;
+}
+
+.cnpj-files-table th {
+  background: rgba(15, 23, 42, 0.5);
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.cnpj-files-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.checkbox-col {
+  width: 40px; /* Fixed width for checkbox column */
+  text-align: center;
+}
+
+.month-col {
+  width: 100px; /* Fixed width for month/year column */
+}
+
+.filename-col {
+  width: 200px; /* Fixed width for filename column */
+}
+
+.size-col {
+  width: 100px; /* Fixed width for size column */
+}
+
+.status-col {
+  width: 120px; /* Fixed width for status column */
+}
+
+.processing-col {
+  width: 150px; /* Fixed width for processing column */
+}
+
+.updated-col {
+  width: 150px; /* Fixed width for last updated column */
+}
+
+.actions-col {
+  width: 150px; /* Fixed width for actions column */
+  text-align: right;
 }
 
 .file-card {
