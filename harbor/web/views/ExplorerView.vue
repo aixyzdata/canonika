@@ -86,10 +86,6 @@
                     <i class="fas fa-eye"></i>
                     Ver Detalhes
                   </button>
-                  <button @click="viewProductDetails(product)" class="btn-action secondary">
-                    <i class="fas fa-eye"></i>
-                    Ver Detalhes
-                  </button>
                 </div>
               </div>
               
@@ -571,6 +567,13 @@ export default {
     closeProductDetails() {
       this.showProductDetails = false
       this.selectedProduct = null
+    },
+
+    viewNFeDetails() {
+      // Implementar visualização de detalhes da NFe
+      console.log('Visualizando detalhes da NFe:', this.canonizedNFe)
+      // Por enquanto, apenas mostra no console
+      alert('Funcionalidade de detalhes da NFe será implementada em breve!')
     },
 
 
@@ -1538,21 +1541,30 @@ export default {
  }
 
  .btn-action {
-   padding: 10px 16px;
+   padding: 12px 20px;
    border: none;
-   border-radius: 8px;
+   border-radius: 10px;
    cursor: pointer;
    font-size: 0.9rem;
    font-weight: 600;
    display: flex;
    align-items: center;
    gap: 8px;
-   transition: all 0.2s ease;
+   transition: all 0.3s ease;
+   text-decoration: none;
+   white-space: nowrap;
  }
 
  .btn-action.primary {
    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
    color: white;
+   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+ }
+
+ .btn-action.primary:hover {
+   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+   transform: translateY(-2px);
+   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
  }
 
  .btn-action.secondary {
@@ -1561,9 +1573,10 @@ export default {
    border: 1px solid rgba(16, 185, 129, 0.2);
  }
 
- .btn-action:hover {
+ .btn-action.secondary:hover {
+   background: rgba(16, 185, 129, 0.2);
    transform: translateY(-2px);
-   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
  }
 
  .product-content {
