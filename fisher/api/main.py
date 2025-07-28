@@ -24,6 +24,9 @@ import httpx
 from urllib.parse import urljoin, urlparse
 import re
 
+from cnpj_processor import CNPJProcessor
+from sqlalchemy import text
+
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -609,6 +612,9 @@ class FisherService:
 # Instância global do serviço
 fisher_service = FisherService()
 
+# Instância global do processador CNPJ
+cnpj_processor = CNPJProcessor()
+
 # WebSocket endpoint
 @app.websocket("/ws/downloads")
 async def websocket_endpoint(websocket: WebSocket):
@@ -647,6 +653,151 @@ async def delete_cnpj_file(filename: str):
 async def get_download_progress(download_id: str):
     """Obtém progresso de um download específico"""
     return await fisher_service.get_download_progress(download_id)
+
+@app.post("/cnpj/process/{filename}")
+async def process_cnpj_file(filename: str):
+    """Processa um arquivo CNPJ baixado"""
+    try:
+        # Verificar se arquivo existe
+        cnpj_dir = fisher_service.data_dir / "cnpj"
+        file_path = cnpj_dir / filename
+        
+        if not file_path.exists():
+            return {
+                "status": "error",
+                "message": f"Arquivo {filename} não encontrado"
+            }
+        
+        # Inicializar processador se necessário
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        # Processar arquivo
+        result = await cnpj_processor.process_cnpj_file(file_path)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Erro ao processar arquivo {filename}: {e}")
+        return {
+            "status": "error",
+            "filename": filename,
+            "error": str(e)
+        }
+
+@app.post("/cnpj/process-all")
+async def process_all_cnpj_files():
+    """Processa todos os arquivos CNPJ baixados"""
+    try:
+        # Verificar arquivos baixados
+        cnpj_dir = fisher_service.data_dir / "cnpj"
+        downloaded_files = list(cnpj_dir.glob("*.zip"))
+        
+        if not downloaded_files:
+            return {
+                "status": "error",
+                "message": "Nenhum arquivo CNPJ baixado encontrado"
+            }
+        
+        # Inicializar processador se necessário
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        # Processar cada arquivo
+        results = []
+        for file_path in downloaded_files:
+            result = await cnpj_processor.process_cnpj_file(file_path)
+            results.append(result)
+        
+        return {
+            "status": "completed",
+            "total_files": len(downloaded_files),
+            "successful": len([r for r in results if r["status"] == "success"]),
+            "failed": len([r for r in results if r["status"] == "error"]),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao processar arquivos CNPJ: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.get("/cnpj/processing-status")
+async def get_processing_status():
+    """Obtém status do processamento dos arquivos CNPJ"""
+    try:
+        # Verificar arquivos baixados vs processados
+        cnpj_dir = fisher_service.data_dir / "cnpj"
+        downloaded_files = list(cnpj_dir.glob("*.zip"))
+        
+        # Verificar arquivos processados (baseado em logs ou metadados)
+        processed_files = []
+        for file_path in downloaded_files:
+            # Verificar se existe diretório extraído
+            extracted_dir = file_path.parent / f"extracted_{file_path.stem}"
+            if extracted_dir.exists():
+                processed_files.append(file_path.name)
+        
+        return {
+            "status": "success",
+            "downloaded_files": [f.name for f in downloaded_files],
+            "processed_files": processed_files,
+            "pending_files": [f.name for f in downloaded_files if f.name not in processed_files],
+            "total_downloaded": len(downloaded_files),
+            "total_processed": len(processed_files),
+            "total_pending": len(downloaded_files) - len(processed_files)
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao obter status de processamento: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.post("/cnpj/setup-database")
+async def setup_cnpj_database():
+    """Configura o banco de dados para os dados CNPJ"""
+    try:
+        # Ler schema SQL
+        schema_file = Path(__file__).parent / "schema.sql"
+        
+        if not schema_file.exists():
+            return {
+                "status": "error",
+                "message": "Arquivo schema.sql não encontrado"
+            }
+        
+        # Inicializar processador
+        await cnpj_processor.initialize_db()
+        
+        # Executar schema SQL
+        async with cnpj_processor.session_factory() as session:
+            with open(schema_file, 'r') as f:
+                schema_sql = f.read()
+            
+            # Executar cada comando SQL separadamente
+            commands = schema_sql.split(';')
+            for command in commands:
+                command = command.strip()
+                if command:
+                    await session.execute(text(command))
+            
+            await session.commit()
+        
+        return {
+            "status": "success",
+            "message": "Banco de dados configurado com sucesso"
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao configurar banco de dados: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
 
 @app.get("/health")
 async def health_check():

@@ -98,6 +98,7 @@
               <div class="header-cell">Arquivo</div>
               <div class="header-cell">Tamanho</div>
               <div class="header-cell">Status</div>
+              <div class="header-cell">Processamento</div>
               <div class="header-cell">Última Atualização</div>
               <div class="header-cell">Ações</div>
             </div>
@@ -119,6 +120,11 @@
                     {{ getStatusText(file.status) }}
                   </span>
                 </div>
+                <div class="table-cell processing">
+                  <span class="status-badge" :class="file.processingStatus || 'pending'">
+                    {{ getProcessingStatusText(file.processingStatus) }}
+                  </span>
+                </div>
                 <div class="table-cell updated">{{ file.lastUpdated }}</div>
                 <div class="table-cell actions">
                   <button 
@@ -128,6 +134,14 @@
                     title="Baixar arquivo"
                   >
                     <i class="fas fa-download"></i>
+                  </button>
+                  <button 
+                    v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
+                    @click="processFile(file)"
+                    class="btn-small"
+                    title="Processar arquivo"
+                  >
+                    <i class="fas fa-cogs"></i>
                   </button>
                   <button 
                     v-if="file.status === 'downloaded'" 
@@ -146,6 +160,61 @@
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processamento de Dados -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3>Processamento de Dados CNPJ</h3>
+          <div class="card-icon">
+            <i class="fas fa-database"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="processing-controls">
+            <div class="control-buttons">
+              <button @click="setupDatabase" class="btn-action">
+                <i class="fas fa-database"></i> Configurar Banco
+              </button>
+              <button @click="processAllFiles" class="btn-action" :disabled="!hasDownloadedFiles">
+                <i class="fas fa-cogs"></i> Processar Todos
+              </button>
+              <button @click="refreshProcessingStatus" class="btn-action">
+                <i class="fas fa-sync"></i> Atualizar Status
+              </button>
+            </div>
+            
+            <div class="processing-stats">
+              <div class="stat-item">
+                <span class="stat-label">Arquivos Baixados:</span>
+                <span class="stat-value">{{ processingStats.downloaded }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Processados:</span>
+                <span class="stat-value success">{{ processingStats.processed }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Pendentes:</span>
+                <span class="stat-value warning">{{ processingStats.pending }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Registros no BD:</span>
+                <span class="stat-value info">{{ processingStats.totalRecords }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="processing-log">
+            <h4>Log de Processamento</h4>
+            <div class="log-entries">
+              <div v-for="log in processingLogs" :key="log.id" class="log-entry" :class="log.level">
+                <div class="log-timestamp">{{ log.timestamp }}</div>
+                <div class="log-message">{{ log.message }}</div>
+                <div class="log-level">{{ log.level }}</div>
               </div>
             </div>
           </div>
@@ -338,6 +407,13 @@ export default {
       downloadInterval: null,
       websocket: null,
       apiBaseUrl: 'http://localhost:7724',
+      processingStats: {
+        downloaded: 0,
+        processed: 0,
+        pending: 0,
+        totalRecords: 0
+      },
+      processingLogs: [],
       sourceStatus: {
         status: 'ONLINE',
         description: 'Conexão ativa com Receita Federal',
@@ -451,6 +527,9 @@ export default {
     hasMissingFiles() {
       return this.cnpjFiles.some(file => file.status === 'available')
     },
+    hasDownloadedFiles() {
+      return this.cnpjFiles.some(file => file.status === 'downloaded')
+    },
     allSelected() {
       const availableFiles = this.cnpjFiles.filter(file => file.status === 'available')
       return availableFiles.length > 0 && availableFiles.every(file => file.selected)
@@ -474,6 +553,7 @@ export default {
     async refreshData() {
       console.log('Refreshing SEFAZ data...')
       await this.refreshFileList()
+      await this.refreshProcessingStatus()
     },
     async syncData() {
       console.log('Synchronizing SEFAZ data...')
@@ -494,7 +574,8 @@ export default {
             status: file.status,
             lastUpdated: file.last_updated,
             selected: false,
-            localPath: file.local_path
+            localPath: file.local_path,
+            processingStatus: file.processing_status || 'pending'
           }))
           
           this.updateFileStats()
@@ -506,6 +587,154 @@ export default {
         // Fallback para dados mockados
         this.loadMockData()
       }
+    },
+    async refreshProcessingStatus() {
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/processing-status`)
+        const data = await response.json()
+        
+        if (data.status === 'success') {
+          this.processingStats = {
+            downloaded: data.total_downloaded,
+            processed: data.total_processed,
+            pending: data.total_pending,
+            totalRecords: 0 // Será calculado separadamente
+          }
+          
+          // Atualizar status de processamento nos arquivos
+          this.cnpjFiles.forEach(file => {
+            if (data.processed_files.includes(file.filename)) {
+              file.processingStatus = 'processed'
+            } else if (data.pending_files.includes(file.filename)) {
+              file.processingStatus = 'pending'
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Erro ao obter status de processamento:', error)
+      }
+    },
+    async setupDatabase() {
+      try {
+        this.addProcessingLog('info', 'Configurando banco de dados...')
+        
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/setup-database`, {
+          method: 'POST'
+        })
+        
+        const result = await response.json()
+        
+        if (result.status === 'success') {
+          this.addProcessingLog('success', 'Banco de dados configurado com sucesso!')
+        } else {
+          this.addProcessingLog('error', `Erro ao configurar banco: ${result.error}`)
+        }
+      } catch (error) {
+        console.error('Erro ao configurar banco:', error)
+        this.addProcessingLog('error', `Erro de conexão: ${error.message}`)
+      }
+    },
+    async processFile(file) {
+      try {
+        this.addProcessingLog('info', `Processando arquivo: ${file.filename}`)
+        
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/process/${file.filename}`, {
+          method: 'POST'
+        })
+        
+        const result = await response.json()
+        
+        if (result.status === 'success') {
+          file.processingStatus = 'processed'
+          this.addProcessingLog('success', `Arquivo ${file.filename} processado com sucesso!`)
+          
+          // Atualizar estatísticas
+          if (result.results) {
+            this.updateProcessingStats(result.results)
+          }
+        } else {
+          file.processingStatus = 'error'
+          this.addProcessingLog('error', `Erro ao processar ${file.filename}: ${result.error}`)
+        }
+      } catch (error) {
+        console.error('Erro ao processar arquivo:', error)
+        file.processingStatus = 'error'
+        this.addProcessingLog('error', `Erro de conexão: ${error.message}`)
+      }
+    },
+    async processAllFiles() {
+      try {
+        this.addProcessingLog('info', 'Iniciando processamento de todos os arquivos...')
+        
+        const response = await fetch(`${this.apiBaseUrl}/cnpj/process-all`, {
+          method: 'POST'
+        })
+        
+        const result = await response.json()
+        
+        if (result.status === 'completed') {
+          this.addProcessingLog('success', `Processamento concluído! ${result.successful} arquivos processados com sucesso.`)
+          
+          // Atualizar status dos arquivos
+          result.results.forEach(fileResult => {
+            const file = this.cnpjFiles.find(f => f.filename === fileResult.filename)
+            if (file) {
+              file.processingStatus = fileResult.status === 'success' ? 'processed' : 'error'
+            }
+          })
+          
+          // Atualizar estatísticas
+          this.updateProcessingStats(result)
+        } else {
+          this.addProcessingLog('error', `Erro no processamento: ${result.error}`)
+        }
+      } catch (error) {
+        console.error('Erro ao processar arquivos:', error)
+        this.addProcessingLog('error', `Erro de conexão: ${error.message}`)
+      }
+    },
+    updateProcessingStats(results) {
+      // Calcular total de registros processados
+      let totalRecords = 0
+      
+      if (results.empresas) {
+        totalRecords += results.empresas.processed || 0
+      }
+      if (results.estabelecimentos) {
+        totalRecords += results.estabelecimentos.processed || 0
+      }
+      if (results.socios) {
+        totalRecords += results.socios.processed || 0
+      }
+      if (results.simples) {
+        totalRecords += results.simples.processed || 0
+      }
+      
+      this.processingStats.totalRecords += totalRecords
+    },
+    addProcessingLog(level, message) {
+      const log = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleTimeString(),
+        message,
+        level
+      }
+      
+      this.processingLogs.unshift(log)
+      
+      // Manter apenas os últimos 50 logs
+      if (this.processingLogs.length > 50) {
+        this.processingLogs = this.processingLogs.slice(0, 50)
+      }
+    },
+    getProcessingStatusText(status) {
+      const statusMap = {
+        'pending': 'PENDENTE',
+        'processing': 'PROCESSANDO',
+        'processed': 'PROCESSADO',
+        'error': 'ERRO'
+      }
+      return statusMap[status] || 'PENDENTE'
     },
     extractMonthYear(filename) {
       const match = filename.match(/CNPJ_(\d{4})_(\d{2})/)
@@ -524,7 +753,8 @@ export default {
           size: '2.1GB',
           status: 'available',
           lastUpdated: '2025-06-15 14:58',
-          selected: false
+          selected: false,
+          processingStatus: 'pending'
         },
         // ... outros arquivos mockados
       ]
@@ -748,6 +978,7 @@ export default {
   },
   async mounted() {
     await this.refreshFileList()
+    await this.refreshProcessingStatus()
   },
   beforeUnmount() {
     if (this.websocket) {
