@@ -126,8 +126,13 @@
 </template>
 
 <script>
+import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
+
 export default {
   name: 'FisherView',
+  components: {
+    CanonikaViewTemplate
+  },
   data() {
     return {
       lastSync: '2024-01-15 14:30:00',

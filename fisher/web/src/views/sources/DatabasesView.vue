@@ -143,8 +143,13 @@
 </template>
 
 <script>
+import CanonikaViewTemplate from '../../../../../shared/templates/CanonikaViewTemplate.vue'
+
 export default {
   name: 'DatabasesView',
+  components: {
+    CanonikaViewTemplate
+  },
   data() {
     return {
       sourceStatus: {

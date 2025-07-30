@@ -469,8 +469,13 @@
 </template>
 
 <script>
+import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
+
 export default {
   name: 'SefazView',
+  components: {
+    CanonikaViewTemplate
+  },
   data() {
     return {
       sourceStatus: {
