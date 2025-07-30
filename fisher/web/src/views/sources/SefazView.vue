@@ -1,87 +1,181 @@
 <template>
-  <CanonikaViewTemplate
-    title="SEFAZ"
-    description="Dados da Receita Federal - SEFAZ"
-    header-icon="fas fa-building"
-    status-text="ONLINE"
-    :primary-action="{
-      text: 'Sincronizar Dados',
-      icon: 'fas fa-sync',
-      handler: syncData
-    }"
-    @refresh="refreshData"
-  >
-    <div class="service-cards">
-      <!-- Status da Fonte -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Status da Fonte</h3>
-          <div class="card-icon">
-            <i class="fas fa-signal"></i>
+  <div class="view-container">
+    <!-- Page Header com Design System -->
+    <div class="canonika-page-header">
+      <div class="canonika-page-header-content">
+        <div class="canonika-page-header-text">
+          <div class="canonika-section-title">
+            <i class="fas fa-building canonika-section-icon"></i>
+            <h1 class="canonika-h1">SEFAZ - Receita Federal</h1>
+          </div>
+          <p class="canonika-subtitle">
+            Sistema de download e processamento de dados CNPJ da Receita Federal
+          </p>
+        </div>
+        <div class="canonika-page-header-actions">
+          <button 
+            @click="syncData" 
+            class="canonika-btn canonika-btn-primary"
+            :disabled="isDownloading"
+          >
+            <i class="fas fa-sync-alt"></i>
+            Sincronizar Dados
+          </button>
+          <button 
+            @click="refreshData" 
+            class="canonika-btn canonika-btn-outline"
+          >
+            <i class="fas fa-refresh"></i>
+            Atualizar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid Principal -->
+    <div class="canonika-container">
+      <div class="canonika-grid canonika-grid-3">
+        
+        <!-- Status da Fonte -->
+        <div class="canonika-card">
+          <div class="canonika-card-header">
+            <div class="canonika-section-title">
+              <i class="fas fa-signal canonika-section-icon"></i>
+              <h3 class="canonika-h3">Status da Fonte</h3>
+            </div>
+          </div>
+          <div class="canonika-card-body">
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-md">
+              <div class="canonika-flex canonika-flex-between">
+                <span class="canonika-text-base">Status:</span>
+                <span class="canonika-badge" :class="getStatusBadgeClass(sourceStatus.status)">
+                  {{ sourceStatus.status }}
+                </span>
+              </div>
+              <div class="canonika-text-sm">{{ sourceStatus.description }}</div>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+                <div class="canonika-flex canonika-flex-between">
+                  <span class="canonika-text-xs">Última Sincronização:</span>
+                  <span class="canonika-text-xs">{{ sourceStatus.lastSync }}</span>
+                </div>
+                <div class="canonika-flex canonika-flex-between">
+                  <span class="canonika-text-xs">Arquivos Baixados:</span>
+                  <span class="canonika-text-xs">{{ sourceStatus.downloadedFiles }}</span>
+                </div>
+                <div class="canonika-flex canonika-flex-between">
+                  <span class="canonika-text-xs">Taxa de Sucesso:</span>
+                  <span class="canonika-text-xs">{{ sourceStatus.successRate }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div class="balance-display">
-            <div class="balance-value">{{ sourceStatus.status }}</div>
-            <div class="balance-label">{{ sourceStatus.description }}</div>
+
+        <!-- Métricas de Dados -->
+        <div class="canonika-card">
+          <div class="canonika-card-header">
+            <div class="canonika-section-title">
+              <i class="fas fa-chart-bar canonika-section-icon"></i>
+              <h3 class="canonika-h3">Métricas de Dados</h3>
+            </div>
           </div>
-          <div class="balance-details">
-            <div class="detail-item">
-              <span class="detail-label">Última Sincronização:</span>
-              <span class="detail-value">{{ sourceStatus.lastSync }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Arquivos Baixados:</span>
-              <span class="detail-value">{{ sourceStatus.downloadedFiles }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Taxa de Sucesso:</span>
-              <span class="detail-value">{{ sourceStatus.successRate }}</span>
+          <div class="canonika-card-body">
+            <div class="canonika-grid canonika-grid-2">
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+                <span class="canonika-text-xs">Arquivos Baixados:</span>
+                <span class="canonika-h4">{{ fileStats.downloaded }}</span>
+              </div>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+                <span class="canonika-text-xs">Dados Armazenados:</span>
+                <span class="canonika-h4">{{ dataMetrics[1]?.value || '0GB' }}</span>
+              </div>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+                <span class="canonika-text-xs">CNPJs Processados:</span>
+                <span class="canonika-h4">{{ dataMetrics[2]?.value || '0' }}</span>
+              </div>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+                <span class="canonika-text-xs">Taxa de Disponibilidade:</span>
+                <span class="canonika-h4">{{ dataMetrics[3]?.value || '0%' }}</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Configurações -->
+        <div class="canonika-card">
+          <div class="canonika-card-header">
+            <div class="canonika-section-title">
+              <i class="fas fa-cog canonika-section-icon"></i>
+              <h3 class="canonika-h3">Configurações</h3>
+            </div>
+          </div>
+          <div class="canonika-card-body">
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+              <div class="canonika-flex canonika-flex-between">
+                <span class="canonika-text-xs">URL Base CNPJ:</span>
+                <span class="canonika-badge canonika-badge-success">ATIVO</span>
+              </div>
+              <div class="canonika-flex canonika-flex-between">
+                <span class="canonika-text-xs">Diretório Local:</span>
+                <span class="canonika-badge canonika-badge-success">CONFIGURADO</span>
+              </div>
+              <div class="canonika-flex canonika-flex-between">
+                <span class="canonika-text-xs">Tamanho Máximo:</span>
+                <span class="canonika-badge canonika-badge-success">OK</span>
+              </div>
+              <div class="canonika-flex canonika-flex-between">
+                <span class="canonika-text-xs">Backup Automático:</span>
+                <span class="canonika-badge canonika-badge-error">INATIVO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Controle de Arquivos CNPJ -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Controle de Arquivos CNPJ</h3>
-          <div class="card-icon">
-            <i class="fas fa-download"></i>
+      <div class="canonika-card canonika-mt-lg">
+        <div class="canonika-card-header">
+          <div class="canonika-section-title">
+            <i class="fas fa-download canonika-section-icon"></i>
+            <h3 class="canonika-h3">Controle de Arquivos CNPJ</h3>
           </div>
         </div>
-        <div class="card-content">
-          <div class="cnpj-controls">
-            <div class="control-buttons">
-              <button @click="refreshFileList" class="btn-action">
-                <i class="fas fa-sync-alt"></i>
-                Atualizar Lista
-              </button>
-              <button @click="downloadSelectedFiles" class="btn-action" :disabled="!hasSelectedFiles">
-                <i class="fas fa-download"></i>
-                Baixar Selecionados
-              </button>
-              <button @click="downloadMissingFiles" class="btn-action" :disabled="!hasMissingFiles">
-                <i class="fas fa-download"></i>
-                Baixar Todos os Faltantes
-              </button>
-              <button @click="testModal" class="btn-action">
-                <i class="fas fa-test"></i>
-                Teste Modal
-              </button>
-            </div>
-            
-            <!-- Filtro de Mês/Ano -->
-            <div class="filter-controls">
-              <div class="filter-group">
-                <label for="monthYearFilter" class="filter-label">
-                  <i class="fas fa-filter"></i> Filtrar por Mês/Ano:
+        <div class="canonika-card-body">
+          
+          <!-- Controles Principais -->
+          <div class="canonika-flex canonika-flex-gap-md canonika-mb-lg">
+            <button @click="refreshFileList" class="canonika-btn canonika-btn-primary">
+              <i class="fas fa-sync-alt"></i>
+              Atualizar Lista
+            </button>
+            <button @click="downloadSelectedFiles" class="canonika-btn canonika-btn-secondary" :disabled="!hasSelectedFiles">
+              <i class="fas fa-download"></i>
+              Baixar Selecionados
+            </button>
+            <button @click="downloadMissingFiles" class="canonika-btn canonika-btn-outline" :disabled="!hasMissingFiles">
+              <i class="fas fa-download"></i>
+              Baixar Todos os Faltantes
+            </button>
+            <button @click="testModal" class="canonika-btn canonika-btn-outline">
+              <i class="fas fa-vial"></i>
+              Teste Modal
+            </button>
+          </div>
+
+          <!-- Filtros e Estatísticas -->
+          <div class="canonika-flex canonika-flex-between canonika-mb-md">
+            <div class="canonika-flex canonika-flex-gap-md">
+              <div class="canonika-form-group">
+                <label for="monthYearFilter" class="canonika-form-label">
+                  <i class="fas fa-filter"></i>
+                  Filtrar por Mês/Ano:
                 </label>
                 <select 
                   id="monthYearFilter" 
                   v-model="selectedMonthYear" 
                   @change="applyMonthYearFilter"
-                  class="filter-select"
+                  class="canonika-form-input"
                 >
                   <option value="">Todos os meses</option>
                   <option 
@@ -92,50 +186,44 @@
                     {{ formatMonthYear(monthYear) }}
                   </option>
                 </select>
-                <button 
-                  @click="clearMonthYearFilter" 
-                  class="btn-small"
-                  :disabled="!selectedMonthYear"
-                  title="Limpar filtro"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
               </div>
-              
-              <div class="filter-stats" v-if="selectedMonthYear">
-                <span class="filter-stat">
-                  <i class="fas fa-file"></i>
-                  {{ filteredFilesCount }} arquivos no mês {{ formatMonthYear(selectedMonthYear) }}
-                </span>
-              </div>
+              <button 
+                @click="clearMonthYearFilter" 
+                class="canonika-btn canonika-btn-sm"
+                :disabled="!selectedMonthYear"
+                title="Limpar filtro"
+              >
+                <i class="fas fa-times"></i>
+              </button>
             </div>
             
-            <div class="file-stats">
-              <div class="stat-item">
-                <span class="stat-label">Total Disponível:</span>
-                <span class="stat-value">{{ fileStats.totalAvailable }}</span>
+            <!-- Estatísticas -->
+            <div class="canonika-flex canonika-flex-gap-lg">
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                <span class="canonika-text-xs">Total:</span>
+                <span class="canonika-h5">{{ fileStats.totalAvailable }}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Já Baixados:</span>
-                <span class="stat-value success">{{ fileStats.downloaded }}</span>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                <span class="canonika-text-xs">Baixados:</span>
+                <span class="canonika-h5 canonika-text-success">{{ fileStats.downloaded }}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Faltando:</span>
-                <span class="stat-value warning">{{ fileStats.missing }}</span>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                <span class="canonika-text-xs">Faltantes:</span>
+                <span class="canonika-h5 canonika-text-warning">{{ fileStats.missing }}</span>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Selecionados:</span>
-                <span class="stat-value info">{{ fileStats.selected }}</span>
+              <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                <span class="canonika-text-xs">Selecionados:</span>
+                <span class="canonika-h5 canonika-text-info">{{ fileStats.selected }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Tabela de Arquivos CNPJ -->
-          <div class="cnpj-files-table-container">
-            <table class="cnpj-files-table">
+          <!-- Tabela de Arquivos -->
+          <div class="canonika-table-container">
+            <table class="canonika-table">
               <thead>
                 <tr>
-                  <th class="checkbox-col">
+                  <th>
                     <input 
                       type="checkbox" 
                       :checked="allSelected" 
@@ -153,73 +241,77 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="file in cnpjFiles" :key="file.id" :class="file.status">
-                  <td class="checkbox-col">
+                <tr v-for="file in cnpjFiles" :key="file.id" :class="getRowClass(file)">
+                  <td>
                     <input 
                       type="checkbox" 
                       v-model="file.selected"
                       :disabled="file.status === 'downloaded'"
                     >
                   </td>
-                  <td class="month-col">{{ file.monthYear }}</td>
-                  <td class="filename-col">{{ file.filename }}</td>
-                  <td class="size-col">{{ file.size }}</td>
-                  <td class="status-col">
-                    <span class="status-badge" :class="file.status">
+                  <td>{{ file.monthYear }}</td>
+                  <td>{{ file.filename }}</td>
+                  <td>{{ formatFileSize(file.size) }}</td>
+                  <td>
+                    <span class="canonika-badge" :class="getStatusBadgeClass(file.status)">
                       {{ getStatusText(file.status) }}
                     </span>
                   </td>
-                  <td class="processing-col">
-                    <span class="status-badge" :class="file.processingStatus || 'pending'">
+                  <td>
+                    <span class="canonika-badge" :class="getProcessingBadgeClass(file.processingStatus)">
                       {{ getProcessingStatusText(file.processingStatus) }}
                     </span>
                   </td>
-                  <td class="updated-col">{{ file.lastUpdated }}</td>
-                  <td class="actions-col">
-                    <button 
-                      v-if="file.status === 'available'" 
-                      @click="downloadFile(file)"
-                      class="btn-small"
-                      title="Baixar arquivo"
-                    >
-                      <i class="fas fa-download"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'" 
-                      @click="processFile(file)"
-                      class="btn-small"
-                      title="Processar arquivo"
-                    >
-                      <i class="fas fa-cogs"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded'" 
-                      @click="viewFile(file)"
-                      class="btn-small"
-                      title="Visualizar arquivo"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button 
-                      v-if="file.status === 'downloaded'" 
-                      @click="deleteFile(file)"
-                      class="btn-small danger"
-                      title="Excluir arquivo"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
+                  <td>{{ formatDate(file.lastUpdated) }}</td>
+                  <td>
+                    <div class="canonika-flex canonika-flex-gap-sm">
+                      <button 
+                        v-if="file.status === 'available'"
+                        @click="downloadFile(file)" 
+                        class="canonika-btn canonika-btn-sm"
+                        :disabled="isDownloading"
+                        title="Baixar arquivo"
+                      >
+                        <i class="fas fa-download"></i>
+                      </button>
+                      <button 
+                        v-if="file.status === 'downloaded' && file.processingStatus !== 'processed'"
+                        @click="processFile(file)" 
+                        class="canonika-btn canonika-btn-sm"
+                        title="Processar arquivo"
+                      >
+                        <i class="fas fa-cogs"></i>
+                      </button>
+                      <button 
+                        v-if="file.status === 'downloaded'"
+                        @click="viewFile(file)" 
+                        class="canonika-btn canonika-btn-sm"
+                        title="Visualizar arquivo"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button 
+                        v-if="file.status === 'downloaded'"
+                        @click="deleteFile(file)" 
+                        class="canonika-btn canonika-btn-sm canonika-btn-danger"
+                        title="Excluir arquivo"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
             
-            <div v-if="cnpjFiles.length === 0" class="empty-state">
-              <div class="empty-icon">
+            <!-- Estado Vazio -->
+            <div v-if="cnpjFiles.length === 0" class="canonika-empty-state">
+              <div class="canonika-empty-icon">
                 <i class="fas fa-folder-open"></i>
               </div>
-              <div class="empty-text">
-                <h4>Nenhum arquivo encontrado</h4>
-                <p>Clique em "Atualizar Lista" para buscar arquivos CNPJ disponíveis</p>
+              <div class="canonika-empty-text">
+                <h4 class="canonika-h4">Nenhum arquivo encontrado</h4>
+                <p class="canonika-text-base">Clique em "Atualizar Lista" para buscar arquivos CNPJ disponíveis</p>
               </div>
             </div>
           </div>
@@ -227,245 +319,209 @@
       </div>
 
       <!-- Processamento de Dados -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Processamento de Dados CNPJ</h3>
-          <div class="card-icon">
-            <i class="fas fa-database"></i>
+      <div class="canonika-card canonika-mt-lg">
+        <div class="canonika-card-header">
+          <div class="canonika-section-title">
+            <i class="fas fa-database canonika-section-icon"></i>
+            <h3 class="canonika-h3">Processamento de Dados CNPJ</h3>
           </div>
         </div>
-        <div class="card-content">
-          <div class="processing-controls">
-            <div class="control-buttons">
-              <button @click="setupDatabase" class="btn-action">
-                <i class="fas fa-database"></i> Configurar Banco
-              </button>
-              <button @click="processAllFiles" class="btn-action" :disabled="!hasDownloadedFiles">
-                <i class="fas fa-cogs"></i> Processar Todos
-              </button>
-              <button @click="refreshProcessingStatus" class="btn-action">
-                <i class="fas fa-sync"></i> Atualizar Status
-              </button>
+        <div class="canonika-card-body">
+          
+          <!-- Controles de Processamento -->
+          <div class="canonika-flex canonika-flex-gap-md canonika-mb-lg">
+            <button @click="setupDatabase" class="canonika-btn canonika-btn-primary">
+              <i class="fas fa-database"></i>
+              Configurar Banco
+            </button>
+            <button @click="processAllFiles" class="canonika-btn canonika-btn-secondary" :disabled="!hasDownloadedFiles">
+              <i class="fas fa-cogs"></i>
+              Processar Todos
+            </button>
+            <button @click="refreshProcessingStatus" class="canonika-btn canonika-btn-outline">
+              <i class="fas fa-sync"></i>
+              Atualizar Status
+            </button>
+          </div>
+
+          <!-- Estatísticas de Processamento -->
+          <div class="canonika-grid canonika-grid-4 canonika-mb-lg">
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+              <span class="canonika-text-xs">Arquivos Baixados:</span>
+              <span class="canonika-h4">{{ processingStats.downloaded }}</span>
             </div>
-            
-            <div class="processing-stats">
-              <div class="stat-item">
-                <span class="stat-label">Arquivos Baixados:</span>
-                <span class="stat-value">{{ processingStats.downloaded }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Processados:</span>
-                <span class="stat-value success">{{ processingStats.processed }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Pendentes:</span>
-                <span class="stat-value warning">{{ processingStats.pending }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Registros no BD:</span>
-                <span class="stat-value info">{{ processingStats.totalRecords }}</span>
-              </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+              <span class="canonika-text-xs">Processados:</span>
+              <span class="canonika-h4 canonika-text-success">{{ processingStats.processed }}</span>
+            </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+              <span class="canonika-text-xs">Pendentes:</span>
+              <span class="canonika-h4 canonika-text-warning">{{ processingStats.pending }}</span>
+            </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+              <span class="canonika-text-xs">Registros no BD:</span>
+              <span class="canonika-h4 canonika-text-info">{{ processingStats.totalRecords }}</span>
             </div>
           </div>
 
-          <div class="processing-log">
-            <h4>Log de Processamento</h4>
-            <div class="log-entries">
-              <div v-for="log in processingLogs" :key="log.id" class="log-entry" :class="log.level">
-                <div class="log-timestamp">{{ log.timestamp }}</div>
-                <div class="log-message">{{ log.message }}</div>
-                <div class="log-level">{{ log.level }}</div>
-              </div>
-            </div>
+          <!-- Log de Processamento -->
+          <div class="canonika-section-subheader">
+            <h4 class="canonika-h4">Log de Processamento</h4>
           </div>
-        </div>
-      </div>
-
-      <!-- Métricas de Dados -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Métricas de Dados</h3>
-          <div class="card-icon">
-            <i class="fas fa-chart-bar"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="metrics-grid">
-            <div v-for="metric in dataMetrics" :key="metric.id" class="metric-item">
-              <div class="metric-icon">
-                <i :class="metric.icon"></i>
-              </div>
-              <div class="metric-details">
-                <div class="metric-value">{{ metric.value }}</div>
-                <div class="metric-label">{{ metric.label }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Configurações -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Configurações</h3>
-          <div class="card-icon">
-            <i class="fas fa-cog"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="config-list">
-            <div v-for="config in configurations" :key="config.id" class="config-item">
-              <div class="config-label">{{ config.name }}</div>
-              <div class="config-value">{{ config.value }}</div>
-              <div class="config-status" :class="config.status">
-                {{ config.statusText }}
-              </div>
+          <div class="canonika-log-container">
+            <div 
+              v-for="log in processingLogs" 
+              :key="log.id" 
+              class="canonika-log-entry"
+              :class="`log-${log.level}`"
+            >
+              <div class="canonika-log-timestamp">{{ log.timestamp }}</div>
+              <div class="canonika-log-message">{{ log.message }}</div>
+              <div class="canonika-log-status">{{ log.level }}</div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Logs Recentes -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Logs Recentes</h3>
-          <div class="card-icon">
-            <i class="fas fa-list-alt"></i>
+      <div class="canonika-card canonika-mt-lg">
+        <div class="canonika-card-header">
+          <div class="canonika-section-title">
+            <i class="fas fa-list-alt canonika-section-icon"></i>
+            <h3 class="canonika-h3">Logs Recentes</h3>
           </div>
         </div>
-        <div class="card-content">
-          <div class="logs-list">
-            <div v-for="log in recentLogs" :key="log.id" :class="`log-item ${log.level}`">
-              <div class="log-icon">
-                <i :class="log.icon"></i>
-              </div>
-              <div class="log-content">
-                <div class="log-title">{{ log.title }}</div>
-                <div class="log-message">{{ log.message }}</div>
-                <div class="log-time">{{ log.timestamp }}</div>
+        <div class="canonika-card-body">
+          <div class="canonika-flex canonika-flex-col canonika-flex-gap-sm">
+            <div 
+              v-for="log in recentLogs" 
+              :key="log.id" 
+              class="canonika-log-entry"
+              :class="`log-${log.level}`"
+            >
+              <div class="canonika-flex canonika-flex-gap-sm">
+                <i :class="log.icon" class="canonika-text-sm"></i>
+                <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                  <div class="canonika-text-base">{{ log.title }}</div>
+                  <div class="canonika-text-xs">{{ log.message }}</div>
+                  <div class="canonika-text-xs">{{ log.timestamp }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Modal de Progresso de Download -->
-      <div v-if="showDownloadModal" class="download-modal">
-        <div class="modal-overlay" @click="closeDownloadModal"></div>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>
-              <i class="fas fa-download"></i>
-              Download de Arquivos CNPJ
-            </h3>
-            <button @click="closeDownloadModal" class="modal-close">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          
-          <div class="modal-body">
-            <div class="download-summary">
-              <div class="summary-item">
-                <span class="summary-label">Total:</span>
-                <span class="summary-value">{{ downloadQueue.length }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Concluídos:</span>
-                <span class="summary-value success">{{ completedDownloads }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Em Progresso:</span>
-                <span class="summary-value info">{{ activeDownloads }}</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label">Falhas:</span>
-                <span class="summary-value error">{{ failedDownloads }}</span>
-              </div>
-            </div>
+    </div>
 
-            <div class="download-queue">
-              <div v-for="item in downloadQueue" :key="item.id" class="download-item" :class="item.status">
-                <div class="download-header">
-                  <div class="download-info">
-                    <div class="filename">{{ item.filename }}</div>
-                    <div class="filesize">{{ item.size }}</div>
-                  </div>
-                  <div class="download-status">
-                    <span class="status-badge" :class="item.status">
-                      {{ getDownloadStatusText(item.status) }}
-                    </span>
-                  </div>
+    <!-- Modal de Download -->
+    <div v-if="showDownloadModal" class="canonika-modal-overlay" @click="closeDownloadModal">
+      <div class="canonika-modal-content" @click.stop>
+        <div class="canonika-modal-header">
+          <h3 class="canonika-h3">
+            <i class="fas fa-download"></i>
+            Download de Arquivos CNPJ
+          </h3>
+          <button @click="closeDownloadModal" class="canonika-btn canonika-btn-sm">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="canonika-modal-body">
+          <!-- Resumo do Download -->
+          <div class="canonika-grid canonika-grid-4 canonika-mb-lg">
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+              <span class="canonika-text-xs">Total:</span>
+              <span class="canonika-h5">{{ downloadQueue.length }}</span>
+            </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+              <span class="canonika-text-xs">Concluídos:</span>
+              <span class="canonika-h5 canonika-text-success">{{ completedDownloads }}</span>
+            </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+              <span class="canonika-text-xs">Em Progresso:</span>
+              <span class="canonika-h5 canonika-text-info">{{ activeDownloads }}</span>
+            </div>
+            <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+              <span class="canonika-text-xs">Falhas:</span>
+              <span class="canonika-h5 canonika-text-error">{{ failedDownloads }}</span>
+            </div>
+          </div>
+
+          <!-- Fila de Downloads -->
+          <div class="canonika-flex canonika-flex-col canonika-flex-gap-md">
+            <div 
+              v-for="item in downloadQueue" 
+              :key="item.id" 
+              class="canonika-download-item"
+              :class="`download-${item.status}`"
+            >
+              <div class="canonika-flex canonika-flex-between canonika-mb-sm">
+                <div class="canonika-flex canonika-flex-col canonika-flex-gap-xs">
+                  <div class="canonika-text-base">{{ item.filename }}</div>
+                  <div class="canonika-text-xs">{{ item.size }}</div>
                 </div>
-                
-                <div class="download-progress">
-                  <div class="progress-bar">
-                    <div 
-                      class="progress-fill" 
-                      :style="{ width: item.progress + '%' }"
-                      :class="item.status"
-                    ></div>
-                  </div>
-                  <div class="progress-details">
-                    <span class="progress-text">{{ item.progress }}%</span>
-                    <span class="progress-speed" v-if="item.speed">{{ item.speed }}</span>
-                    <span class="progress-time" v-if="item.eta">{{ item.eta }}</span>
-                  </div>
-                </div>
-                
-                <div class="download-message" v-if="item.message">
-                  {{ item.message }}
-                </div>
+                <span class="canonika-badge" :class="getDownloadStatusBadgeClass(item.status)">
+                  {{ getDownloadStatusText(item.status) }}
+                </span>
               </div>
+              
+              <!-- Progress Bar -->
+              <div class="canonika-progress-bar">
+                <div 
+                  class="canonika-progress-fill" 
+                  :class="`progress-${item.status}`"
+                  :style="{ width: item.progress + '%' }"
+                ></div>
+              </div>
+              
+              <!-- Detalhes do Progresso -->
+              <div class="canonika-flex canonika-flex-between canonika-mt-sm">
+                <span class="canonika-text-xs">{{ item.progress }}%</span>
+                <span v-if="item.speed" class="canonika-text-xs">{{ item.speed }}</span>
+                <span v-if="item.eta" class="canonika-text-xs">{{ item.eta }}</span>
+              </div>
+              
+              <div v-if="item.message" class="canonika-text-xs canonika-mt-sm">{{ item.message }}</div>
             </div>
           </div>
-          
-          <div class="modal-footer">
-            <div class="download-options">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  v-model="forceReplace"
-                  class="checkbox-input"
-                >
-                <span class="checkbox-text">Forçar substituição de arquivos existentes</span>
-              </label>
-            </div>
-            
-            <div class="modal-actions">
-              <button 
-                @click="pauseDownloads" 
-                class="btn-action"
-                :disabled="!isDownloading"
-              >
-                <i class="fas fa-pause"></i> Pausar
-              </button>
-              <button 
-                @click="resumeDownloads" 
-                class="btn-action"
-                :disabled="!isPaused"
-              >
-                <i class="fas fa-play"></i> Retomar
-              </button>
-              <button 
-                @click="cancelDownloads" 
-                class="btn-action danger"
-                :disabled="!isDownloading && !isPaused"
-              >
-                <i class="fas fa-stop"></i> Cancelar
-              </button>
-              <button 
-                @click="closeDownloadModal" 
-                class="btn-action"
-                :disabled="isDownloading"
-              >
-                <i class="fas fa-check"></i> Fechar
-              </button>
-            </div>
+
+          <!-- Opções de Download -->
+          <div class="canonika-form-check canonika-mt-lg">
+            <input 
+              v-model="forceReplace" 
+              type="checkbox" 
+              class="canonika-form-check-input" 
+              id="forceReplace"
+            >
+            <label class="canonika-form-check-label" for="forceReplace">
+              Forçar substituição de arquivos existentes
+            </label>
           </div>
+        </div>
+        
+        <div class="canonika-modal-footer">
+          <button @click="pauseDownloads" class="canonika-btn canonika-btn-outline" :disabled="!isDownloading">
+            <i class="fas fa-pause"></i>
+            Pausar
+          </button>
+          <button @click="resumeDownloads" class="canonika-btn canonika-btn-outline" :disabled="!isPaused">
+            <i class="fas fa-play"></i>
+            Retomar
+          </button>
+          <button @click="cancelDownloads" class="canonika-btn canonika-btn-danger" :disabled="!isDownloading && !isPaused">
+            <i class="fas fa-stop"></i>
+            Cancelar
+          </button>
+          <button @click="closeDownloadModal" class="canonika-btn canonika-btn-primary" :disabled="isDownloading">
+            <i class="fas fa-check"></i>
+            Fechar
+          </button>
         </div>
       </div>
     </div>
-  </CanonikaViewTemplate>
+
+  </div>
 </template>
 
 <script>
@@ -544,6 +600,75 @@ export default {
     }
   },
   methods: {
+    // Métodos do Design System
+    getStatusBadgeClass(status) {
+      const statusMap = {
+        'ONLINE': 'canonika-badge-success',
+        'OFFLINE': 'canonika-badge-error',
+        'CONNECTING': 'canonika-badge-warning',
+        'ERROR': 'canonika-badge-error',
+        'available': 'canonika-badge-info',
+        'downloaded': 'canonika-badge-success',
+        'downloading': 'canonika-badge-warning',
+        'error': 'canonika-badge-error'
+      };
+      return statusMap[status] || 'canonika-badge-info';
+    },
+
+    getProcessingBadgeClass(status) {
+      const statusMap = {
+        'pending': 'canonika-badge-warning',
+        'processing': 'canonika-badge-info',
+        'processed': 'canonika-badge-success',
+        'error': 'canonika-badge-error'
+      };
+      return statusMap[status] || 'canonika-badge-warning';
+    },
+
+    getDownloadStatusBadgeClass(status) {
+      const statusMap = {
+        'pending': 'canonika-badge-warning',
+        'downloading': 'canonika-badge-info',
+        'completed': 'canonika-badge-success',
+        'error': 'canonika-badge-error',
+        'cancelled': 'canonika-badge-error'
+      };
+      return statusMap[status] || 'canonika-badge-warning';
+    },
+
+    getRowClass(file) {
+      const classes = ['canonika-table-row'];
+      if (file.status === 'downloaded') classes.push('canonika-row-success');
+      if (file.status === 'available') classes.push('canonika-row-info');
+      if (file.processingStatus === 'processed') classes.push('canonika-row-processed');
+      return classes.join(' ');
+    },
+
+    formatFileSize(size) {
+      if (!size) return 'N/A';
+      if (typeof size === 'number') {
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let value = size;
+        let unitIndex = 0;
+        while (value >= 1024 && unitIndex < units.length - 1) {
+          value /= 1024;
+          unitIndex++;
+        }
+        return `${value.toFixed(1)} ${units[unitIndex]}`;
+      }
+      return size;
+    },
+
+    formatDate(date) {
+      if (!date) return 'N/A';
+      try {
+        return new Date(date).toLocaleString('pt-BR');
+      } catch {
+        return date;
+      }
+    },
+
+    // Métodos existentes
     async refreshAllData() {
       console.log('Refreshing all data from API...')
       
@@ -2260,38 +2385,120 @@ export default {
 </style>
 
 <style scoped>
-/* v1.1 - Force cache reload */
-.modal-overlay {
+/* Estilos específicos do SefazView com Design System */
+
+/* Tabela personalizada */
+.canonika-table-container {
+  overflow-x: auto;
+  border-radius: var(--canonika-border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.canonika-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.canonika-table th {
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--canonika-white);
+  padding: 12px;
+  text-align: left;
+  font-weight: var(--canonika-font-weight-semibold);
+  font-size: var(--canonika-font-size-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.canonika-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-sm);
+}
+
+.canonika-table-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.canonika-row-success {
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.canonika-row-info {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.canonika-row-processed {
+  border-left: 3px solid var(--canonika-success);
+}
+
+/* Estado vazio */
+.canonika-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--canonika-gray);
+}
+
+.canonika-empty-icon {
+  font-size: 3rem;
+  color: #475569;
+  margin-bottom: 15px;
+}
+
+.canonika-empty-text h4 {
+  margin: 0 0 10px 0;
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-lg);
+}
+
+.canonika-empty-text p {
+  margin: 0;
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-sm);
+}
+
+/* Modal personalizado */
+.canonika-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
-.modal-content {
+.canonika-modal-content {
   background: #1e293b;
   border: 1px solid #475569;
-  border-radius: 8px;
+  border-radius: var(--canonika-border-radius-lg);
   padding: 20px;
   max-width: 800px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
+  position: relative;
 }
 
-.modal-header {
+.canonika-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid #475569;
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
 
-.modal-footer {
+.canonika-modal-body {
+  margin-bottom: 20px;
+}
+
+.canonika-modal-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2302,74 +2509,144 @@ export default {
   flex-wrap: wrap;
 }
 
-.download-options {
+/* Download items */
+.canonika-download-item {
+  padding: 15px;
+  border-radius: var(--canonika-border-radius);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 10px;
+}
+
+.canonika-download-item.download-pending {
+  border-left: 3px solid var(--canonika-warning);
+}
+
+.canonika-download-item.download-downloading {
+  border-left: 3px solid var(--canonika-info);
+}
+
+.canonika-download-item.download-completed {
+  border-left: 3px solid var(--canonika-success);
+}
+
+.canonika-download-item.download-error {
+  border-left: 3px solid var(--canonika-error);
+}
+
+.canonika-download-item.download-cancelled {
+  border-left: 3px solid var(--canonika-error);
+}
+
+/* Progress bar */
+.canonika-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.canonika-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.canonika-progress-fill.progress-pending {
+  background: var(--canonika-warning);
+}
+
+.canonika-progress-fill.progress-downloading {
+  background: var(--canonika-info);
+}
+
+.canonika-progress-fill.progress-completed {
+  background: var(--canonika-success);
+}
+
+.canonika-progress-fill.progress-error {
+  background: var(--canonika-error);
+}
+
+.canonika-progress-fill.progress-cancelled {
+  background: var(--canonika-error);
+}
+
+/* Log container */
+.canonika-log-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--canonika-border-radius);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.canonika-log-entry {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-right: 1rem;
-  color: #94a3b8;
-  font-size: 0.875rem;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: var(--canonika-font-size-sm);
+}
+
+.canonika-log-entry:last-child {
+  border-bottom: none;
+}
+
+.canonika-log-entry.log-success {
+  background: rgba(16, 185, 129, 0.05);
+  border-left: 3px solid var(--canonika-success);
+}
+
+.canonika-log-entry.log-error {
+  background: rgba(239, 68, 68, 0.05);
+  border-left: 3px solid var(--canonika-error);
+}
+
+.canonika-log-entry.log-info {
+  background: rgba(59, 130, 246, 0.05);
+  border-left: 3px solid var(--canonika-info);
+}
+
+.canonika-log-timestamp {
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-xs);
+  min-width: 80px;
+}
+
+.canonika-log-message {
   flex: 1;
-  min-width: 300px;
+  color: var(--canonika-gray);
 }
 
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  cursor: pointer;
-  user-select: none;
+.canonika-log-status {
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-xs);
+  text-transform: uppercase;
+  font-weight: var(--canonika-font-weight-medium);
 }
 
-.checkbox-input {
-  width: 1rem;
-  height: 1rem;
-  accent-color: #3b82f6;
-  cursor: pointer;
-}
-
-.checkbox-text {
-  color: #94a3b8;
-  font-size: 0.875rem;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.btn-action {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  color: #3b82f6;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-action:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-action.danger {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-}
-
-.btn-action.danger:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.2);
+/* Responsividade */
+@media (max-width: 768px) {
+  .canonika-table-container {
+    font-size: var(--canonika-font-size-xs);
+  }
+  
+  .canonika-table th,
+  .canonika-table td {
+    padding: 8px;
+  }
+  
+  .canonika-modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .canonika-modal-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 </style> 
