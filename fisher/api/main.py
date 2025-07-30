@@ -569,7 +569,7 @@ class FisherService:
                     "progress": 100,
                     "message": "Download concluído com sucesso!",
                     "local_path": str(local_path),
-                    "month_year": month_year,
+                                        "month_year": month_year,
                     "directory": str(month_dir)
                 })
                 
@@ -712,8 +712,8 @@ class FisherService:
                     "status": "error",
                     "message": f"Arquivo {filename} não encontrado na estrutura de pastas"
                 }
-                
-        except Exception as e:
+        
+    except Exception as e:
             logger.error(f"❌ Erro ao deletar arquivo {filename}: {str(e)}")
             return {
                 "status": "error",
@@ -839,7 +839,7 @@ class FisherService:
                             "month": month
                         })
                     
-                    return {
+    return {
                         "status": "success",
                         "total_available": len(all_files),
                         "downloaded": len(downloaded_files),
