@@ -140,7 +140,7 @@
 </template>
 
 <script>
-import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
+import CanonikaViewTemplate from '../../../../../shared/templates/CanonikaViewTemplate.vue'
 
 export default {
   name: 'MarketplacesView',
