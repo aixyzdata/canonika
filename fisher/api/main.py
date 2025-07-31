@@ -713,7 +713,7 @@ class FisherService:
                     "message": f"Arquivo {filename} não encontrado na estrutura de pastas"
                 }
         
-    except Exception as e:
+        except Exception as e:
             logger.error(f"❌ Erro ao deletar arquivo {filename}: {str(e)}")
             return {
                 "status": "error",
@@ -839,7 +839,7 @@ class FisherService:
                             "month": month
                         })
                     
-    return {
+                    return {
                         "status": "success",
                         "total_available": len(all_files),
                         "downloaded": len(downloaded_files),
