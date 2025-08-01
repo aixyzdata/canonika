@@ -1,0 +1,9 @@
+[submodule "quarter"]
+	path = quarter
+	url = https://github.com/aixyzdata/quarter.git
+[submodule "guardian"]
+	path = guardian
+	url = https://github.com/aixyzdata/guardian.git
+[submodule "harbor"]
+	path = harbor
+	url = https://github.com/aixyzdata/harbor.git
