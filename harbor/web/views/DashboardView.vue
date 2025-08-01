@@ -5,7 +5,7 @@
       <div class="view-title">
         <i class="fas fa-tachometer-alt"></i>
         <div class="title-content">
-          <h1>Dashboard Canonika</h1>
+          <h1>Dashboard Canonika - TESTE FINAL HOT RELOAD! ✅</h1>
           <p>Visão geral da plataforma</p>
         </div>
       </div>

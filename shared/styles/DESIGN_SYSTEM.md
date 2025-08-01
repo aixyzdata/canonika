@@ -4,6 +4,27 @@
 
 O Canonika Design System é um sistema de design unificado que padroniza todos os elementos visuais do projeto, garantindo consistência, simetria e organização em todas as views e componentes.
 
+## 🎯 Diretrizes de Componentização
+
+### ✅ **OBRIGATÓRIO: Componentização Total**
+- **TODOS** os componentes devem ser reutilizáveis
+- **NENHUM** CSS inline em componentes específicos  
+- **TODOS** os estilos devem vir do Design System
+- **ZERO** duplicação de código CSS
+
+### ✅ **OBRIGATÓRIO: Padronização Visual**
+- **Cores**: Apenas as definidas no Design System
+- **Tipografia**: Apenas as classes do Design System
+- **Espaçamentos**: Apenas as variáveis do Design System
+- **Componentes**: Apenas os templates do Design System
+
+### ✅ **OBRIGATÓRIO: Arquitetura Unificada**
+- **MasterPage**: Componente único para todos os serviços
+- **LoginTemplate**: Componente único para todos os serviços
+- **Design System**: Fonte única de verdade para estilos
+
+**📋 Para detalhes completos, veja [DIRETRIZES_COMPONENTIZACAO.md](./DIRETRIZES_COMPONENTIZACAO.md)**
+
 ## Princípios de Design
 
 ### 1. Hierarquia Visual

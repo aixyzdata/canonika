@@ -1,7 +1,7 @@
 <template>
   <CanonikaViewTemplate
-    title="Status do Quarter"
-    description="Monitoramento e Status do Sistema de Gestão de Usuários"
+    title="Status do Fisher"
+    description="Monitoramento e Status do Tripulante de Pesca"
     header-icon="fas fa-chart-line"
     status-text="ONLINE"
     :primary-action="{
@@ -119,10 +119,10 @@
 </template>
 
 <script>
-import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
+import CanonikaViewTemplate from 'shared/templates/CanonikaViewTemplate.vue'
 
 export default {
-  name: 'QuarterStatusView',
+  name: 'FisherStatusView',
   components: {
     CanonikaViewTemplate
   },
@@ -131,77 +131,77 @@ export default {
       serviceStatus: {
         status: 'ONLINE',
         description: 'Serviço funcionando normalmente',
-        uptime: '18d 12h 45m',
-        port: '3714',
-        version: '1.3.2'
+        uptime: '12d 4h 18m',
+        port: '3703',
+        version: '1.1.5'
       },
       performanceMetrics: [
         {
           id: 1,
-          name: 'Usuários Ativos',
-          value: '1.156',
-          description: 'Logados hoje',
-          icon: 'fas fa-users'
+          name: 'Missões por Hora',
+          value: '8.5',
+          description: 'Média dos últimos 60 minutos',
+          icon: 'fas fa-rocket'
         },
         {
           id: 2,
-          name: 'Novos Registros',
-          value: '89',
-          description: 'Registrados hoje',
-          icon: 'fas fa-user-plus'
+          name: 'Dados Processados',
+          value: '2.3GB',
+          description: 'Volume processado hoje',
+          icon: 'fas fa-database'
         },
         {
           id: 3,
           name: 'Taxa de Sucesso',
-          value: '99.2%',
-          description: 'Logins bem-sucedidos',
+          value: '94.2%',
+          description: 'Missões bem-sucedidas',
           icon: 'fas fa-check-circle'
         },
         {
           id: 4,
-          name: 'Administradores',
+          name: 'Fontes Ativas',
           value: '12',
-          description: 'Usuários admin ativos',
-          icon: 'fas fa-shield-alt'
+          description: 'Fontes de dados ativas',
+          icon: 'fas fa-fish'
         }
       ],
       recentLogs: [
         {
           id: 1,
           level: 'success',
-          title: 'Novo usuário registrado',
-          message: 'João Silva criou sua conta com sucesso',
-          timestamp: '2025-07-27 23:50:15',
+          title: 'Missão concluída',
+          message: 'Pesca de dados da Receita Federal concluída com sucesso',
+          timestamp: '2025-07-27 23:48:22',
           icon: 'fas fa-check-circle'
         },
         {
           id: 2,
           level: 'info',
-          title: 'Login realizado',
-          message: 'Maria Santos fez login no sistema',
-          timestamp: '2025-07-27 23:48:30',
+          title: 'Nova fonte adicionada',
+          message: 'Fonte Open Food Facts configurada e testada',
+          timestamp: '2025-07-27 23:45:10',
           icon: 'fas fa-info-circle'
         },
         {
           id: 3,
           level: 'warning',
-          title: 'Tentativa de login falhou',
-          message: 'Tentativa de login com credenciais inválidas',
-          timestamp: '2025-07-27 23:45:12',
+          title: 'Fonte temporariamente indisponível',
+          message: 'API da Receita Federal com resposta lenta',
+          timestamp: '2025-07-27 23:42:05',
           icon: 'fas fa-exclamation-triangle'
         }
       ],
       systemConfigs: [
         {
           id: 1,
-          name: 'Timeout de Sessão',
-          value: '24 horas',
+          name: 'Intervalo de Pesca',
+          value: '30min',
           status: 'Ativo'
         },
         {
           id: 2,
-          name: 'Política de Senhas',
-          value: 'Mínimo 8 caracteres',
+          name: 'Retry Policy',
+          value: '3 tentativas',
           status: 'Configurado'
         },
         {
@@ -212,7 +212,7 @@ export default {
         },
         {
           id: 4,
-          name: 'Auto Backup',
+          name: 'Auto Recovery',
           value: 'Enabled',
           status: 'Ativo'
         }
@@ -221,7 +221,7 @@ export default {
   },
   methods: {
     refreshStatus() {
-      console.log('Refreshing Quarter status...')
+      console.log('Refreshing Fisher status...')
       // Aqui você implementaria a chamada real para a API
     }
   }
@@ -229,5 +229,5 @@ export default {
 </script>
 
 <style>
-@import '../../../../shared/styles/canonika-view.css';
+@import '../../../shared/styles/canonika-view.css';
 </style> 

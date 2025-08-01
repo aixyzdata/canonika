@@ -1,0 +1,108 @@
+services:
+  # Banco de dados principal
+  postgres:
+    image: postgres:15
+    container_name: canonika_postgres
+    environment:
+      POSTGRES_USER: canonika
+      POSTGRES_PASSWORD: canonika
+      POSTGRES_DB: canonika
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Cache e filas
+  redis:
+    image: redis:7
+    container_name: canonika_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # Harbor com Hot Reload
+  harbor-dev:
+    build: 
+      context: ./harbor
+      dockerfile: Dockerfile.dev
+    container_name: canonika_harbor_dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./harbor/web:/app
+      - ./shared/styles:/app/shared/styles
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # Nginx para proxy do Harbor Dev
+  harbor-nginx:
+    image: nginx:1.25-alpine
+    container_name: canonika_harbor_nginx
+    ports:
+      - "3701:80"
+    volumes:
+      - ./harbor/nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - harbor-dev
+    restart: unless-stopped
+
+  fisher:
+    build: ./fisher
+    container_name: canonika_fisher
+    ports:
+      - "7724:7724"
+    volumes:
+      - ./fisher/api:/app
+      - fisher_data:/app/data
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  skipper:
+    build: ./skipper
+    container_name: canonika_skipper
+    ports:
+      - "3702:80"
+    volumes:
+      - ./shared/styles:/usr/share/nginx/html/shared/styles
+      - ./skipper/web:/usr/share/nginx/html
+      - ./skipper/api:/app/api
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  tollgate:
+    build: ./tollgate
+    container_name: canonika_tollgate
+    ports:
+      - "3703:80"
+    volumes:
+      - ./shared/styles:/usr/share/nginx/html/shared/styles
+      - ./tollgate/web:/usr/share/nginx/html
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  quarter:
+    build: ./quarter
+    container_name: canonika_quarter
+    ports:
+      - "3704:80"
+    volumes:
+      - ./shared/styles:/usr/share/nginx/html/shared/styles
+      - ./quarter/web:/usr/share/nginx/html
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  fisher_data: 

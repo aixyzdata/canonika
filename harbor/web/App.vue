@@ -53,6 +53,19 @@
         
         <div class="sidebar-nav">
           <ul class="nav flex-column">
+            <!-- Teste de Navegação -->
+            <li class="nav-item">
+              <router-link class="nav-link" to="/test" @click="handleNavClick">
+                <div class="nav-icon">
+                  <i class="fas fa-vial"></i>
+                </div>
+                <div class="nav-text">
+                  <div class="nav-title">Teste</div>
+                  <div class="service-subtitle">Teste de Navegação</div>
+                </div>
+              </router-link>
+            </li>
+            
             <!-- Explorer -->
             <li class="nav-item">
               <router-link class="nav-link" to="/explorer" @click="handleNavClick">
@@ -591,57 +604,7 @@
       </nav>
       
       <main :class="['main-content', { 'sidebar-collapsed': sidebarCollapsed && user }]">
-        <div v-if="!user" class="login-container">
-          <div class="login-card">
-            <div class="login-header">
-              <div class="login-logo">
-                <div class="logo-hexagon-large"></div>
-                <div class="logo-pulse-large"></div>
-              </div>
-              <h2 class="login-title">Portal Canonika</h2>
-              <p class="login-subtitle">Acesso unificado à plataforma</p>
-            </div>
-            
-            <form @submit.prevent="login" class="login-form">
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.email" 
-                    type="email"
-                    class="form-input" 
-                    placeholder="Email"
-                    required 
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.password" 
-                    type="password"
-                    class="form-input" 
-                    placeholder="Senha"
-                    required 
-                  />
-                </div>
-              </div>
-              <div v-if="error" class="error-message">
-                {{ error }}
-              </div>
-              <button type="submit" class="login-btn">
-                <span>ENTRAR</span>
-                <div class="btn-glow"></div>
-              </button>
-            </form>
-          </div>
-        </div>
-        <router-view v-if="user" />
+        <router-view />
         
         <!-- Teste de Hot Reload -->
         <div class="hot-reload-test" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 1rem; border-radius: 0.5rem; color: white; font-size: 0.8rem; border: 1px solid #475569;">
@@ -656,7 +619,6 @@
 
 <script>
 import { services } from './services.js'
-
 export default {
   name: 'App',
   data() {
@@ -691,6 +653,8 @@ export default {
     this.loadAuthState();
   },
   methods: {
+
+    
     async login() {
       this.error = null;
       try {
@@ -712,6 +676,8 @@ export default {
       this.user = null;
       // Limpar estado de autenticação
       this.clearAuthState();
+      // Redirecionar para o Quarter (ponto de entrada)
+      window.location.href = 'http://localhost:80';
     },
     saveAuthState() {
       if (this.user) {

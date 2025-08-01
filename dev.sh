@@ -10,7 +10,8 @@ echo "=================================="
 show_help() {
     echo ""
     echo "Comandos disponíveis:"
-    echo "  start     - Inicia o ambiente de desenvolvimento"
+    echo "  start     - Inicia o ambiente de desenvolvimento (produção)"
+    echo "  dev       - Inicia o ambiente com hot reload"
     echo "  stop      - Para todos os containers"
     echo "  restart   - Reinicia todos os containers"
     echo "  logs      - Mostra logs dos containers"
@@ -23,7 +24,7 @@ show_help() {
 
 # Função para iniciar desenvolvimento
 start_dev() {
-    echo "📦 Iniciando ambiente de desenvolvimento..."
+    echo "📦 Iniciando ambiente de desenvolvimento (produção)..."
     docker-compose up -d
     echo "✅ Ambiente iniciado! Acesse os módulos:"
     echo "   Harbor: http://localhost:3701"
@@ -37,10 +38,29 @@ start_dev() {
     echo "💡 Dica: Use 'logs' para ver logs em tempo real"
 }
 
+# Função para iniciar desenvolvimento com hot reload
+start_dev_hot() {
+    echo "🔥 Iniciando ambiente de desenvolvimento com HOT RELOAD..."
+    docker-compose -f docker-compose.dev.yml up -d
+    echo "✅ Ambiente com hot reload iniciado! Acesse os módulos:"
+    echo "   Harbor (Hot Reload): http://localhost:3701"
+    echo "   Vite Dev Server: http://localhost:5173"
+    echo "   Skipper: http://localhost:3702"
+    echo "   Tollgate: http://localhost:3703"
+    echo "   Quarter: http://localhost:3704"
+    echo ""
+    echo "🗄️  Banco de dados: localhost:5432"
+    echo "🔴 Redis: localhost:6379"
+    echo ""
+    echo "🔥 Hot Reload ativo - mudanças nos arquivos Vue serão refletidas automaticamente!"
+    echo "💡 Dica: Use 'logs' para ver logs em tempo real"
+}
+
 # Função para parar
 stop_dev() {
     echo "🛑 Parando ambiente de desenvolvimento..."
     docker-compose down
+    docker-compose -f docker-compose.dev.yml down
     echo "✅ Ambiente parado!"
 }
 
@@ -76,6 +96,7 @@ rebuild_dev() {
 clean_dev() {
     echo "🧹 Limpando ambiente..."
     docker-compose down -v
+    docker-compose -f docker-compose.dev.yml down -v
     docker system prune -f
     echo "✅ Ambiente limpo!"
 }
@@ -90,6 +111,9 @@ fi
 case "$1" in
     "start")
         start_dev
+        ;;
+    "dev")
+        start_dev_hot
         ;;
     "stop")
         stop_dev

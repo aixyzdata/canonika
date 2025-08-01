@@ -6,6 +6,13 @@ export default [
     component: () => import('./views/DashboardView.vue')
   },
   
+  // Teste de Navegação
+  {
+    path: '/test',
+    name: 'Test',
+    component: () => import('./views/TestView.vue')
+  },
+  
   // Explorer - Interface de pesquisa
   {
     path: '/explorer',
@@ -13,229 +20,229 @@ export default [
     component: () => import('./views/ExplorerView.vue')
   },
   
-  // Diver - Primeiro item do menu
+  // Diver - Placeholder (não existe ainda)
   {
     path: '/diver',
     name: 'Diver',
-    component: () => import('../../diver/web/src/views/DiverView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/diver/status',
     name: 'DiverStatus',
-    component: () => import('../../diver/web/src/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Fisher - Pesca de dados
+  // Fisher - Views centralizadas no Harbor
   {
     path: '/fisher',
     name: 'Fisher',
-    component: () => import('../../fisher/web/src/views/FisherView.vue')
+    component: () => import('./views/Fisher/FisherView.vue')
   },
   {
     path: '/fisher/status',
     name: 'FisherStatus',
-    component: () => import('../../fisher/web/src/views/StatusView.vue')
+    component: () => import('./views/Fisher/StatusView.vue')
   },
   {
     path: '/fisher/sefaz',
     name: 'FisherSefaz',
-    component: () => import('../../fisher/web/src/views/sources/SefazView.vue')
+    component: () => import('./views/Fisher/sources/SefazView.vue')
   },
   {
     path: '/fisher/marketplaces',
     name: 'FisherMarketplaces',
-    component: () => import('../../fisher/web/src/views/sources/MarketplacesView.vue')
+    component: () => import('./views/Fisher/sources/MarketplacesView.vue')
   },
   {
     path: '/fisher/apis',
     name: 'FisherApis',
-    component: () => import('../../fisher/web/src/views/sources/ApisView.vue')
+    component: () => import('./views/Fisher/sources/ApisView.vue')
   },
   {
     path: '/fisher/databases',
     name: 'FisherDatabases',
-    component: () => import('../../fisher/web/src/views/sources/DatabasesView.vue')
+    component: () => import('./views/Fisher/sources/DatabasesView.vue')
   },
   {
     path: '/fisher/scraping',
     name: 'FisherScraping',
-    component: () => import('../../fisher/web/src/views/sources/ScrapingView.vue')
+    component: () => import('./views/Fisher/sources/ScrapingView.vue')
   },
   {
     path: '/fisher/files',
     name: 'FisherFiles',
-    component: () => import('../../fisher/web/src/views/sources/FilesView.vue')
+    component: () => import('./views/Fisher/sources/FilesView.vue')
   },
   
-  // Skipper
+  // Skipper - Views reais do microserviço
   {
     path: '/skipper',
     name: 'Skipper',
-    component: () => import('../../skipper/web/src/views/Dashboard.vue')
+    component: () => import('skipper/views/DashboardView.vue')
   },
   {
     path: '/skipper/status',
     name: 'SkipperStatus',
-    component: () => import('../../skipper/web/src/views/Dashboard.vue')
+    component: () => import('skipper/views/DashboardView.vue')
   },
   {
     path: '/skipper/simulacao',
     name: 'SkipperSimulacao',
-    component: () => import('../../skipper/web/src/views/Simulacao.vue')
+    component: () => import('skipper/views/Simulacao.vue')
   },
   {
     path: '/skipper/fontes',
     name: 'SkipperFontes',
-    component: () => import('../../skipper/web/src/views/Fontes.vue')
+    component: () => import('skipper/views/Fontes.vue')
   },
   {
     path: '/skipper/analises',
     name: 'SkipperAnalises',
-    component: () => import('../../skipper/web/src/views/Analises.vue')
+    component: () => import('skipper/views/Analises.vue')
   },
   {
     path: '/skipper/extracao',
     name: 'SkipperExtracao',
-    component: () => import('../../skipper/web/src/views/Extracao.vue')
+    component: () => import('skipper/views/Extracao.vue')
   },
   
-  // Ledger
+  // Ledger - Placeholder (não existe ainda)
   {
     path: '/ledger',
     name: 'Ledger',
-    component: () => import('../../ledger/web/src/views/Dashboard.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/ledger/status',
     name: 'LedgerStatus',
-    component: () => import('../../ledger/web/src/views/Dashboard.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/ledger/lancamentos',
     name: 'LedgerLancamentos',
-    component: () => import('../../ledger/web/src/views/Lancamentos.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/ledger/relatorios',
     name: 'LedgerRelatorios',
-    component: () => import('../../ledger/web/src/views/Relatorios.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Tollgate
+  // Tollgate - Placeholder (não existe ainda)
   {
     path: '/tollgate',
     name: 'Tollgate',
-    component: () => import('../../tollgate/web/src/views/Dashboard.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/tollgate/status',
     name: 'TollgateStatus',
-    component: () => import('../../tollgate/web/src/views/Dashboard.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/tollgate/pedagios',
     name: 'TollgatePedagios',
-    component: () => import('../../tollgate/web/src/views/Pedagios.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/tollgate/auditoria',
     name: 'TollgateAuditoria',
-    component: () => import('../../tollgate/web/src/views/Auditoria.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Quarter
+  // Quarter - Placeholder (não existe ainda)
   {
     path: '/quarter',
     name: 'Quarter',
-    component: () => import('../../quarter/web/src/views/Dashboard.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/quarter/status',
     name: 'QuarterStatus',
-    component: () => import('../../quarter/web/src/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Dock
+  // Dock - Placeholder (não existe ainda)
   {
     path: '/dock',
     name: 'Dock',
-    component: () => import('../../dock/views/DockView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/dock/status',
     name: 'DockStatus',
-    component: () => import('../../dock/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Beacon
+  // Beacon - Placeholder (não existe ainda)
   {
     path: '/beacon',
     name: 'Beacon',
-    component: () => import('../../beacon/views/BeaconView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/beacon/status',
     name: 'BeaconStatus',
-    component: () => import('../../beacon/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Echo
+  // Echo - Placeholder (não existe ainda)
   {
     path: '/echo',
     name: 'Echo',
-    component: () => import('../../echo/views/EchoView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/echo/status',
     name: 'EchoStatus',
-    component: () => import('../../echo/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Guardian
+  // Guardian - Placeholder (não existe ainda)
   {
     path: '/guardian',
     name: 'Guardian',
-    component: () => import('../../guardian/views/GuardianView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/guardian/status',
     name: 'GuardianStatus',
-    component: () => import('../../guardian/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Mapmaker
+  // Mapmaker - Placeholder (não existe ainda)
   {
     path: '/mapmaker',
     name: 'Mapmaker',
-    component: () => import('../../mapmaker/views/MapmakerView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/mapmaker/status',
     name: 'MapmakerStatus',
-    component: () => import('../../mapmaker/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Seagull
+  // Seagull - Placeholder (não existe ainda)
   {
     path: '/seagull',
     name: 'Seagull',
-    component: () => import('../../seagull/views/SeagullView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/seagull/status',
     name: 'SeagullStatus',
-    component: () => import('../../seagull/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   
-  // Wayfinder
+  // Wayfinder - Placeholder (não existe ainda)
   {
     path: '/wayfinder',
     name: 'Wayfinder',
-    component: () => import('../../wayfinder/views/WayfinderView.vue')
+    component: () => import('./views/DashboardView.vue')
   },
   {
     path: '/wayfinder/status',
     name: 'WayfinderStatus',
-    component: () => import('../../wayfinder/views/StatusView.vue')
+    component: () => import('./views/DashboardView.vue')
   }
 ] 

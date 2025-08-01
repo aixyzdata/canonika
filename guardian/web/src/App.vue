@@ -23,6 +23,10 @@
             </div>
             <span class="user-name">{{ user.name }}</span>
             <div class="user-menu">
+              <button @click="openKeycloakAccount" class="account-btn">
+                <i class="fas fa-user-cog"></i>
+                Conta
+              </button>
               <button @click="logout" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i>
                 Sair
@@ -38,23 +42,13 @@
       <div class="header-glow"></div>
     </header>
 
-    <div class="canonika-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
-      <!-- Toggle button para menu retrátil -->
-      <button 
-        v-if="user" 
-        @click="toggleSidebar" 
-        class="sidebar-toggle"
-        :class="{ 'sidebar-collapsed': sidebarCollapsed }"
-      >
-        <i class="fas fa-bars"></i>
-      </button>
-
+    <div class="canonika-layout">
       <!-- Sidebar futurista -->
-      <nav class="canonika-sidebar" v-if="user" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+      <nav class="canonika-sidebar">
         <div class="sidebar-header">
           <div class="nav-icon active">
             <i class="nav-dot"></i>
-            <span v-if="!sidebarCollapsed">NAVEGAÇÃO</span>
+            <span>SEGURANÇA</span>
           </div>
         </div>
         <ul class="nav-menu">
@@ -63,245 +57,281 @@
               <div class="nav-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
-              <div v-if="!sidebarCollapsed" class="nav-text">
+              <div class="nav-text">
                 <span class="nav-title">Dashboard</span>
               </div>
             </div>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'seguranca' }">
-            <div class="nav-link" @click="setView('seguranca')">
+          <li class="nav-item" :class="{ active: currentView === 'keycloak-admin' }">
+            <div class="nav-link" @click="setView('keycloak-admin')">
+              <div class="nav-icon">
+                <i class="fas fa-users-cog"></i>
+              </div>
+              <div class="nav-text">
+                <span class="nav-title">Keycloak Admin</span>
+                <span class="service-subtitle">Gestão de Usuários</span>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item" :class="{ active: currentView === 'autenticacao' }">
+            <div class="nav-link" @click="setView('autenticacao')">
+              <div class="nav-icon">
+                <i class="fas fa-key"></i>
+              </div>
+              <div class="nav-text">
+                <span class="nav-title">Autenticação</span>
+                <span class="service-subtitle">Login & MFA</span>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item" :class="{ active: currentView === 'autorizacao' }">
+            <div class="nav-link" @click="setView('autorizacao')">
               <div class="nav-icon">
                 <i class="fas fa-shield-alt"></i>
               </div>
-              <div v-if="!sidebarCollapsed" class="nav-text">
-                <span class="nav-title">Segurança</span>
-                <span class="service-subtitle">Proteção</span>
+              <div class="nav-text">
+                <span class="nav-title">Autorização</span>
+                <span class="service-subtitle">OPA & Políticas</span>
               </div>
             </div>
           </li>
-          <li class="nav-item" :class="{ active: currentView === 'vigilancia' }">
-            <div class="nav-link" @click="setView('vigilancia')">
+          <li class="nav-item" :class="{ active: currentView === 'sessoes' }">
+            <div class="nav-link" @click="setView('sessoes')">
               <div class="nav-icon">
-                <i class="fas fa-video"></i>
+                <i class="fas fa-clock"></i>
               </div>
-              <div v-if="!sidebarCollapsed" class="nav-text">
-                <span class="nav-title">Vigilância</span>
-                <span class="service-subtitle">Monitoramento</span>
-              </div>
-            </div>
-          </li>
-          <li class="nav-item" :class="{ active: currentView === 'controle' }">
-            <div class="nav-link" @click="setView('controle')">
-              <div class="nav-icon">
-                <i class="fas fa-lock"></i>
-              </div>
-              <div v-if="!sidebarCollapsed" class="nav-text">
-                <span class="nav-title">Controle</span>
-                <span class="service-subtitle">Acesso</span>
+              <div class="nav-text">
+                <span class="nav-title">Sessões</span>
+                <span class="service-subtitle">Controle Ativo</span>
               </div>
             </div>
           </li>
           <li class="nav-item" :class="{ active: currentView === 'auditoria' }">
             <div class="nav-link" @click="setView('auditoria')">
               <div class="nav-icon">
-                <i class="fas fa-clipboard-check"></i>
+                <i class="fas fa-file-alt"></i>
               </div>
-              <div v-if="!sidebarCollapsed" class="nav-text">
+              <div class="nav-text">
                 <span class="nav-title">Auditoria</span>
-                <span class="service-subtitle">Logs</span>
+                <span class="service-subtitle">Logs & Relatórios</span>
               </div>
             </div>
           </li>
         </ul>
       </nav>
 
-      <!-- Main content -->
-      <main class="canonika-main" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
-
-        <!-- Login Screen -->
-        <div v-if="!user" class="login-container">
-          <div class="login-card">
-            <div class="login-header">
-              <div class="login-logo">
-                <div class="logo-hexagon-large"></div>
-                <div class="logo-pulse-large"></div>
-              </div>
-              <h2 class="login-title">Portal Canonika</h2>
-              <p class="login-subtitle">Acesso unificado à plataforma</p>
-            </div>
-            
-            <form @submit.prevent="login" class="login-form">
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.email" 
-                    type="email"
-                    class="form-input" 
-                    placeholder="Email"
-                    required 
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.password" 
-                    type="password"
-                    class="form-input" 
-                    placeholder="Senha"
-                    required 
-                  />
-                </div>
-              </div>
-              <div v-if="error" class="error-message">
-                {{ error }}
-              </div>
-              <button type="submit" class="login-btn">
-                <span>ENTRAR</span>
-                <div class="btn-glow"></div>
-              </button>
-            </form>
-          </div>
-        </div>
-
+      <!-- Conteúdo principal -->
+      <main class="canonika-main">
         <!-- Dashboard -->
-        <div v-else-if="currentView === 'dashboard'" class="dashboard-container">
-          <div class="dashboard-header">
-            <h1>Guardian Dashboard</h1>
-            <p>Sistema de segurança e controle de acesso</p>
+        <div v-if="currentView === 'dashboard'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Dashboard de Segurança</h2>
+            <p class="view-subtitle">Monitoramento centralizado do sistema de segurança Canonika</p>
           </div>
           
           <div class="dashboard-grid">
-            <!-- Status do Sistema -->
-            <div class="dashboard-card">
+            <!-- Status dos Serviços -->
+            <div class="canonika-card">
               <div class="card-header">
-                <h3>Status do Sistema</h3>
-                <div class="card-icon">
-                  <i class="fas fa-shield-alt"></i>
+                <h3 class="card-title">Status dos Serviços</h3>
+                <div class="card-actions">
+                  <button @click="refreshStatus" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                    Atualizar
+                  </button>
                 </div>
               </div>
               <div class="card-content">
-                <div class="service-status-list">
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Sistema de Segurança</span>
-                    <span class="service-port">Ativo</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Controle de Acesso</span>
-                    <span class="service-port">Conectado</span>
-                  </div>
-                  <div class="service-status online">
-                    <span class="status-dot"></span>
-                    <span class="service-name">Sistema de Auditoria</span>
-                    <span class="service-port">Executando</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Estatísticas de Segurança -->
-            <div class="dashboard-card">
-              <div class="card-header">
-                <h3>Estatísticas de Segurança</h3>
-                <div class="card-icon">
-                  <i class="fas fa-chart-bar"></i>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <div class="stat-value">247</div>
-                    <div class="stat-label">Acessos Hoje</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">7</div>
-                    <div class="stat-label">Alertas Segurança</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">99.7%</div>
-                    <div class="stat-label">Integridade</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">24/7</div>
-                    <div class="stat-label">Monitoramento</div>
+                <div class="service-status-grid">
+                  <div class="service-status" v-for="service in serviceStatus" :key="service.name">
+                    <div class="status-icon" :class="service.status">
+                      <i :class="service.icon"></i>
+                    </div>
+                    <div class="status-info">
+                      <span class="service-name">{{ service.name }}</span>
+                      <span class="status-text">{{ service.statusText }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Ações Rápidas -->
-            <div class="dashboard-card">
+            <div class="canonika-card">
               <div class="card-header">
-                <h3>Ações Rápidas</h3>
-                <div class="card-icon">
-                  <i class="fas fa-bolt"></i>
-                </div>
+                <h3 class="card-title">Ações Rápidas</h3>
               </div>
               <div class="card-content">
                 <div class="quick-actions">
-                  <button @click="setView('seguranca')" class="quick-action-btn">
+                  <button @click="openKeycloakAdmin" class="canonika-btn canonika-btn-primary">
+                    <i class="fas fa-users-cog"></i>
+                    Keycloak Admin
+                  </button>
+                  <button @click="openKeycloakAccount" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-user-cog"></i>
+                    Minha Conta
+                  </button>
+                  <button @click="openOPAPolicies" class="canonika-btn canonika-btn-secondary">
                     <i class="fas fa-shield-alt"></i>
-                    Configurar Segurança
+                    Políticas OPA
                   </button>
-                  <button @click="setView('vigilancia')" class="quick-action-btn">
-                    <i class="fas fa-video"></i>
-                    Ver Vigilância
-                  </button>
-                  <button @click="setView('controle')" class="quick-action-btn">
-                    <i class="fas fa-lock"></i>
-                    Controle Acesso
-                  </button>
-                  <button @click="setView('auditoria')" class="quick-action-btn">
-                    <i class="fas fa-clipboard-check"></i>
-                    Relatório Auditoria
+                  <button @click="openAuditLogs" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-file-alt"></i>
+                    Logs de Auditoria
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Atividade Recente -->
-            <div class="dashboard-card">
+        <!-- Keycloak Admin -->
+        <div v-if="currentView === 'keycloak-admin'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Keycloak Admin Console</h2>
+            <p class="view-subtitle">Gestão centralizada de usuários, grupos e permissões</p>
+          </div>
+          
+          <div class="keycloak-admin-container">
+            <div class="admin-actions">
+              <button @click="openKeycloakAdmin" class="canonika-btn canonika-btn-primary">
+                <i class="fas fa-external-link-alt"></i>
+                Abrir Admin Console
+              </button>
+              <button @click="openKeycloakAccount" class="canonika-btn canonika-btn-secondary">
+                <i class="fas fa-user-cog"></i>
+                Account Console
+              </button>
+            </div>
+            
+            <div class="admin-info">
+              <div class="info-card">
+                <h4>URL do Admin Console</h4>
+                <p>http://localhost:8080/admin</p>
+                <p><strong>Credenciais:</strong> admin / admin123</p>
+                <p><strong>Realm:</strong> canonika</p>
+                <p><strong>Usuário Canonika:</strong> admin@canonika.io</p>
+              </div>
+              <div class="info-card">
+                <h4>Funcionalidades Disponíveis</h4>
+                <ul>
+                  <li>Gestão de usuários e grupos</li>
+                  <li>Configuração de roles e permissões</li>
+                  <li>Gerenciamento de clientes (apps)</li>
+                  <li>Controle de sessões ativas</li>
+                  <li>Configuração de políticas de segurança</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Autenticação -->
+        <div v-if="currentView === 'autenticacao'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Sistema de Autenticação</h2>
+            <p class="view-subtitle">Configuração e monitoramento de login, MFA e segurança</p>
+          </div>
+          
+          <div class="auth-container">
+            <div class="canonika-card">
               <div class="card-header">
-                <h3>Atividade Recente</h3>
-                <div class="card-icon">
-                  <i class="fas fa-clock"></i>
+                <h3 class="card-title">Métodos de Autenticação</h3>
+              </div>
+              <div class="card-content">
+                <div class="auth-method" v-for="method in authMethods" :key="method.name">
+                  <div class="method-icon">
+                    <i :class="method.icon"></i>
+                  </div>
+                  <div class="method-info">
+                    <span class="method-name">{{ method.name }}</span>
+                    <span class="method-status" :class="method.status">{{ method.statusText }}</span>
+                  </div>
+                  <button @click="toggleAuthMethod(method)" class="canonika-btn canonika-btn-small">
+                    {{ method.status === 'enabled' ? 'Desativar' : 'Ativar' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Autorização -->
+        <div v-if="currentView === 'autorizacao'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Sistema de Autorização</h2>
+            <p class="view-subtitle">Políticas OPA e controle de acesso granular</p>
+          </div>
+          
+          <div class="authorization-container">
+            <div class="canonika-card">
+              <div class="card-header">
+                <h3 class="card-title">Políticas OPA</h3>
+                <div class="card-actions">
+                  <button @click="openOPAPolicies" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-external-link-alt"></i>
+                    Abrir OPA
+                  </button>
                 </div>
               </div>
               <div class="card-content">
-                <div class="activity-list">
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Alerta de segurança resolvido</div>
-                      <div class="activity-time">5 minutos atrás</div>
-                    </div>
+                <div class="policy-status">
+                  <div class="status-item">
+                    <span class="status-label">Status OPA:</span>
+                    <span class="status-value online">Online</span>
                   </div>
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-lock"></i>
-                    </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Acesso autorizado - Setor A</div>
-                      <div class="activity-time">13 minutos atrás</div>
-                    </div>
+                  <div class="status-item">
+                    <span class="status-label">Políticas Carregadas:</span>
+                    <span class="status-value">{{ opaStats.loadedPolicies }}</span>
                   </div>
-                  <div class="activity-item">
-                    <div class="activity-icon">
-                      <i class="fas fa-video"></i>
+                  <div class="status-item">
+                    <span class="status-label">Decisões/Minuto:</span>
+                    <span class="status-value">{{ opaStats.decisionsPerMinute }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sessões -->
+        <div v-if="currentView === 'sessoes'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Controle de Sessões</h2>
+            <p class="view-subtitle">Monitoramento e gestão de sessões ativas</p>
+          </div>
+          
+          <div class="sessions-container">
+            <div class="canonika-card">
+              <div class="card-header">
+                <h3 class="card-title">Sessões Ativas</h3>
+                <div class="card-actions">
+                  <button @click="refreshSessions" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                    Atualizar
+                  </button>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="sessions-list">
+                  <div class="session-item" v-for="session in activeSessions" :key="session.id">
+                    <div class="session-info">
+                      <div class="session-user">
+                        <div class="user-avatar small">
+                          <span>{{ session.user.charAt(0).toUpperCase() }}</span>
+                        </div>
+                        <span class="user-name">{{ session.user }}</span>
+                      </div>
+                      <div class="session-details">
+                        <span class="session-ip">{{ session.ip }}</span>
+                        <span class="session-time">{{ session.lastActivity }}</span>
+                      </div>
                     </div>
-                    <div class="activity-content">
-                      <div class="activity-title">Câmera 7 reativada</div>
-                      <div class="activity-time">28 minutos atrás</div>
+                    <div class="session-actions">
+                      <button @click="terminateSession(session.id)" class="canonika-btn canonika-btn-danger canonika-btn-small">
+                        <i class="fas fa-times"></i>
+                        Encerrar
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -310,39 +340,41 @@
           </div>
         </div>
 
-        <!-- Service Views -->
-        <div v-else class="dashboard-container">
-          <div class="dashboard-header">
-            <h1>{{ getServiceTitle() }}</h1>
-            <p>{{ getServiceDescription() }}</p>
+        <!-- Auditoria -->
+        <div v-if="currentView === 'auditoria'" class="canonika-view">
+          <div class="view-header">
+            <h2 class="view-title">Logs de Auditoria</h2>
+            <p class="view-subtitle">Monitoramento de atividades e eventos de segurança</p>
           </div>
           
-          <div class="dashboard-grid">
-            <div class="dashboard-card">
+          <div class="audit-container">
+            <div class="canonika-card">
               <div class="card-header">
-                <h3>{{ getServiceTitle() }}</h3>
-                <div class="card-icon">
-                  <i class="fas fa-cog"></i>
+                <h3 class="card-title">Eventos Recentes</h3>
+                <div class="card-actions">
+                  <button @click="openAuditLogs" class="canonika-btn canonika-btn-secondary">
+                    <i class="fas fa-external-link-alt"></i>
+                    Ver Todos
+                  </button>
                 </div>
               </div>
               <div class="card-content">
-                <div class="view-header">
-                  <div class="view-status">
-                    <div class="status-indicator online"></div>
-                    <span>ONLINE</span>
-                  </div>
-                  <div class="view-actions">
-                    <button @click="refreshServiceData()" class="action-btn">
-                      <i class="fas fa-sync-alt"></i>
-                      Atualizar
-                    </button>
-                  </div>
-                </div>
-                <div class="service-info">
-                  <p>{{ getServiceDescription() }}</p>
-                  <div class="service-status">
-                    <div class="status-dot online"></div>
-                    <span>Serviço Online</span>
+                <div class="audit-events">
+                  <div class="event-item" v-for="event in auditEvents" :key="event.id" :class="event.level">
+                    <div class="event-icon">
+                      <i :class="event.icon"></i>
+                    </div>
+                    <div class="event-content">
+                      <div class="event-header">
+                        <span class="event-service">{{ event.service }}</span>
+                        <span class="event-time">{{ event.timestamp }}</span>
+                      </div>
+                      <div class="event-message">{{ event.message }}</div>
+                      <div class="event-details">
+                        <span class="event-user">{{ event.user }}</span>
+                        <span class="event-ip">{{ event.ip }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -356,871 +388,383 @@
 
 <script>
 export default {
-  name: 'App',
+  name: 'GuardianApp',
   data() {
     return {
-      user: null,
-      loginForm: {
+      user: {
+        name: 'Administrador Canonika',
         email: 'admin@canonika.io',
-        password: 'Admin@123'
+        roles: ['canonika_admin', 'security_admin']
       },
-      error: null,
       currentView: 'dashboard',
-      sidebarCollapsed: false
+      
+      // Status dos serviços
+      serviceStatus: [
+        { name: 'Keycloak', status: 'online', statusText: 'Online', icon: 'fas fa-users-cog' },
+        { name: 'OPA', status: 'online', statusText: 'Online', icon: 'fas fa-shield-alt' },
+        { name: 'ClickHouse', status: 'online', statusText: 'Online', icon: 'fas fa-database' },
+        { name: 'Redis', status: 'online', statusText: 'Online', icon: 'fas fa-memory' }
+      ],
+      
+      // Métodos de autenticação
+      authMethods: [
+        { name: 'Login/Password', status: 'enabled', statusText: 'Ativo', icon: 'fas fa-key' },
+        { name: 'MFA/TOTP', status: 'enabled', statusText: 'Ativo', icon: 'fas fa-mobile-alt' },
+        { name: 'WebAuthn', status: 'disabled', statusText: 'Inativo', icon: 'fas fa-fingerprint' },
+        { name: 'SAML', status: 'disabled', statusText: 'Inativo', icon: 'fas fa-exchange-alt' }
+      ],
+      
+      // Estatísticas OPA
+      opaStats: {
+        loadedPolicies: 15,
+        decisionsPerMinute: 245
+      },
+      
+      // Sessões ativas
+      activeSessions: [
+        { id: 1, user: 'admin', ip: '192.168.1.100', lastActivity: '2 min atrás' },
+        { id: 2, user: 'user1', ip: '192.168.1.101', lastActivity: '5 min atrás' },
+        { id: 3, user: 'user2', ip: '192.168.1.102', lastActivity: '10 min atrás' }
+      ],
+      
+      // Eventos de auditoria
+      auditEvents: [
+        { id: 1, level: 'info', service: 'keycloak', message: 'Usuário admin fez login', user: 'admin', ip: '192.168.1.100', timestamp: '2 min atrás', icon: 'fas fa-sign-in-alt' },
+        { id: 2, level: 'warn', service: 'opa', message: 'Tentativa de acesso negada', user: 'user1', ip: '192.168.1.101', timestamp: '5 min atrás', icon: 'fas fa-ban' },
+        { id: 3, level: 'error', service: 'guardian', message: 'Falha na conexão com OPA', user: 'system', ip: 'localhost', timestamp: '10 min atrás', icon: 'fas fa-exclamation-triangle' }
+      ]
     }
   },
+  
   methods: {
-    async login() {
-      this.error = null;
-      try {
-        // Simular login bem-sucedido
-        this.user = {
-          id: 'admin-001',
-          name: 'Administrador',
-          email: this.loginForm.email,
-          roles: ['admin']
-        };
-        this.currentView = 'dashboard';
-        this.loginForm = { email: '', password: '' };
-      } catch (e) {
-        this.error = e.message;
-      }
+    setView(view) {
+      this.currentView = view
     },
     
     logout() {
-      this.user = null;
-      this.currentView = 'dashboard';
+      window.location.href = 'http://localhost:8080/auth/realms/canonika/protocol/openid-connect/logout'
     },
     
-    setView(view) {
-      this.currentView = view;
+    openKeycloakAdmin() {
+      window.open('http://localhost:8080/admin', '_blank')
     },
     
-    getServiceTitle() {
-      const titles = {
-        'seguranca': 'Sistema de Segurança',
-        'vigilancia': 'Vigilância e Monitoramento',
-        'controle': 'Controle de Acesso',
-        'auditoria': 'Auditoria e Logs'
-      };
-      return titles[this.currentView] || 'Guardian';
+    openKeycloakAccount() {
+      window.open('http://localhost:8080/auth/realms/canonika/account', '_blank')
     },
     
-    getServiceDescription() {
-      const descriptions = {
-        'seguranca': 'Configuração e gerenciamento do sistema de segurança',
-        'vigilancia': 'Monitoramento por câmeras e sistemas de vigilância',
-        'controle': 'Gestão de permissões e controle de acesso',
-        'auditoria': 'Relatórios de auditoria e análise de logs de segurança'
-      };
-      return descriptions[this.currentView] || 'Sistema de segurança e controle de acesso';
+    login() {
+      window.location.href = 'http://localhost:8080/auth/realms/canonika/protocol/openid-connect/auth?client_id=guardian&redirect_uri=http://localhost:3705&response_type=code'
     },
     
-    refreshServiceData() {
-      console.log(`Atualizando dados do serviço: ${this.currentView}`);
+    openOPAPolicies() {
+      window.open('http://localhost:8181', '_blank')
     },
-
-    toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
-    }
-  },
-  
-  mounted() {
-    // Verificar se há usuário logado
-    const savedUser = localStorage.getItem('canonika_user');
-    if (savedUser) {
-      this.user = JSON.parse(savedUser);
-    }
-  },
-  
-  watch: {
-    user(newUser) {
-      if (newUser) {
-        localStorage.setItem('canonika_user', JSON.stringify(newUser));
-      } else {
-        localStorage.removeItem('canonika_user');
-      }
+    
+    openAuditLogs() {
+      window.open('http://localhost:8123', '_blank')
+    },
+    
+    refreshStatus() {
+      console.log('Atualizando status dos serviços...')
+    },
+    
+    toggleAuthMethod(method) {
+      method.status = method.status === 'enabled' ? 'disabled' : 'enabled'
+      method.statusText = method.status === 'enabled' ? 'Ativo' : 'Inativo'
+    },
+    
+    refreshSessions() {
+      console.log('Atualizando sessões...')
+    },
+    
+    terminateSession(sessionId) {
+      this.activeSessions = this.activeSessions.filter(s => s.id !== sessionId)
     }
   }
 }
 </script>
 
 <style>
-/* Reset CSS Universal */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@import './guardian-styles.css';
 
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
-
-/* Estilos existentes mantidos e expandidos */
-.canonika-app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  color: #e2e8f0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Header */
-.canonika-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-  padding: 1rem 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.logo-icon {
-  position: relative;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-.logo-hexagon {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-pulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.25rem;
-  height: 0.25rem;
-  background: #ffffff;
-  border-radius: 50%;
-  z-index: 2;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.logo-text-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.1em;
-  line-height: 1;
-  margin: 0;
-}
-
-.logo-subtitle {
-  font-size: 0.75rem;
-  color: #cbd5e1;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  opacity: 0.8;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.user-name {
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.logout-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-.system-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.status-indicator {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-.status-indicator.online {
-  background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-}
-
-.header-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-/* Sidebar Toggle Button */
-.sidebar-toggle {
-  position: fixed;
-  top: 90px;
-  left: 20px;
-  z-index: 1001;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: none;
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.125rem;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-
-.sidebar-toggle.sidebar-collapsed {
-  left: 20px;
-}
-
-/* Sidebar */
-.canonika-sidebar {
-  width: 280px;
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  border-right: 1px solid #334155;
-  padding: 2rem 0;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  position: fixed;
-  top: 80px;
-  left: 0;
-  z-index: 1000;
-  height: calc(100vh - 80px);
-  display: flex;
-  flex-direction: column;
-}
-
-.canonika-sidebar.sidebar-collapsed {
-  transform: translateX(-100%);
-}
-
-/* Main Content */
-.canonika-main {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  margin-left: 280px;
-  transition: margin-left 0.3s ease;
-  min-height: calc(100vh - 80px);
-}
-
-.canonika-main.sidebar-collapsed {
-  margin-left: 0;
-}
-
-/* Navigation Menu */
-.nav-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-grow: 1;
-}
-
-.nav-item {
-  margin-bottom: 0.5rem;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  color: #94a3b8;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border-radius: 0.5rem;
-  margin: 0 1rem;
-  position: relative;
-  overflow: hidden;
-  min-height: 3.5rem;
-}
-
-.nav-link:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #e2e8f0;
-  transform: translateX(5px);
-}
-
-.nav-item.active .nav-link {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border-right: 3px solid #10b981;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transform: translateX(5px);
-}
-
-.nav-item.active .nav-link::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  pointer-events: none;
-}
-
-.nav-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  margin-right: 1rem;
-  flex-shrink: 0;
-  flex: 0 0 1.5rem;
-}
-
-.nav-text {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-  min-height: 2.5rem;
-  gap: 0.125rem;
-}
-
-.nav-title {
-  font-weight: 600;
-  font-size: 0.875rem;
-  line-height: 1.2;
-  margin: 0;
-  color: inherit;
-}
-
-.service-subtitle {
-  font-size: 0.75rem;
-  opacity: 0.7;
-  margin: 0;
-  white-space: nowrap;
-  color: inherit;
-}
-
-/* Login */
-.login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 80px);
-}
-
-.login-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 3rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.login-logo {
-  position: relative;
-  width: 4rem;
-  height: 4rem;
-  margin: 0 auto 1rem;
-}
-
-.logo-hexagon-large {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-pulse-large {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.5rem;
-  height: 0.5rem;
-  background: #ffffff;
-  border-radius: 50%;
-  z-index: 2;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.login-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem;
-}
-
-.login-subtitle {
-  color: #94a3b8;
-  margin: 0;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  position: relative;
-}
-
-.input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon {
-  position: absolute;
-  left: 1rem;
-  color: #64748b;
-  z-index: 2;
-}
-
-.form-input {
-  width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  color: #e2e8f0;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-input::placeholder {
-  color: #64748b;
-}
-
-.error-message {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid #ef4444;
-  color: #fca5a5;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.login-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-.btn-glow {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.login-btn:hover .btn-glow {
-  left: 100%;
-}
-
-/* Dashboard */
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.dashboard-header {
-  margin-bottom: 2rem;
-}
-
-.dashboard-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem;
-}
-
-.dashboard-header p {
-  color: #94a3b8;
-  margin: 0;
-}
-
+/* Estilos específicos do Guardian */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.dashboard-card {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.card-header h3 {
-  color: #e2e8f0;
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.card-icon {
-  color: #3b82f6;
-  font-size: 1.25rem;
-}
-
-.service-status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.service-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .service-status {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background: rgba(15, 23, 42, 0.3);
-}
-
-.status-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: #10b981;
-  animation: pulse 2s infinite;
-}
-
-.service-name {
-  flex: 1;
-  color: #e2e8f0;
-  font-weight: 500;
-}
-
-.service-port {
-  color: #64748b;
-  font-size: 0.875rem;
-  font-family: monospace;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.stat-item {
-  text-align: center;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 0.5rem;
+  background: var(--canonika-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--canonika-border);
 }
 
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #3b82f6;
-  margin-bottom: 0.25rem;
+.status-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.2rem;
 }
 
-.stat-label {
-  font-size: 0.875rem;
-  color: #94a3b8;
+.status-icon.online {
+  background: var(--canonika-success);
+  color: white;
 }
 
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-.quick-action-btn {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.keycloak-admin-container,
+.auth-container,
+.authorization-container,
+.sessions-container,
+.audit-container {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.admin-actions {
   display: flex;
-  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-card {
+  padding: 1.5rem;
+  background: var(--canonika-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--canonika-border);
+}
+
+.info-card h4 {
+  margin-bottom: 1rem;
+  color: var(--canonika-primary);
+}
+
+.info-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.info-card li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--canonika-border);
+}
+
+.info-card li:last-child {
+  border-bottom: none;
+}
+
+.auth-method {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  padding: 1rem;
+  background: var(--canonika-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--canonika-border);
+  margin-bottom: 1rem;
 }
 
-.quick-action-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
-  transform: translateY(-1px);
-}
-
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 0.5rem;
-}
-
-.activity-icon {
-  width: 2rem;
-  height: 2rem;
-  background: rgba(59, 130, 246, 0.2);
+.method-icon {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background: var(--canonika-primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6;
+  margin-right: 1rem;
 }
 
-.activity-content {
+.method-info {
   flex: 1;
 }
 
-.activity-title {
-  color: #e2e8f0;
-  font-weight: 500;
-  font-size: 0.875rem;
+.method-name {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
 }
 
-.activity-time {
-  color: #64748b;
-  font-size: 0.75rem;
+.method-status {
+  font-size: 0.9rem;
 }
 
-/* Service Views */
-.view-header {
+.method-status.enabled {
+  color: var(--canonika-success);
+}
+
+.method-status.disabled {
+  color: var(--canonika-danger);
+}
+
+.policy-status {
+  display: grid;
+  gap: 1rem;
+}
+
+.status-item {
   display: flex;
   justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--canonika-border);
+}
+
+.status-item:last-child {
+  border-bottom: none;
+}
+
+.status-value.online {
+  color: var(--canonika-success);
+}
+
+.sessions-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.session-item {
+  display: flex;
   align-items: center;
-  margin-bottom: 2rem;
+  justify-content: space-between;
   padding: 1rem;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border-radius: 1rem;
-  border: 1px solid #475569;
+  background: var(--canonika-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--canonika-border);
 }
 
-.view-status {
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.session-user {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
-.view-actions {
+.user-avatar.small {
+  width: 30px;
+  height: 30px;
+  font-size: 0.8rem;
+}
+
+.session-details {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: var(--canonika-text-secondary);
 }
 
-.action-btn {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.audit-events {
+  display: grid;
+  gap: 1rem;
+}
+
+.event-item {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--canonika-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--canonika-border);
 }
 
-.action-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
-  transform: translateY(-1px);
+.event-item.info {
+  border-left: 4px solid var(--canonika-info);
 }
 
-.service-info {
-  text-align: center;
-  padding: 2rem;
+.event-item.warn {
+  border-left: 4px solid var(--canonika-warning);
 }
 
-.service-info p {
-  color: #94a3b8;
-  margin-bottom: 1.5rem;
-  font-size: 1.125rem;
+.event-item.error {
+  border-left: 4px solid var(--canonika-danger);
 }
 
-.service-status {
+.event-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--canonika-primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  color: #10b981;
-  font-weight: 600;
 }
 
-/* Animations */
-@keyframes pulse-glow {
-  0%, 100% { 
-    opacity: 0.8; 
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-  }
-  50% { 
-    opacity: 1; 
-    box-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 12px rgba(255, 255, 255, 0.6);
-  }
+.event-content {
+  flex: 1;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .canonika-sidebar {
-    width: 100%;
-    transform: translateX(-100%);
-  }
-  
-  .canonika-sidebar:not(.sidebar-collapsed) {
-    transform: translateX(0);
-  }
-  
-  .canonika-main {
-    margin-left: 0;
-  }
-  
-  .sidebar-toggle {
-    display: flex;
-  }
+.event-service {
+  font-weight: bold;
+  color: var(--canonika-primary);
+}
+
+.event-time {
+  font-size: 0.9rem;
+  color: var(--canonika-text-secondary);
+}
+
+.event-message {
+  margin-bottom: 0.5rem;
+}
+
+.event-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--canonika-text-secondary);
+}
+
+.account-btn {
+  background: var(--canonika-secondary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.account-btn:hover {
+  background: var(--canonika-secondary-dark);
 }
 </style> 

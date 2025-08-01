@@ -1,0 +1,28 @@
+# Dockerfile para desenvolvimento do Harbor com Hot Reload
+FROM node:18-alpine
+
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    gcc \
+    musl-dev \
+    libffi-dev
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar package.json e package-lock.json
+COPY web/package*.json ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar código fonte
+COPY web/ ./
+
+# Expor porta do Vite
+EXPOSE 5173
+
+# Comando para desenvolvimento com hot reload
+CMD ["npm", "run", "dev:local"] 

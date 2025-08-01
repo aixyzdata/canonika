@@ -42,6 +42,10 @@
   content: "⚓";
 }
 
+.icon-quarter::before {
+  content: "⚓";
+}
+
 .icon-ledger::before {
   content: "📊";
 }

@@ -1,9 +1,29 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
   plugins: [vue()],
   base: '/',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      'shared': path.resolve(__dirname, '../../shared'),
+      'fisher': path.resolve(__dirname, '../../fisher/web/src'),
+      'skipper': path.resolve(__dirname, '../../skipper/web/src'),
+      'tollgate': path.resolve(__dirname, '../../tollgate/web/src'),
+      'quarter': path.resolve(__dirname, '../../quarter/web/src'),
+      'ledger': path.resolve(__dirname, '../../ledger/web/src'),
+      'beacon': path.resolve(__dirname, '../../beacon/views'),
+      'echo': path.resolve(__dirname, '../../echo/views'),
+      'guardian': path.resolve(__dirname, '../../guardian/views'),
+      'mapmaker': path.resolve(__dirname, '../../mapmaker/views'),
+      'seagull': path.resolve(__dirname, '../../seagull/views'),
+      'wayfinder': path.resolve(__dirname, '../../wayfinder/views'),
+      'dock': path.resolve(__dirname, '../../dock/views'),
+      'diver': path.resolve(__dirname, '../../diver/web/src')
+    }
+  },
   server: {
     port: 5173,
     host: true,
