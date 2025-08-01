@@ -1,121 +1,14 @@
 version: '3.8'
 
+networks:
+  canonika-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
 services:
-  # ========================================
-  # INFRAESTRUTURA DE AUTENTICAÇÃO E IDENTIDADE
-  # ========================================
-  
-  # PostgreSQL - Banco principal para Keycloak e aplicações
-  postgres:
-    image: postgres:15-alpine
-    container_name: canonika_postgres
-    environment:
-      POSTGRES_DB: canonika
-      POSTGRES_USER: canonika
-      POSTGRES_PASSWORD: canonika123
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U canonika"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Keycloak - Identity Provider (IdP)
-  keycloak:
-    image: quay.io/keycloak/keycloak:23.0
-    container_name: canonika_keycloak
-    environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/canonika
-      KC_DB_USERNAME: canonika
-      KC_DB_PASSWORD: canonika123
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin123
-      KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_ENABLED: true
-      KC_HEALTH_ENABLED: true
-      KC_METRICS_ENABLED: true
-    command: start-dev
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health/ready || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # Redis - Cache e sessões
-  redis:
-    image: redis:7-alpine
-    container_name: canonika_redis
-    command: redis-server --appendonly yes --requirepass redis123
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # ClickHouse - Logs e auditoria
-  clickhouse:
-    image: clickhouse/clickhouse-server:23.8
-    container_name: canonika_clickhouse
-    environment:
-      CLICKHOUSE_DB: canonika_logs
-      CLICKHOUSE_USER: canonika
-      CLICKHOUSE_PASSWORD: clickhouse123
-      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-      - ./scripts/init-clickhouse.sql:/docker-entrypoint-initdb.d/init-clickhouse.sql
-    ports:
-      - "8123:8123"
-      - "9000:9000"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # OPA (Open Policy Agent) - Políticas ABAC/ReBAC
-  opa:
-    image: openpolicyagent/opa:0.58.0
-    container_name: canonika_opa
-    command: run --server --addr :8181 --addr :8182 --diagnostic-addr :8183 --set=default_decision=v1/data/canonika/allow
-    volumes:
-      - ./policies:/policies
-    ports:
-      - "8181:8181"
-      - "8182:8182"
-      - "8183:8183"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8181/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # ========================================
-  # MICROSERVIÇOS CANONIKA
-  # ========================================
-
-  # Quarter - Serviço de autenticação (porta 80)
+  # Quarter - Ponto de Entrada
   quarter:
     build: ./quarter
     container_name: canonika_quarter
@@ -123,384 +16,201 @@ services:
       - "80:80"
       - "8000:8000"
       - "5174:5174"
-    volumes:
-      - ./shared/styles:/usr/share/nginx/html/shared/styles
-      - ./quarter/web:/app/web
+    networks:
+      - canonika-network
     environment:
-      - DEV_MODE=true
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
+      - postgres
+      - redis
 
-  # Harbor - Dashboard principal (porta 3701)
+  # Harbor - Dashboard Principal
   harbor:
     build: ./harbor
     container_name: canonika_harbor
     ports:
       - "3701:3701"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
+      - "8001:8001"
+      - "5171:5171"
+    networks:
+      - canonika-network
     environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
+      - quarter
+      - postgres
 
-  # Beacon - Serviço de navegação (porta 3702)
-  beacon:
-    build: ./beacon
-    container_name: canonika_beacon
-    ports:
-      - "3702:3702"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Fisher - Serviço de dados (porta 3703)
-  fisher:
-    build: ./fisher
-    container_name: canonika_fisher
-    ports:
-      - "3703:3703"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Ledger - Serviço financeiro (porta 3704)
-  ledger:
-    build: ./ledger
-    container_name: canonika_ledger
-    ports:
-      - "3704:3704"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Guardian - Serviço de segurança (porta 3705)
+  # Guardian - Segurança
   guardian:
     build: ./guardian
     container_name: canonika_guardian
     ports:
-      - "3705:80"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
+      - "3705:3705"
+      - "8005:8005"
+      - "5175:5175"
+    networks:
+      - canonika-network
     environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
+      - quarter
+      - keycloak
+      - opa
 
-  # Echo - Serviço de comunicação (porta 3706)
-  echo:
-    build: ./echo
-    container_name: canonika_echo
-    ports:
-      - "3706:3706"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Diver - Serviço de exploração (porta 3707)
-  diver:
-    build: ./diver
-    container_name: canonika_diver
-    ports:
-      - "3707:3707"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Dock - Serviço de porto (porta 3708)
-  dock:
-    build: ./dock
-    container_name: canonika_dock
-    ports:
-      - "3708:3708"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Mapmaker - Serviço de mapeamento (porta 3709)
-  mapmaker:
-    build: ./mapmaker
-    container_name: canonika_mapmaker
-    ports:
-      - "3709:3709"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Seagull - Serviço de monitoramento (porta 3710)
-  seagull:
-    build: ./seagull
-    container_name: canonika_seagull
-    ports:
-      - "3710:3710"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
-    environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Skipper - Serviço de navegação rápida (porta 3711)
+  # Skipper - Navegação
   skipper:
     build: ./skipper
     container_name: canonika_skipper
     ports:
-      - "3711:3711"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
+      - "3702:3702"
+      - "8002:8002"
+      - "5172:5172"
+    networks:
+      - canonika-network
     environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-    restart: unless-stopped
+      - quarter
 
-  # Tollgate - Serviço de controle de acesso (porta 3712)
+  # Beacon - Monitoramento
+  beacon:
+    build: ./beacon
+    container_name: canonika_beacon
+    ports:
+      - "3703:3703"
+      - "8003:8003"
+      - "5173:5173"
+    networks:
+      - canonika-network
+    environment:
+      - DEV_MODE=false
+    depends_on:
+      - quarter
+      - clickhouse
+
+  # Fisher - Coleta de Dados
+  fisher:
+    build: ./fisher
+    container_name: canonika_fisher
+    ports:
+      - "3706:3706"
+      - "8006:8006"
+      - "5176:5176"
+    networks:
+      - canonika-network
+    environment:
+      - DEV_MODE=false
+    depends_on:
+      - quarter
+      - clickhouse
+
+  # Tollgate - Gateway
   tollgate:
     build: ./tollgate
     container_name: canonika_tollgate
     ports:
-      - "3712:3712"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
+      - "3707:3707"
+      - "8007:8007"
+      - "5177:5177"
+    networks:
+      - canonika-network
     environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
+      - quarter
+      - guardian
 
-  # Wayfinder - Serviço de descoberta (porta 3713)
-  wayfinder:
-    build: ./wayfinder
-    container_name: canonika_wayfinder
+  # Ledger - Financeiro
+  ledger:
+    build: ./ledger
+    container_name: canonika_ledger
     ports:
-      - "3713:3713"
-    volumes:
-      - ./shared/styles:/app/shared/styles
-      - ./shared/config:/app/shared/config
+      - "3708:3708"
+      - "8008:8008"
+      - "5178:5178"
+    networks:
+      - canonika-network
     environment:
-      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
-      - REDIS_URL=redis://:redis123@redis:6379
-      - KEYCLOAK_URL=http://keycloak:8080
-      - OPA_URL=http://opa:8181
-      - CLICKHOUSE_URL=http://clickhouse:8123
+      - DEV_MODE=false
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    restart: unless-stopped
+      - quarter
+      - postgres
+
+  # Keycloak - Autenticação
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: canonika_keycloak
+    ports:
+      - "8080:8080"
+    networks:
+      - canonika-network
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin123
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak123
+    command: start-dev
+    depends_on:
+      - postgres
+
+  # PostgreSQL - Banco Principal
+  postgres:
+    image: postgres:15-alpine
+    container_name: canonika_postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - canonika-network
+    environment:
+      - POSTGRES_DB=canonika
+      - POSTGRES_USER=canonika
+      - POSTGRES_PASSWORD=canonika123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
+  # Redis - Cache
+  redis:
+    image: redis:7-alpine
+    container_name: canonika_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - canonika-network
+    volumes:
+      - redis_data:/data
+
+  # OPA - Políticas
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: canonika_opa
+    ports:
+      - "8181:8181"
+    networks:
+      - canonika-network
+    command: run --server --addr :8181
+    volumes:
+      - ./policies:/policies
+
+  # ClickHouse - Analytics
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: canonika_clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    networks:
+      - canonika-network
+    environment:
+      - CLICKHOUSE_DB=canonika
+      - CLICKHOUSE_USER=canonika
+      - CLICKHOUSE_PASSWORD=canonika123
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
-  clickhouse_data:
-    driver: local
-
-networks:
-  default:
-    name: canonika_network
-    driver: bridge 
+  clickhouse_data: 

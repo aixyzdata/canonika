@@ -108,7 +108,68 @@
 
       <!-- Conteúdo principal -->
       <main :class="['canonika-main', { 'sidebar-collapsed': sidebarCollapsed }]">
+        <!-- Tela de login -->
+        <div v-if="!user && hasLogin" class="login-container">
+          <div class="login-card">
+            <div class="login-header">
+              <div class="login-logo">
+                <div class="logo-hexagon-large"></div>
+                <div class="logo-pulse-large"></div>
+              </div>
+              <h2 class="login-title">Acesso ao {{ serviceConfig.name }}</h2>
+              <p class="login-subtitle">{{ serviceConfig.description }}</p>
+            </div>
+            <form @submit.prevent="login" class="login-form">
+              <div class="form-group">
+                <div class="input-container">
+                  <span class="input-icon">👤</span>
+                  <input 
+                    v-model="loginForm.username" 
+                    type="text" 
+                    placeholder="Usuário" 
+                    class="form-input"
+                    required
+                  >
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-container">
+                  <span class="input-icon">🔒</span>
+                  <input 
+                    v-model="loginForm.password" 
+                    type="password" 
+                    placeholder="Senha" 
+                    class="form-input"
+                    required
+                  >
+                </div>
+              </div>
+              <button type="submit" class="login-btn">
+                <span>🚀</span> Entrar
+              </button>
+            </form>
+          </div>
+        </div>
 
+        <!-- Redirecionamento para Quarter -->
+        <div v-if="!user && !hasLogin" class="quarter-redirect">
+          <div class="redirect-card">
+            <div class="redirect-header">
+              <div class="redirect-logo">
+                <div class="logo-hexagon-large"></div>
+                <div class="logo-pulse-large"></div>
+              </div>
+              <h2 class="redirect-title">Acesso Centralizado</h2>
+              <p class="redirect-subtitle">Este módulo utiliza o Quarter para autenticação</p>
+            </div>
+            <div class="redirect-content">
+              <p>Para acessar o {{ serviceConfig.name }}, você precisa fazer login através do Quarter.</p>
+              <button @click="redirectToQuarter" class="redirect-btn">
+                <span>🚀</span> Ir para Quarter
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Conteúdo do serviço -->
         <div v-else class="service-content">
@@ -132,6 +193,10 @@ export default {
         iconClass: 'icon-default',
         menuItems: []
       })
+    },
+    hasLogin: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -139,7 +204,11 @@ export default {
       user: null,
       sidebarCollapsed: false,
       currentView: 'dashboard',
-      openSubmenus: {}
+      openSubmenus: {},
+      loginForm: {
+        username: '',
+        password: ''
+      }
     }
   },
   methods: {
@@ -153,40 +222,34 @@ export default {
     toggleSubmenu(menuId) {
       this.$set(this.openSubmenus, menuId, !this.openSubmenus[menuId])
     },
-
-    logout() {
-      this.user = null;
-      this.clearAuthState();
-      this.$emit('logout');
-    },
-    loadAuthState() {
-      const authenticated = localStorage.getItem('canonika_authenticated');
-      const userData = localStorage.getItem('canonika_user');
-      
-      if (authenticated === 'true' && userData) {
-        try {
-          this.user = JSON.parse(userData);
-        } catch (e) {
-          // Se houver erro ao parsear, limpar dados corrompidos
-          this.clearAuthState();
-        }
+    login() {
+      // Simular login
+      this.user = {
+        name: this.loginForm.username,
+        role: 'admin'
       }
+      this.$emit('login', this.user)
     },
-    clearAuthState() {
-      localStorage.removeItem('canonika_user');
-      localStorage.removeItem('canonika_authenticated');
+    logout() {
+      this.user = null
+      this.$emit('logout')
+    },
+    redirectToQuarter() {
+      window.location.href = 'http://localhost'
     }
   },
   mounted() {
-    // Carregar estado de autenticação ao iniciar
-    this.loadAuthState();
-    
     // Inicializar submenus fechados
     this.serviceConfig.menuItems.forEach(item => {
       if (item.submenu) {
         this.$set(this.openSubmenus, item.id, false)
       }
     })
+    
+    // Redirecionar automaticamente para Quarter se não tem login próprio e não está autenticado
+    if (!this.hasLogin && !this.user) {
+      this.redirectToQuarter()
+    }
   }
 }
 </script>
@@ -195,40 +258,36 @@ export default {
 /* Estilos específicos do MasterPage */
 .canonika-app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e293b, #334155, #475569);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: #e2e8f0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .canonika-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom: 1px solid #475569;
   position: relative;
   overflow: hidden;
-  height: 60px;
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 2rem;
   position: relative;
   z-index: 2;
-  height: 100%;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-shrink: 0;
-  min-width: 0;
 }
 
 .logo-icon {
   position: relative;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
 }
 
 .logo-hexagon {
@@ -236,10 +295,7 @@ export default {
   height: 100%;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  animation: rotate 10s linear infinite;
 }
 
 .logo-pulse {
@@ -247,81 +303,61 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 0.25rem;
-  height: 0.25rem;
-  background: #ffffff;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(59, 130, 246, 0.3);
   border-radius: 50%;
-  z-index: 2;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.1em;
-  line-height: 1;
   margin: 0;
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-}
-
-.logo-text-container {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
 }
 
 .logo-subtitle {
-  font-size: 0.75rem;
-  color: #cbd5e1;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  opacity: 0.8;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  flex-shrink: 0;
+  gap: 1rem;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  color: white;
 }
 
 .user-name {
-  font-weight: 600;
+  font-weight: 500;
   color: #e2e8f0;
 }
 
 .logout-btn {
-  background: #ffffff1a;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -332,28 +368,23 @@ export default {
 }
 
 .logout-btn:hover {
-  background: #fff3;
-  transform: translateY(-1px);
+  background: rgba(239, 68, 68, 0.2);
 }
 
 .system-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  color: #10b981;
+  font-weight: 500;
 }
 
 .status-indicator {
   width: 0.5rem;
   height: 0.5rem;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-.status-indicator.online {
   background: #10b981;
-  box-shadow: 0 0 8px #10b98180;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .header-glow {
@@ -362,14 +393,13 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
   pointer-events: none;
 }
 
 .canonika-layout {
   display: flex;
-  height: calc(100vh - 60px);
-  overflow: hidden;
+  min-height: calc(100vh - 4rem);
 }
 
 .sidebar-toggle {
@@ -521,25 +551,228 @@ export default {
   margin-left: 4rem;
 }
 
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+}
+
+.login-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+}
+
+.logo-hexagon-large {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  animation: rotate 10s linear infinite;
+}
+
+.logo-pulse-large {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem;
+}
+
+.login-subtitle {
+  color: #94a3b8;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #64748b;
+  z-index: 1;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
 .service-content {
   width: 100%;
+}
+
+/* Estilos para redirecionamento Quarter */
+.quarter-redirect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 4rem);
+  padding: 2rem;
+}
+
+.redirect-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.redirect-header {
+  margin-bottom: 2rem;
+}
+
+.redirect-logo {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+}
+
+.logo-hexagon-large {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  animation: rotate 10s linear infinite;
+}
+
+.logo-pulse-large {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.redirect-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem;
+}
+
+.redirect-subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.redirect-content {
+  margin-top: 1.5rem;
+}
+
+.redirect-content p {
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.redirect-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.redirect-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* Animações */
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { 
-    opacity: 0.8; 
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-  }
-  50% { 
-    opacity: 1; 
-    box-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 12px rgba(255, 255, 255, 0.6);
-  }
 }
 
 @keyframes pulse {
@@ -569,31 +802,6 @@ export default {
   
   .sidebar-toggle {
     display: flex;
-  }
-  
-  /* Responsividade do header */
-  .header-content {
-    padding: 0 1rem;
-  }
-  
-  .logo-text {
-    font-size: 1.25rem;
-  }
-  
-  .logo-subtitle {
-    font-size: 0.625rem;
-  }
-  
-  .header-actions {
-    gap: 1rem;
-  }
-  
-  .user-name {
-    display: none;
-  }
-  
-  .system-status span {
-    display: none;
   }
 }
 </style> 

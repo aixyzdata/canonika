@@ -109,7 +109,7 @@
       <!-- Conteúdo principal -->
       <main :class="['canonika-main', { 'sidebar-collapsed': sidebarCollapsed }]">
         <!-- Tela de login -->
-        <div v-if="!user" class="login-container">
+        <div v-if="!user && hasLogin" class="login-container">
           <div class="login-card">
             <div class="login-header">
               <div class="login-logo">
@@ -151,6 +151,26 @@
           </div>
         </div>
 
+        <!-- Redirecionamento para Quarter -->
+        <div v-if="!user && !hasLogin" class="quarter-redirect">
+          <div class="redirect-card">
+            <div class="redirect-header">
+              <div class="redirect-logo">
+                <div class="logo-hexagon-large"></div>
+                <div class="logo-pulse-large"></div>
+              </div>
+              <h2 class="redirect-title">Acesso Centralizado</h2>
+              <p class="redirect-subtitle">Este módulo utiliza o Quarter para autenticação</p>
+            </div>
+            <div class="redirect-content">
+              <p>Para acessar o {{ serviceConfig.name }}, você precisa fazer login através do Quarter.</p>
+              <button @click="redirectToQuarter" class="redirect-btn">
+                <span>🚀</span> Ir para Quarter
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Conteúdo do serviço -->
         <div v-else class="service-content">
           <slot></slot>
@@ -173,6 +193,10 @@ export default {
         iconClass: 'icon-default',
         menuItems: []
       })
+    },
+    hasLogin: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -209,6 +233,9 @@ export default {
     logout() {
       this.user = null
       this.$emit('logout')
+    },
+    redirectToQuarter() {
+      window.location.href = 'http://localhost'
     }
   },
   mounted() {
@@ -218,6 +245,11 @@ export default {
         this.$set(this.openSubmenus, item.id, false)
       }
     })
+    
+    // Redirecionar automaticamente para Quarter se não tem login próprio e não está autenticado
+    if (!this.hasLogin && !this.user) {
+      this.redirectToQuarter()
+    }
   }
 }
 </script>
@@ -643,6 +675,98 @@ export default {
 
 .service-content {
   width: 100%;
+}
+
+/* Estilos para redirecionamento Quarter */
+.quarter-redirect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 4rem);
+  padding: 2rem;
+}
+
+.redirect-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.redirect-header {
+  margin-bottom: 2rem;
+}
+
+.redirect-logo {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+}
+
+.logo-hexagon-large {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  animation: rotate 10s linear infinite;
+}
+
+.logo-pulse-large {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.redirect-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem;
+}
+
+.redirect-subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.redirect-content {
+  margin-top: 1.5rem;
+}
+
+.redirect-content p {
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.redirect-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.redirect-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* Animações */

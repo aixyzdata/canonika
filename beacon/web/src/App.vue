@@ -1,6 +1,7 @@
 <template>
   <MasterPage 
     :serviceConfig="serviceConfig"
+    :hasLogin="false"
     @view-changed="handleViewChange"
     @login="handleLogin"
     @logout="handleLogout"
