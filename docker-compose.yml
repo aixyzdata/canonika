@@ -20,6 +20,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - postgres
       - redis
@@ -36,6 +49,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - postgres
@@ -52,6 +78,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - keycloak
@@ -69,6 +108,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
 
@@ -84,6 +136,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - clickhouse
@@ -100,6 +165,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - clickhouse
@@ -116,6 +194,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - guardian
@@ -132,6 +223,19 @@ services:
       - canonika-network
     environment:
       - DEV_MODE=false
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
       - quarter
       - postgres
