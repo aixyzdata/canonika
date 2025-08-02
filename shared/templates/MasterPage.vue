@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import config from '../../shared/config/env.js'
+import config from '../config/env.js'
 
 export default {
   name: 'MasterPage',
@@ -239,7 +239,9 @@ export default {
     redirectToQuarter() {
       // Usar configuração centralizada
       const quarterUrl = config.getServiceUrl('quarter')
-      window.location.href = quarterUrl
+      const currentUrl = window.location.href
+      const redirectUrl = encodeURIComponent(currentUrl)
+      window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
     }
   },
   mounted() {

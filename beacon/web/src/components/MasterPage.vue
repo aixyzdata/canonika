@@ -181,6 +181,8 @@
 </template>
 
 <script>
+import config from '../config/env.js'
+
 export default {
   name: 'MasterPage',
   props: {
@@ -235,7 +237,11 @@ export default {
       this.$emit('logout')
     },
     redirectToQuarter() {
-      window.location.href = 'http://localhost'
+      // Usar configuração centralizada
+      const quarterUrl = config.getServiceUrl('quarter')
+      const currentUrl = window.location.href
+      const redirectUrl = encodeURIComponent(currentUrl)
+      window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
     }
   },
   mounted() {
