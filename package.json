@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "puppeteer": "^24.15.0",
+    "selenium-webdriver": "^4.34.0"
+  }
+}

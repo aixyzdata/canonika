@@ -4,30 +4,30 @@
 const config = {
   // URLs dos microserviços
   services: {
-    quarter: process.env.VUE_APP_QUARTER_URL || 'http://localhost',
-    harbor: process.env.VUE_APP_HARBOR_URL || 'http://localhost:3701',
-    guardian: process.env.VUE_APP_GUARDIAN_URL || 'http://localhost:3705',
-    skipper: process.env.VUE_APP_SKIPPER_URL || 'http://localhost:3702',
-    beacon: process.env.VUE_APP_BEACON_URL || 'http://localhost:3703',
-    fisher: process.env.VUE_APP_FISHER_URL || 'http://localhost:3706',
-    tollgate: process.env.VUE_APP_TOLLGATE_URL || 'http://localhost:3707',
-    ledger: process.env.VUE_APP_LEDGER_URL || 'http://localhost:3708'
+    quarter: import.meta.env.VITE_QUARTER_URL || 'http://localhost:3700',
+    harbor: import.meta.env.VITE_HARBOR_URL || 'http://localhost:3701',
+    guardian: import.meta.env.VITE_GUARDIAN_URL || 'http://localhost:3705',
+    skipper: import.meta.env.VITE_SKIPPER_URL || 'http://localhost:3702',
+    beacon: import.meta.env.VITE_BEACON_URL || 'http://localhost:3703',
+    fisher: import.meta.env.VITE_FISHER_URL || 'http://localhost:3706',
+    tollgate: import.meta.env.VITE_TOLLGATE_URL || 'http://localhost:3707',
+    ledger: import.meta.env.VITE_LEDGER_URL || 'http://localhost:3708'
   },
 
   // URLs da infraestrutura
   infrastructure: {
-    keycloak: process.env.VUE_APP_KEYCLOAK_URL || 'http://localhost:8080',
-    postgres: process.env.VUE_APP_POSTGRES_URL || 'postgresql://canonika:canonika123@localhost:5432/canonika',
-    redis: process.env.VUE_APP_REDIS_URL || 'redis://localhost:6379',
-    opa: process.env.VUE_APP_OPA_URL || 'http://localhost:8181',
-    clickhouse: process.env.VUE_APP_CLICKHOUSE_URL || 'http://localhost:8123'
+    keycloak: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
+    postgres: import.meta.env.VITE_POSTGRES_URL || 'postgresql://canonika:canonika123@localhost:5432/canonika',
+    redis: import.meta.env.VITE_REDIS_URL || 'redis://localhost:6379',
+    opa: import.meta.env.VITE_OPA_URL || 'http://localhost:8181',
+    clickhouse: import.meta.env.VITE_CLICKHOUSE_URL || 'http://localhost:8123'
   },
 
   // Configurações gerais
   general: {
-    devMode: process.env.VUE_APP_DEV_MODE === 'true',
-    apiTimeout: parseInt(process.env.VUE_APP_API_TIMEOUT) || 30000,
-    retryAttempts: parseInt(process.env.VUE_APP_RETRY_ATTEMPTS) || 3
+    devMode: import.meta.env.VITE_DEV_MODE === 'true',
+    apiTimeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,
+    retryAttempts: parseInt(import.meta.env.VITE_RETRY_ATTEMPTS) || 3
   },
 
   // Métodos utilitários

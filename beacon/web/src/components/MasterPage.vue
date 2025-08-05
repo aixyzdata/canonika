@@ -182,19 +182,14 @@
 
 <script>
 import config from '../config/env.js'
+import authService from '../services/AuthService.js'
 
 export default {
   name: 'MasterPage',
   props: {
     serviceConfig: {
       type: Object,
-      required: true,
-      default: () => ({
-        name: 'Serviço',
-        description: 'Descrição do serviço',
-        iconClass: 'icon-default',
-        menuItems: []
-      })
+      required: true
     },
     hasLogin: {
       type: Boolean,
@@ -210,40 +205,52 @@ export default {
       loginForm: {
         username: '',
         password: ''
-      }
+      },
+      metrics: {
+        active_users: 0,
+        online_services: 0,
+        total_services: 0,
+        last_24h_requests: 0,
+        average_response_time: 0
+      },
+      services: []
     }
   },
   methods: {
-    toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed
-    },
-    setView(viewId) {
-      this.currentView = viewId
-      this.$emit('view-changed', viewId)
-    },
-    toggleSubmenu(menuId) {
-      this.$set(this.openSubmenus, menuId, !this.openSubmenus[menuId])
-    },
-    login() {
-      // Simular login
-      this.user = {
-        name: this.loginForm.username,
-        role: 'admin'
+    async checkAuthentication() {
+      // Verificar se precisa renovar o token
+      const tokenValid = await authService.checkAndRefreshToken();
+      
+      if (tokenValid) {
+        this.user = authService.getCurrentUser();
+        console.log('Usuário autenticado:', this.user);
+      } else {
+        this.user = null;
+        console.log('Usuário não autenticado');
       }
-      this.$emit('login', this.user)
     },
+    
+    async login() {
+      // Redirecionar para Quarter para login
+      this.redirectToQuarter();
+    },
+    
     logout() {
-      this.user = null
-      this.$emit('logout')
+      authService.logout();
+      this.user = null;
+      this.$emit('logout');
     },
+    
     redirectToQuarter() {
-      // Usar configuração centralizada
-      const quarterUrl = config.getServiceUrl('quarter')
+      // Usar URL do Quarter diretamente
+      const quarterUrl = 'http://localhost:3700'
       const currentUrl = window.location.href
       const redirectUrl = encodeURIComponent(currentUrl)
+      console.log('Redirecionando para:', `${quarterUrl}?redirect_to=${redirectUrl}`)
       window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
     }
   },
+  
   mounted() {
     // Inicializar submenus fechados
     this.serviceConfig.menuItems.forEach(item => {
@@ -252,8 +259,13 @@ export default {
       }
     })
     
+    // Verificar autenticação usando o novo serviço
+    this.checkAuthentication()
+    
     // Redirecionar automaticamente para Quarter se não tem login próprio e não está autenticado
+    console.log('MasterPage mounted - hasLogin:', this.hasLogin, 'user:', this.user)
     if (!this.hasLogin && !this.user) {
+      console.log('Redirecionando para Quarter...')
       this.redirectToQuarter()
     }
   }
@@ -311,7 +323,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 1.5rem;
   height: 1.5rem;
-  background: rgba(59, 130, 246, 0.3);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
 }
@@ -599,11 +611,11 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 2rem;
-  height: 2rem;
-  background: rgba(59, 130, 246, 0.3);
+  width: 10px;
+  height: 10px;
+  background: #FFFFFF !important;
   border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse 2s infinite;
 }
 
 .login-title {
@@ -726,11 +738,11 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 2rem;
-  height: 2rem;
-  background: rgba(59, 130, 246, 0.3);
+  width: 10px;
+  height: 10px;
+  background: #FFFFFF !important;
   border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse 2s infinite;
 }
 
 .redirect-title {

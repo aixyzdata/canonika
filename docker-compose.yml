@@ -13,7 +13,7 @@ services:
     build: ./quarter
     container_name: canonika_quarter
     ports:
-      - "80:80"
+      - "3700:80"
       - "8000:8000"
       - "5174:5174"
     networks:

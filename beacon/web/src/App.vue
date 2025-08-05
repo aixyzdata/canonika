@@ -16,7 +16,6 @@ import MasterPage from './components/MasterPage.vue'
 import BeaconView from './views/BeaconView.vue'
 import { getServiceMenu } from './config/service-menus.js'
 import config from './config/env.js'
-import config from './config/env.js'
 
 export default {
   name: 'BeaconApp',
