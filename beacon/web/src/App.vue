@@ -16,6 +16,7 @@ import MasterPage from './components/MasterPage.vue'
 import BeaconView from './views/BeaconView.vue'
 import { getServiceMenu } from './config/service-menus.js'
 import config from './config/env.js'
+import BeaconAuthService from './auth/AuthService.js'
 
 export default {
   name: 'BeaconApp',
@@ -26,7 +27,9 @@ export default {
   data() {
     return {
       currentView: 'dashboard',
-      serviceConfig: getServiceMenu('beacon')
+      serviceConfig: getServiceMenu('beacon'),
+      user: null,
+      isAuthenticated: false
     }
   },
   methods: {
@@ -48,7 +51,47 @@ export default {
       console.log('User logged in:', user)
     },
     handleLogout() {
-      console.log('User logged out')
+      console.log('🚪 Logout solicitado no Beacon')
+      BeaconAuthService.logout()
+    },
+    // Verificar autenticação
+    checkAuthentication() {
+      console.log('🔍 Verificando autenticação no Beacon...')
+      
+      // Verificar se está autenticado
+      if (BeaconAuthService.isAuthenticated()) {
+        console.log('✅ Usuário autenticado no Beacon')
+        this.user = BeaconAuthService.getUserInfo()
+        this.isAuthenticated = true
+        return true
+      } else {
+        console.log('❌ Usuário não autenticado no Beacon')
+        this.user = null
+        this.isAuthenticated = false
+        return false
+      }
+    }
+  },
+  mounted() {
+    console.log('🚀 BEACON APP CARREGADO - Sistema de Autenticação Centralizado')
+    
+    // Verificar se é logout
+    if (window.location.search.includes('logout=1')) {
+      console.log('🚪 Logout detectado, redirecionando para Quarter...')
+      window.location.href = 'http://localhost:3700';
+      return;
+    }
+    
+    // Processar token de autenticação se presente na URL
+    BeaconAuthService.processAuthToken();
+    
+    // Verificar autenticação
+    if (!this.checkAuthentication()) {
+      console.log('🔄 Redirecionando para Quarter...')
+      BeaconAuthService.redirectToQuarter()
+    } else {
+      console.log('✅ Usuário autenticado no Beacon')
+      this.user = BeaconAuthService.getUserInfo()
     }
   }
 }
