@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import MasterPage from '../../../shared/templates/MasterPage.vue'
+import MasterPage from '../../shared/templates/MasterPage.vue'
 
 export default {
   name: 'App',
@@ -93,7 +93,7 @@ export default {
       const quarterUrl = 'http://localhost:3700'
       const currentUrl = window.location.href
       const redirectUrl = encodeURIComponent(currentUrl)
-      window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
+      window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}&service=beacon`
     }
   },
   mounted() {
