@@ -1,7 +1,7 @@
 <template>
   <MasterPage 
     :serviceConfig="serviceConfig"
-    :hasLogin="false"
+    :hasLogin="true"
     @view-changed="handleViewChange"
     @login="handleLogin"
     @logout="handleLogout"
@@ -49,6 +49,8 @@ export default {
     },
     handleLogin(user) {
       console.log('User logged in:', user)
+      this.user = user
+      this.isAuthenticated = true
     },
     handleLogout() {
       console.log('🚪 Logout solicitado no Beacon')

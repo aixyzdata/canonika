@@ -13,22 +13,36 @@ export const serviceMenus = {
         icon: 'fas fa-tachometer-alt'
       },
       {
-        id: 'sinalizacao',
-        title: 'Sinalização',
-        subtitle: 'Transmissão',
-        icon: 'fas fa-broadcast-tower'
+        id: 'status',
+        title: 'Status',
+        subtitle: 'Monitoramento',
+        icon: 'fas fa-chart-line'
       },
       {
-        id: 'transmissao',
-        title: 'Transmissão',
-        subtitle: 'Comunicação',
-        icon: 'fas fa-wifi'
-      },
-      {
-        id: 'configuracoes',
-        title: 'Configurações',
-        subtitle: 'Sistema',
-        icon: 'fas fa-cogs'
+        id: 'services',
+        title: 'Serviços',
+        subtitle: 'Gerenciamento',
+        icon: 'fas fa-server',
+        submenu: [
+          {
+            id: 'sinalizacao',
+            title: 'Sinalização',
+            subtitle: 'Transmissão',
+            icon: 'fas fa-broadcast-tower'
+          },
+          {
+            id: 'transmissao',
+            title: 'Transmissão',
+            subtitle: 'Comunicação',
+            icon: 'fas fa-wifi'
+          },
+          {
+            id: 'configuracoes',
+            title: 'Configurações',
+            subtitle: 'Sistema',
+            icon: 'fas fa-cogs'
+          }
+        ]
       }
     ]
   },
