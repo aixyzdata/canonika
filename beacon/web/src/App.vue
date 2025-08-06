@@ -104,10 +104,48 @@ export default {
     if (authToken) {
       // Processar token de autenticação
       console.log('Token recebido:', authToken)
-      // Aqui você pode decodificar o JWT e verificar a validade
+      
+      try {
+        // Decodificar o JWT (sem verificar assinatura por simplicidade)
+        const tokenParts = authToken.split('.')
+        if (tokenParts.length === 3) {
+          const payload = JSON.parse(atob(tokenParts[1]))
+          console.log('Token decodificado:', payload)
+          
+          // Verificar se o token não expirou
+          const now = Math.floor(Date.now() / 1000)
+          if (payload.exp && payload.exp > now) {
+            console.log('Token válido, usuário autenticado')
+            // Armazenar informações do usuário se necessário
+            localStorage.setItem('auth_token', authToken)
+            localStorage.setItem('user_info', JSON.stringify(payload))
+            
+            // Limpar a URL removendo o token
+            const cleanUrl = window.location.origin + window.location.pathname
+            window.history.replaceState({}, document.title, cleanUrl)
+          } else {
+            console.log('Token expirado')
+            this.redirectToQuarter()
+          }
+        } else {
+          console.log('Token inválido')
+          this.redirectToQuarter()
+        }
+      } catch (error) {
+        console.error('Erro ao processar token:', error)
+        this.redirectToQuarter()
+      }
     } else {
-      // Redirecionar para Quarter se não há token
-      this.redirectToQuarter()
+      // Verificar se já temos um token armazenado
+      const storedToken = localStorage.getItem('auth_token')
+      if (storedToken) {
+        console.log('Token encontrado no localStorage')
+        // Token já processado, continuar normalmente
+      } else {
+        // Redirecionar para Quarter se não há token
+        console.log('Nenhum token encontrado, redirecionando para Quarter')
+        this.redirectToQuarter()
+      }
     }
   }
 }
