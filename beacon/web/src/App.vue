@@ -481,9 +481,6 @@ export default {
     
     // Verificar autenticação
     this.checkAuth()
-    
-    // Verificar redirecionamento de retorno
-    this.redirectToQuarter()
   }
 }
 </script>
