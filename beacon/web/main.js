@@ -5,7 +5,7 @@ import BeaconView from './src/views/BeaconView.vue';
 import StatusView from './src/views/StatusView.vue';
 
 const router = createRouter({
-  history: createWebHistory('/'),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
