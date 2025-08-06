@@ -271,33 +271,181 @@ export default {
     },
     
     // Verificar autenticação
-    checkAuthentication() {
-      console.log('🔍 Verificando autenticação no Beacon...')
+    checkAuth() {
+      console.log('🔍 Verificando autenticação...')
       
-      // Verificar se está autenticado
-      if (BeaconAuthService.isAuthenticated()) {
-        console.log('✅ Usuário autenticado no Beacon')
-        this.user = BeaconAuthService.getUserInfo()
+      // Verificar token na URL
+      const urlParams = new URLSearchParams(window.location.search)
+      const authToken = urlParams.get('auth_token')
+      
+      if (authToken) {
+        console.log('🔑 Token encontrado na URL, processando...')
+        this.processAuthToken(authToken)
+        return
+      }
+      
+      // Verificar token no localStorage
+      const storedToken = localStorage.getItem('auth_token') || 
+                         localStorage.getItem('canonika_auth_token')
+      
+      if (storedToken) {
+        console.log('🔑 Token encontrado no localStorage, validando...')
+        if (this.validateToken(storedToken)) {
+          console.log('✅ Token válido, usuário autenticado')
+          this.user = this.getUserFromToken(storedToken)
+          this.isAuthenticated = true
+          return
+        } else {
+          console.log('❌ Token inválido, limpando...')
+          this.clearTokens()
+        }
+      }
+      
+      console.log('❌ Usuário não autenticado, redirecionando para Quarter...')
+      this.redirectToQuarter()
+    },
+    
+    // Processar token de autenticação
+    processAuthToken(token) {
+      console.log('🔑 Processando token de autenticação...')
+      
+      if (this.validateToken(token)) {
+        console.log('✅ Token válido, salvando...')
+        localStorage.setItem('auth_token', token)
+        localStorage.setItem('canonika_auth_token', token)
+        
+        this.user = this.getUserFromToken(token)
         this.isAuthenticated = true
-        return true
+        
+        // Limpar token da URL
+        const url = new URL(window.location)
+        url.searchParams.delete('auth_token')
+        window.history.replaceState({}, '', url.toString())
+        
+        console.log('✅ Usuário autenticado com sucesso')
       } else {
-        console.log('❌ Usuário não autenticado no Beacon')
-        this.user = null
-        this.isAuthenticated = false
+        console.log('❌ Token inválido, redirecionando para Quarter...')
+        this.redirectToQuarter()
+      }
+    },
+    
+    // Validar token
+    validateToken(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        const now = Math.floor(Date.now() / 1000)
+        
+        if (payload.exp && payload.exp < now) {
+          console.log('❌ Token expirado')
+          return false
+        }
+        
+        console.log('✅ Token válido')
+        return true
+      } catch (error) {
+        console.log('❌ Token inválido:', error)
         return false
       }
     },
     
+    // Obter usuário do token
+    getUserFromToken(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        return {
+          id: payload.id,
+          name: payload.name,
+          email: payload.email,
+          roles: payload.roles || []
+        }
+      } catch (error) {
+        console.log('❌ Erro ao extrair usuário do token:', error)
+        return null
+      }
+    },
+    
+    // Limpar tokens
+    clearTokens() {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('canonika_auth_token')
+      localStorage.removeItem('canonika_refresh_token')
+      localStorage.removeItem('canonika_authenticated')
+      localStorage.removeItem('canonika_user')
+      
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      document.cookie = 'canonika_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      document.cookie = 'canonika_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      document.cookie = 'canonika_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+    },
+    
     // Redirecionar para Quarter
     redirectToQuarter() {
-      console.log('🔄 Redirecionando para Quarter...')
-      BeaconAuthService.redirectToQuarter()
+      const currentUrl = window.location.href
+      const redirectUrl = encodeURIComponent(currentUrl)
+      console.log('🔄 Redirecionando para Quarter:', `http://localhost:3700?redirect_to=${redirectUrl}`)
+      window.location.href = `http://localhost:3700?redirect_to=${redirectUrl}`
     },
     
     // Fazer logout
     logout() {
-      console.log('🚪 Logout solicitado no Beacon')
-      BeaconAuthService.logout()
+      console.log('🚪 ===== INICIANDO LOGOUT NO BEACON =====');
+      console.log('🔍 URL atual:', window.location.href);
+      console.log('🔍 Timestamp:', new Date().toISOString());
+      
+      // 1. Verificar tokens antes de limpar
+      console.log('📋 Tokens antes da limpeza:');
+      console.log('  - localStorage auth_token:', localStorage.getItem('auth_token'));
+      console.log('  - localStorage canonika_auth_token:', localStorage.getItem('canonika_auth_token'));
+      console.log('  - Cookie auth_token:', document.cookie.includes('auth_token'));
+      console.log('  - Cookie canonika_auth_token:', document.cookie.includes('canonika_auth_token'));
+      
+      // 2. Limpar tokens do localStorage
+      console.log('🧹 Limpando localStorage...');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('canonika_auth_token');
+      localStorage.removeItem('canonika_refresh_token');
+      localStorage.removeItem('canonika_authenticated');
+      localStorage.removeItem('canonika_user');
+      
+      // 3. Limpar cookies
+      console.log('🧹 Limpando cookies...');
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'canonika_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'canonika_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'canonika_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+      // 4. Verificar tokens após limpeza
+      console.log('📋 Tokens após limpeza:');
+      console.log('  - localStorage auth_token:', localStorage.getItem('auth_token'));
+      console.log('  - localStorage canonika_auth_token:', localStorage.getItem('canonika_auth_token'));
+      console.log('  - Cookie auth_token:', document.cookie.includes('auth_token'));
+      console.log('  - Cookie canonika_auth_token:', document.cookie.includes('canonika_auth_token'));
+      
+      // 5. Preparar redirecionamento
+      const cleanUrl = window.location.origin + window.location.pathname;
+      console.log('🧹 URL limpa calculada:', cleanUrl);
+      console.log('🔄 Preparando redirecionamento para Quarter...');
+      console.log('🎯 URL de destino: http://localhost:3700?logout=1');
+      
+      // 6. Executar redirecionamento
+      console.log('🚀 EXECUTANDO REDIRECIONAMENTO...');
+      try {
+        // Redirecionar para Quarter com parâmetro de logout
+        console.log('🔄 Redirecionando para Quarter com logout...');
+        window.location.href = 'http://localhost:3700?logout=1';
+        console.log('✅ Redirecionamento executado com sucesso');
+      } catch (error) {
+        console.error('❌ Erro no redirecionamento:', error);
+        // Fallback
+        try {
+          console.log('🔄 Tentando fallback...');
+          window.location.assign('http://localhost:3700?logout=1');
+        } catch (error2) {
+          console.error('❌ Erro no fallback:', error2);
+        }
+      }
+      
+      console.log('🚪 ===== FIM DO LOGOUT =====');
     },
     
     // Login local (fallback)
@@ -331,17 +479,11 @@ export default {
       return;
     }
     
-    // Processar token de autenticação se presente na URL
-    BeaconAuthService.processAuthToken();
-    
     // Verificar autenticação
-    if (!this.checkAuthentication()) {
-      console.log('❌ Usuário não autenticado, redirecionando para Quarter...')
-      this.redirectToQuarter();
-      return;
-    }
+    this.checkAuth()
     
-    console.log('✅ Usuário autenticado, carregando aplicação...')
+    // Verificar redirecionamento de retorno
+    this.redirectToQuarter()
   }
 }
 </script>
