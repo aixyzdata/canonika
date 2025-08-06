@@ -267,16 +267,24 @@ export default {
       // 6. Executar redirecionamento
       console.log('🚀 EXECUTANDO REDIRECIONAMENTO...');
       try {
-        // Redirecionar para Quarter com parâmetro de logout
-        console.log('🔄 Redirecionando para Quarter com logout...');
-        window.location.href = 'http://localhost:3700?logout=1';
+        // Redirecionar para Quarter com parâmetro de logout e redirect_to
+        const currentUrl = window.location.href;
+        const redirectUrl = encodeURIComponent(currentUrl);
+        const quarterUrl = `http://localhost:3700?logout=1&redirect_to=${redirectUrl}`;
+        
+        console.log('🔄 Redirecionando para Quarter com logout e redirect_to...');
+        console.log('🎯 URL de destino:', quarterUrl);
+        window.location.href = quarterUrl;
         console.log('✅ Redirecionamento executado com sucesso');
       } catch (error) {
         console.error('❌ Erro no redirecionamento:', error);
         // Fallback
         try {
           console.log('🔄 Tentando fallback...');
-          window.location.assign('http://localhost:3700?logout=1');
+          const currentUrl = window.location.href;
+          const redirectUrl = encodeURIComponent(currentUrl);
+          const quarterUrl = `http://localhost:3700?logout=1&redirect_to=${redirectUrl}`;
+          window.location.assign(quarterUrl);
         } catch (error2) {
           console.error('❌ Erro no fallback:', error2);
         }
