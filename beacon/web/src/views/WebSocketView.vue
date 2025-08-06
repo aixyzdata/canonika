@@ -203,6 +203,67 @@
           </div>
         </div>
       </div>
+
+      <!-- Tracking de Tarefas -->
+      <div class="service-card">
+        <div class="card-header">
+          <h3><i class="fas fa-tasks"></i> Tracking de Tarefas Backend</h3>
+        </div>
+        <div class="card-content">
+          <div class="task-controls">
+            <div class="input-group">
+              <select v-model="selectedTaskType" class="form-input">
+                <option value="">Selecionar tipo de tarefa</option>
+                <option value="download">Download de Arquivo</option>
+                <option value="upload">Upload de Arquivo</option>
+                <option value="process">Processamento de Dados</option>
+                <option value="export">Exportação</option>
+                <option value="backup">Backup</option>
+              </select>
+              <button @click="startTask" class="btn btn-primary" :disabled="!selectedTaskType || !connectionStatus.connected">
+                <i class="fas fa-play"></i>
+                Iniciar Tarefa
+              </button>
+            </div>
+          </div>
+          
+          <div class="tasks-list">
+            <h4>Tarefas Ativas:</h4>
+            <div v-if="activeTasks.length === 0" class="empty-state">
+              <i class="fas fa-info-circle"></i>
+              <p>Nenhuma tarefa ativa</p>
+            </div>
+            <div v-else class="task-items">
+              <div 
+                v-for="task in activeTasks" 
+                :key="task.task_id"
+                class="task-item"
+              >
+                <div class="task-header">
+                  <div class="task-info">
+                    <span class="task-type">{{ task.task_type }}</span>
+                    <span class="task-id">{{ task.task_id.slice(0, 8) }}...</span>
+                  </div>
+                  <span class="task-status" :class="task.status">{{ task.status }}</span>
+                </div>
+                <div class="task-progress">
+                  <div class="progress-bar">
+                    <div 
+                      class="progress-fill" 
+                      :style="{ width: `${task.progress}%` }"
+                      :class="task.status"
+                    ></div>
+                  </div>
+                  <span class="progress-text">{{ task.progress }}%</span>
+                </div>
+                <div v-if="task.data" class="task-data">
+                  <pre>{{ JSON.stringify(task.data, null, 2) }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -236,7 +297,9 @@ export default {
         heartbeatInterval: 30,
         rateLimit: 100,
         compressionThreshold: 1024
-      }
+      },
+      selectedTaskType: '',
+      activeTasks: []
     };
   },
   
@@ -359,6 +422,54 @@ export default {
       const now = Date.now();
       const diff = Math.floor((now - timestamp) / 1000);
       return `${diff}s atrás`;
+    },
+
+    startTask() {
+      if (!this.selectedTaskType || !this.connectionStatus.connected) {
+        alert('Selecione um tipo de tarefa e conecte-se ao WebSocket.');
+        return;
+      }
+
+      const taskData = {
+        task_type: this.selectedTaskType,
+        task_id: Date.now().toString(), // Gerar um ID único
+        status: 'pending',
+        progress: 0,
+        data: null
+      };
+
+      this.activeTasks.push(taskData);
+      this.updateStatus(); // Atualizar status para refletir a nova tarefa
+
+      // Simular o processo de execução da tarefa
+      this.simulateTaskExecution(taskData);
+    },
+
+    simulateTaskExecution(task) {
+      const interval = setInterval(() => {
+        if (task.status === 'completed') {
+          clearInterval(interval);
+          return;
+        }
+
+        if (task.status === 'failed') {
+          clearInterval(interval);
+          task.status = 'failed';
+          task.progress = 100;
+          task.data = { error: 'Tarefa falhou por algum motivo' };
+          this.updateStatus();
+          return;
+        }
+
+        if (task.status === 'pending') {
+          task.status = 'running';
+          task.progress = Math.min(task.progress + 10, 100); // Aumentar progress
+          this.updateStatus();
+        } else if (task.status === 'running') {
+          task.progress = Math.min(task.progress + 5, 100); // Aumentar progress
+          this.updateStatus();
+        }
+      }, 1000); // Atualizar a cada 1 segundo
     }
   }
 };
@@ -723,5 +834,116 @@ export default {
   .metrics-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.task-controls {
+  margin-bottom: 1rem;
+}
+
+.task-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.task-item {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #3b82f6;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.task-type {
+  font-weight: 600;
+  color: #3b82f6;
+  text-transform: capitalize;
+}
+
+.task-id {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.task-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.task-status.running {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.task-status.completed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.task-status.failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.task-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+  transition: width 0.3s ease;
+}
+
+.progress-fill.completed {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.progress-fill.failed {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  min-width: 40px;
+}
+
+.task-data {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin-top: 0.5rem;
 }
 </style> 

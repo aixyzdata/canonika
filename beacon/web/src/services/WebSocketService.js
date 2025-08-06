@@ -112,6 +112,87 @@ class WebSocketService {
   }
 
   /**
+   * Inscrever em progresso de uma tarefa específica
+   */
+  subscribeToTask(taskId, callback) {
+    const topic = `tasks.${taskId}`;
+    return this.subscribe(topic, callback);
+  }
+
+  /**
+   * Iniciar uma nova tarefa
+   */
+  async startTask(taskType, data = {}) {
+    try {
+      const token = this.getStoredToken();
+      const response = await fetch(`/api/tasks/${taskType}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error starting task:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obter status de uma tarefa
+   */
+  async getTaskStatus(taskId) {
+    try {
+      const token = this.getStoredToken();
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error getting task status:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obter todas as tarefas do usuário
+   */
+  async getUserTasks() {
+    try {
+      const token = this.getStoredToken();
+      const response = await fetch('/api/tasks', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error getting user tasks:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Cancelar inscrição em um tópico
    */
   unsubscribe(topic, callback) {

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, Depends
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
@@ -17,6 +17,7 @@ import jwt
 from datetime import datetime, timedelta
 import gzip
 import base64
+import uuid
 
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
@@ -45,7 +46,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Beacon WebSocket Broker", 
-    description="Broker de mensagens em tempo real com observable pattern",
+    description="Broker de mensagens em tempo real com progress tracking",
     lifespan=lifespan
 )
 
@@ -66,6 +67,7 @@ class ConnectionManager:
         self.user_connections: Dict[str, Set[str]] = defaultdict(set)
         self.connection_metadata: Dict[str, Dict] = {}
         self.rate_limits: Dict[str, List[float]] = defaultdict(list)
+        self.running_tasks: Dict[str, Dict] = {}  # task_id -> task_info
         
     async def connect(self, websocket: WebSocket, user_id: str, connection_id: str):
         await websocket.accept()
@@ -140,7 +142,191 @@ class ConnectionManager:
         self.rate_limits[user_id].append(now)
         return True
 
+    async def start_task_progress(self, task_id: str, task_type: str, user_id: str, initial_data: Dict = None):
+        """Iniciar tracking de progresso de uma tarefa"""
+        self.running_tasks[task_id] = {
+            "task_id": task_id,
+            "task_type": task_type,
+            "user_id": user_id,
+            "status": "running",
+            "progress": 0,
+            "started_at": time.time(),
+            "data": initial_data or {},
+            "updates": []
+        }
+        
+        # Notificar início da tarefa
+        await self.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_started",
+            "task_id": task_id,
+            "task_type": task_type,
+            "status": "running",
+            "progress": 0,
+            "timestamp": time.time()
+        })
+        
+        logger.info(f"Started tracking task {task_id} for user {user_id}")
+
+    async def update_task_progress(self, task_id: str, progress: int, status: str = None, data: Dict = None):
+        """Atualizar progresso de uma tarefa"""
+        if task_id not in self.running_tasks:
+            logger.warning(f"Task {task_id} not found")
+            return
+            
+        task = self.running_tasks[task_id]
+        task["progress"] = progress
+        if status:
+            task["status"] = status
+        if data:
+            task["data"].update(data)
+            
+        task["updates"].append({
+            "timestamp": time.time(),
+            "progress": progress,
+            "status": task["status"],
+            "data": data
+        })
+        
+        # Notificar atualização
+        await self.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_progress",
+            "task_id": task_id,
+            "progress": progress,
+            "status": task["status"],
+            "data": data,
+            "timestamp": time.time()
+        })
+        
+        logger.info(f"Updated task {task_id} progress to {progress}%")
+
+    async def complete_task(self, task_id: str, final_data: Dict = None):
+        """Completar uma tarefa"""
+        if task_id not in self.running_tasks:
+            logger.warning(f"Task {task_id} not found")
+            return
+            
+        task = self.running_tasks[task_id]
+        task["status"] = "completed"
+        task["progress"] = 100
+        task["completed_at"] = time.time()
+        if final_data:
+            task["data"].update(final_data)
+            
+        # Notificar conclusão
+        await self.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_completed",
+            "task_id": task_id,
+            "status": "completed",
+            "progress": 100,
+            "data": final_data,
+            "timestamp": time.time()
+        })
+        
+        # Manter histórico por 1 hora
+        await asyncio.sleep(3600)
+        if task_id in self.running_tasks:
+            del self.running_tasks[task_id]
+            
+        logger.info(f"Completed task {task_id}")
+
+    async def fail_task(self, task_id: str, error: str, error_data: Dict = None):
+        """Falhar uma tarefa"""
+        if task_id not in self.running_tasks:
+            logger.warning(f"Task {task_id} not found")
+            return
+            
+        task = self.running_tasks[task_id]
+        task["status"] = "failed"
+        task["error"] = error
+        task["failed_at"] = time.time()
+        if error_data:
+            task["data"].update(error_data)
+            
+        # Notificar falha
+        await self.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_failed",
+            "task_id": task_id,
+            "status": "failed",
+            "error": error,
+            "data": error_data,
+            "timestamp": time.time()
+        })
+        
+        logger.error(f"Task {task_id} failed: {error}")
+
 manager = ConnectionManager()
+
+class TaskManager:
+    def __init__(self):
+        self.running_tasks: Dict[str, Dict] = {}
+    
+    async def start_task(self, task_id: str, task_type: str, user_id: str, data: Dict = None):
+        """Iniciar tracking de uma tarefa"""
+        self.running_tasks[task_id] = {
+            "task_id": task_id,
+            "task_type": task_type,
+            "user_id": user_id,
+            "status": "running",
+            "progress": 0,
+            "started_at": time.time(),
+            "data": data or {}
+        }
+        
+        # Notificar início
+        await manager.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_started",
+            "task_id": task_id,
+            "task_type": task_type,
+            "status": "running",
+            "progress": 0,
+            "timestamp": time.time()
+        })
+    
+    async def update_progress(self, task_id: str, progress: int, status: str = None, data: Dict = None):
+        """Atualizar progresso de uma tarefa"""
+        if task_id not in self.running_tasks:
+            return
+            
+        task = self.running_tasks[task_id]
+        task["progress"] = progress
+        if status:
+            task["status"] = status
+        if data:
+            task["data"].update(data)
+        
+        # Notificar atualização
+        await manager.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_progress",
+            "task_id": task_id,
+            "progress": progress,
+            "status": task["status"],
+            "data": data,
+            "timestamp": time.time()
+        })
+    
+    async def complete_task(self, task_id: str, final_data: Dict = None):
+        """Completar uma tarefa"""
+        if task_id not in self.running_tasks:
+            return
+            
+        task = self.running_tasks[task_id]
+        task["status"] = "completed"
+        task["progress"] = 100
+        task["completed_at"] = time.time()
+        if final_data:
+            task["data"].update(final_data)
+        
+        # Notificar conclusão
+        await manager.broadcast_to_topic(f"tasks.{task_id}", {
+            "type": "task_completed",
+            "task_id": task_id,
+            "status": "completed",
+            "progress": 100,
+            "data": final_data,
+            "timestamp": time.time()
+        })
+
+task_manager = TaskManager()
 
 @dataclass
 class Event:
@@ -178,6 +364,7 @@ class MessageType(str, Enum):
     SUBSCRIBE = "subscribe"
     UNSUBSCRIBE = "unsubscribe"
     ERROR = "error"
+    TASK_PROGRESS = "task_progress"
 
 class CommandType(str, Enum):
     SUBSCRIBE = "subscribe"
@@ -185,6 +372,8 @@ class CommandType(str, Enum):
     PUBLISH = "publish"
     GET_TOPICS = "get_topics"
     GET_SUBSCRIBERS = "get_subscribers"
+    START_TASK = "start_task"
+    GET_TASK_STATUS = "get_task_status"
 
 # Autenticação
 security = HTTPBearer()
@@ -227,7 +416,8 @@ async def get_status(request: Request, user: Dict = Depends(get_current_user)):
         "user": user,
         "connections": len(manager.active_connections.get(user.get("id", ""), [])),
         "topics": len(manager.topic_subscribers),
-        "total_subscribers": sum(len(subscribers) for subscribers in manager.topic_subscribers.values())
+        "total_subscribers": sum(len(subscribers) for subscribers in manager.topic_subscribers.values()),
+        "running_tasks": len(manager.running_tasks)
     }
 
 @app.get("/api/metrics")
@@ -242,6 +432,7 @@ async def get_metrics(request: Request, user: Dict = Depends(get_current_user)):
         "topics_count": len(manager.topic_subscribers),
         "total_subscribers": sum(len(subscribers) for subscribers in manager.topic_subscribers.values()),
         "user_topics": len(manager.connection_metadata.get(user_id, {}).get("topics", set())),
+        "running_tasks": len(manager.running_tasks),
         "uptime": time.time(),
         "rate_limited": not manager.check_rate_limit(user_id)
     }
@@ -254,6 +445,68 @@ async def get_topics(request: Request, user: Dict = Depends(get_current_user)):
         "user_topics": list(manager.connection_metadata.get(user.get("id", ""), {}).get("topics", set()))
     }
 
+@app.get("/api/tasks")
+async def get_tasks(request: Request, user: Dict = Depends(get_current_user)):
+    """Lista tarefas do usuário"""
+    user_id = user.get("id", "")
+    user_tasks = {
+        task_id: task for task_id, task in manager.running_tasks.items()
+        if task["user_id"] == user_id
+    }
+    return {"tasks": user_tasks}
+
+@app.post("/api/tasks/{task_type}")
+async def start_task(
+    task_type: str, 
+    request: Request, 
+    user: Dict = Depends(get_current_user),
+    background_tasks: BackgroundTasks = None
+):
+    """Iniciar uma nova tarefa"""
+    user_id = user.get("id", "")
+    task_id = str(uuid.uuid4())
+    
+    data = await request.json() if request.headers.get("content-type") == "application/json" else {}
+    
+    await task_manager.start_task(task_id, task_type, user_id, data)
+    
+    # Simular tarefa em background
+    if background_tasks:
+        background_tasks.add_task(simulate_task, task_id, task_type, data)
+    
+    return {
+        "task_id": task_id,
+        "task_type": task_type,
+        "status": "started"
+    }
+
+async def simulate_task(task_id: str, task_type: str, data: Dict):
+    """Simular uma tarefa em background (exemplo: download)"""
+    try:
+        # Simular progresso de download
+        for progress in range(0, 101, 10):
+            await asyncio.sleep(1)
+            
+            if progress == 50:
+                await task_manager.update_progress(task_id, progress, "processing", {
+                    "message": "Downloading file...",
+                    "bytes_downloaded": progress * 1024
+                })
+            else:
+                await task_manager.update_progress(task_id, progress, "running", {
+                    "bytes_downloaded": progress * 1024
+                })
+        
+        # Completar tarefa
+        await task_manager.complete_task(task_id, {
+            "message": "Download completed successfully",
+            "file_size": 102400,
+            "download_url": f"/downloads/{task_id}.zip"
+        })
+        
+    except Exception as e:
+        logger.error(f"Task {task_id} failed: {e}")
+
 # Endpoints públicos
 @app.get("/health")
 async def health_check():
@@ -262,7 +515,8 @@ async def health_check():
         "status": "healthy", 
         "service": "beacon",
         "timestamp": time.time(),
-        "redis_connected": redis_client is not None
+        "redis_connected": redis_client is not None,
+        "running_tasks": len(manager.running_tasks)
     }
 
 @app.get("/")
@@ -272,7 +526,7 @@ async def root():
         "message": "Beacon WebSocket Broker", 
         "status": "online",
         "version": "2.0.0",
-        "features": ["observable", "topics", "compression", "rate_limiting", "fallback"]
+        "features": ["observable", "topics", "compression", "rate_limiting", "fallback", "task_progress"]
     }
 
 # WebSocket principal com observable pattern
@@ -312,7 +566,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "data": {
             "user_id": user_id,
             "connection_id": connection_id,
-            "features": ["observable", "topics", "compression", "heartbeat"],
+            "features": ["observable", "topics", "compression", "heartbeat", "task_progress"],
             "rate_limit": RATE_LIMIT_PER_MINUTE,
             "heartbeat_interval": HEARTBEAT_INTERVAL
         },
@@ -443,6 +697,23 @@ async def process_message(message: Dict, connection_id: str, user_id: str) -> Di
                     },
                     "timestamp": time.time()
                 }
+            elif command == CommandType.GET_TASK_STATUS:
+                task_id = message.get("task_id")
+                if task_id in manager.running_tasks:
+                    task = manager.running_tasks[task_id]
+                    return {
+                        "type": "response",
+                        "id": msg_id,
+                        "data": {"task": task},
+                        "timestamp": time.time()
+                    }
+                else:
+                    return {
+                        "type": "error",
+                        "id": msg_id,
+                        "data": {"message": "Task not found"},
+                        "timestamp": time.time()
+                    }
                 
         elif msg_type == MessageType.HEARTBEAT:
             return {
