@@ -126,7 +126,9 @@ services:
 
   # Beacon - Monitoramento
   beacon:
-    build: ./beacon
+    build:
+      context: .
+      dockerfile: ./beacon/Dockerfile
     container_name: canonika_beacon
     ports:
       - "3703:3703"
