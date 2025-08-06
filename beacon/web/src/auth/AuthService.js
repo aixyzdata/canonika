@@ -5,17 +5,17 @@ class BeaconAuthService {
     this.refreshTokenKey = 'beacon_refresh_token';
   }
 
-  // Verificar se está autenticado
+  // Verificar se usuário está autenticado
   isAuthenticated() {
     const token = this.getAccessToken();
     if (!token) return false;
     
     try {
-      const decoded = this.decodeToken(token);
-      const now = Date.now() / 1000;
-      return decoded.exp > now;
+      const payload = this.decodeToken(token);
+      const now = Math.floor(Date.now() / 1000);
+      
+      return payload.exp > now;
     } catch (error) {
-      console.error('Erro ao decodificar token:', error);
       return false;
     }
   }
@@ -30,18 +30,16 @@ class BeaconAuthService {
     return localStorage.getItem(this.refreshTokenKey) || this.getCookie(this.refreshTokenKey);
   }
 
-  // Decodificar token JWT
+  // Decodificar token
   decodeToken(token) {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(jsonPayload);
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Token inválido');
+      
+      const payload = JSON.parse(atob(parts[1]));
+      return payload;
     } catch (error) {
-      console.error('Erro ao decodificar token:', error);
-      return null;
+      throw new Error('Token inválido');
     }
   }
 
@@ -50,70 +48,64 @@ class BeaconAuthService {
     const token = this.getAccessToken();
     if (!token) return null;
     
-    const decoded = this.decodeToken(token);
-    return decoded ? {
-      id: decoded.id,
-      name: decoded.name,
-      email: decoded.email,
-      roles: decoded.roles || [],
-      permissions: decoded.permissions || []
-    } : null;
+    try {
+      return this.decodeToken(token);
+    } catch (error) {
+      return null;
+    }
   }
 
-  // Processar token de autenticação da URL
+  // Processar token da URL (quando retorna do Quarter)
   processAuthToken() {
     const urlParams = new URLSearchParams(window.location.search);
-    const authToken = urlParams.get('auth_token');
+    const token = urlParams.get('auth_token');
     
-    if (authToken) {
-      console.log('🔐 Processando token de autenticação do Beacon...');
+    if (token) {
+      console.log('🔑 Token recebido do Quarter');
       
-      try {
-        // Decodificar token para verificar validade
-        const decoded = this.decodeToken(authToken);
-        if (decoded && decoded.exp > Date.now() / 1000) {
-          // Salvar tokens
-          localStorage.setItem(this.tokenKey, authToken);
-          
-          // Gerar refresh token (simulado)
-          const refreshToken = this.generateJWT({
-            ...decoded,
-            type: 'refresh',
-            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 dias
-          });
-          localStorage.setItem(this.refreshTokenKey, refreshToken);
-          
-          // Limpar URL
-          const cleanUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, cleanUrl);
-          
-          console.log('✅ Token de autenticação processado com sucesso');
-          return true;
-        } else {
-          console.log('❌ Token expirado ou inválido');
-          return false;
-        }
-      } catch (error) {
-        console.error('❌ Erro ao processar token:', error);
-        return false;
-      }
+      // Salvar token
+      localStorage.setItem(this.tokenKey, token);
+      
+      // Limpar URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+      return true;
     }
     
     return false;
   }
 
-  // Redirecionar para Quarter
+  // Redirecionar para Quarter para login
   redirectToQuarter() {
     const currentUrl = encodeURIComponent(window.location.href);
     const quarterUrl = `${this.quarterUrl}?return_url=${currentUrl}&service=beacon`;
-    window.location.href = quarterUrl;
+    
+    console.log('🔄 Redirecionando para Quarter:', quarterUrl);
+    
+    // Forçar redirecionamento
+    setTimeout(() => {
+      window.location.href = quarterUrl;
+    }, 100);
+  }
+  
+  // Redirecionar para Quarter para logout
+  redirectToQuarterForLogout() {
+    const quarterUrl = `${this.quarterUrl}?logout=true`;
+    
+    console.log('🚪 Redirecionando para Quarter para logout:', quarterUrl);
+    
+    // Forçar redirecionamento
+    setTimeout(() => {
+      window.location.href = quarterUrl;
+    }, 100);
   }
 
   // Fazer logout
   logout() {
-    console.log('🚪 Iniciando logout no Beacon...');
+    console.log('🚪 Iniciando logout...');
     
-    // Limpar tokens
+    // Limpar localStorage
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     
@@ -121,28 +113,30 @@ class BeaconAuthService {
     document.cookie = `${this.tokenKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     document.cookie = `${this.refreshTokenKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     
-    // Redirecionar para Quarter
-    window.location.href = `${this.quarterUrl}?logout=1`;
+    console.log('🧹 Tokens limpos, redirecionando para Quarter...');
+    
+    // Redirecionar imediatamente para Quarter
+    console.log('🔄 Redirecionando para:', this.quarterUrl);
+    window.location.href = this.quarterUrl;
   }
 
-  // Verificar e renovar token
+  // Verificar e renovar token se necessário
   async checkAndRefreshToken() {
     const token = this.getAccessToken();
     if (!token) return false;
     
     try {
-      const decoded = this.decodeToken(token);
-      const now = Date.now() / 1000;
-      const timeUntilExpiry = decoded.exp - now;
+      const payload = this.decodeToken(token);
+      const now = Math.floor(Date.now() / 1000);
       
-      // Se o token expira em menos de 5 minutos, renovar
-      if (timeUntilExpiry < 300) {
+      // Se token expira em menos de 1 hora, renovar
+      if (payload.exp - now < 3600) {
+        console.log('🔄 Token expirando, renovando...');
         return await this.refreshToken();
       }
       
       return true;
     } catch (error) {
-      console.error('Erro ao verificar token:', error);
       return false;
     }
   }
@@ -153,50 +147,80 @@ class BeaconAuthService {
     if (!refreshToken) return false;
     
     try {
-      // Simular renovação de token
-      const decoded = this.decodeToken(refreshToken);
-      const newToken = this.generateJWT({
-        ...decoded,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hora
+      const payload = this.decodeToken(refreshToken);
+      const now = Math.floor(Date.now() / 1000);
+      
+      if (payload.exp <= now) {
+        this.logout();
+        return false;
+      }
+      
+      // Em produção, faria uma chamada para o Quarter para renovar
+      // Por enquanto, vamos simular uma renovação
+      const newAccessToken = this.generateJWT({
+        id: payload.id,
+        name: payload.name,
+        email: payload.email,
+        roles: payload.roles,
+        permissions: payload.permissions
       });
       
-      localStorage.setItem(this.tokenKey, newToken);
-      console.log('✅ Token renovado com sucesso');
+      localStorage.setItem(this.tokenKey, newAccessToken);
       return true;
     } catch (error) {
-      console.error('❌ Erro ao renovar token:', error);
+      this.logout();
       return false;
     }
   }
 
-  // Gerar JWT (simulado)
+  // Gerar JWT Token (simulação)
   generateJWT(payload) {
-    const header = { alg: 'HS256', typ: 'JWT' };
-    const encodedHeader = btoa(JSON.stringify(header));
-    const encodedPayload = btoa(JSON.stringify(payload));
-    const signature = 'signature'; // Simulado
+    const header = {
+      alg: 'HS256',
+      typ: 'JWT'
+    };
     
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
+    const now = Math.floor(Date.now() / 1000);
+    const tokenPayload = {
+      ...payload,
+      iat: now,
+      exp: now + (60 * 60 * 24), // 24 horas
+      iss: 'quarter.canonika.io',
+      aud: 'canonika-ecosystem'
+    };
+    
+    const encodedHeader = btoa(JSON.stringify(header));
+    const encodedPayload = btoa(JSON.stringify(tokenPayload));
+    
+    return `${encodedHeader}.${encodedPayload}.signature`;
   }
 
   // Obter cookie
   getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i=0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
     return null;
   }
 
-  // Verificar permissão
+  // Verificar permissões
   hasPermission(permission) {
-    const userInfo = this.getUserInfo();
-    return userInfo && userInfo.permissions && userInfo.permissions.includes(permission);
+    const user = this.getUserInfo();
+    if (!user) return false;
+    
+    return user.permissions && user.permissions.includes(permission);
   }
 
-  // Verificar role
+  // Verificar roles
   hasRole(role) {
-    const userInfo = this.getUserInfo();
-    return userInfo && userInfo.roles && userInfo.roles.includes(role);
+    const user = this.getUserInfo();
+    if (!user) return false;
+    
+    return user.roles && user.roles.includes(role);
   }
 }
 
