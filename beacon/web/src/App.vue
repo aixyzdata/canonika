@@ -244,12 +244,12 @@ export default {
       // 3. Executar redirecionamento
       console.log('🚀 EXECUTANDO REDIRECIONAMENTO...');
       try {
-        // Redirecionar para Quarter com logout e return_url
-        const currentUrl = window.location.href;
-        const returnUrl = encodeURIComponent(currentUrl);
+        // Redirecionar para Quarter com logout e return_url (URL limpa)
+        const baseUrl = window.location.origin + window.location.pathname;
+        const returnUrl = encodeURIComponent(baseUrl);
         const quarterUrl = `http://localhost:3700?logout=1&return_url=${returnUrl}&service=beacon`;
         
-        console.log('🔄 Redirecionando para Quarter:', quarterUrl);
+        console.log('🔄 Redirecionando para Quarter (URL limpa):', quarterUrl);
         
         // Forçar redirecionamento
         window.location.replace(quarterUrl);
