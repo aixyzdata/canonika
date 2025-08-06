@@ -228,43 +228,20 @@ export default {
     logout() {
       console.log('🔘 ===== BOTÃO LOGOUT CLICADO =====');
       console.log('🔘 Método logout() chamado');
-      console.log('🔘 this:', this);
       console.log('🔘 window.location:', window.location.href);
       console.log('🚪 ===== INICIANDO LOGOUT =====');
-      console.log('🔍 URL atual:', window.location.href);
-      console.log('🔍 Timestamp:', new Date().toISOString());
       
-      // 1. Verificar tokens antes de limpar
-      console.log('📋 Tokens antes da limpeza:');
-      console.log('  - localStorage beacon_access_token:', localStorage.getItem('beacon_access_token'));
-      console.log('  - localStorage beacon_refresh_token:', localStorage.getItem('beacon_refresh_token'));
-      console.log('  - Cookie beacon_access_token:', document.cookie.includes('beacon_access_token'));
-      console.log('  - Cookie beacon_refresh_token:', document.cookie.includes('beacon_refresh_token'));
-      
-      // 2. Limpar tokens do localStorage
+      // 1. Limpar tokens do localStorage
       console.log('🧹 Limpando localStorage...');
       localStorage.removeItem('beacon_access_token');
       localStorage.removeItem('beacon_refresh_token');
       
-      // 3. Limpar cookies
+      // 2. Limpar cookies
       console.log('🧹 Limpando cookies...');
       document.cookie = 'beacon_access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       document.cookie = 'beacon_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 
-      // 4. Verificar tokens após limpeza
-      console.log('📋 Tokens após limpeza:');
-      console.log('  - localStorage beacon_access_token:', localStorage.getItem('beacon_access_token'));
-      console.log('  - localStorage beacon_refresh_token:', localStorage.getItem('beacon_refresh_token'));
-      console.log('  - Cookie beacon_access_token:', document.cookie.includes('beacon_access_token'));
-      console.log('  - Cookie beacon_refresh_token:', document.cookie.includes('beacon_refresh_token'));
-      
-      // 5. Preparar redirecionamento
-      const cleanUrl = window.location.origin + window.location.pathname;
-      console.log('🧹 URL limpa calculada:', cleanUrl);
-      console.log('🔄 Preparando redirecionamento para Quarter...');
-      console.log('🎯 URL de destino: http://localhost:3700');
-      
-      // 6. Executar redirecionamento
+      // 3. Executar redirecionamento
       console.log('🚀 EXECUTANDO REDIRECIONAMENTO...');
       try {
         // Redirecionar para Quarter com logout e return_url
@@ -272,22 +249,16 @@ export default {
         const returnUrl = encodeURIComponent(currentUrl);
         const quarterUrl = `http://localhost:3700?logout=1&return_url=${returnUrl}&service=beacon`;
         
-        console.log('🔄 Redirecionando para Quarter com logout, return_url e service...');
-        console.log('🎯 URL de destino:', quarterUrl);
-        window.location.href = quarterUrl;
+        console.log('🔄 Redirecionando para Quarter:', quarterUrl);
+        
+        // Forçar redirecionamento
+        window.location.replace(quarterUrl);
+        
         console.log('✅ Redirecionamento executado com sucesso');
       } catch (error) {
         console.error('❌ Erro no redirecionamento:', error);
-        // Fallback
-        try {
-          console.log('🔄 Tentando fallback...');
-          const currentUrl = window.location.href;
-          const returnUrl = encodeURIComponent(currentUrl);
-          const quarterUrl = `http://localhost:3700?logout=1&return_url=${returnUrl}&service=beacon`;
-          window.location.assign(quarterUrl);
-        } catch (error2) {
-          console.error('❌ Erro no fallback:', error2);
-        }
+        // Fallback simples
+        window.location.href = 'http://localhost:3700?logout=1&service=beacon';
       }
       
       console.log('🚪 ===== FIM DO LOGOUT =====');
