@@ -1,354 +1,404 @@
+/**
+ * WebSocket Service com Observable Pattern
+ * Implementação moderna com fallback, retry e compressão
+ */
+
 class WebSocketService {
-  constructor(url, options = {}) {
-    this.url = url;
-    this.clientId = options.clientId || this.generateClientId();
-    this.options = {
-      reconnectInterval: options.reconnectInterval || 5000,
-      maxReconnectAttempts: options.maxReconnectAttempts || 10,
-      heartbeatInterval: options.heartbeatInterval || 30000,
-      ...options
-    };
-    
+  constructor() {
     this.ws = null;
-    this.isConnected = false;
+    this.connectionId = null;
+    this.userId = null;
+    this.topics = new Set();
+    this.observers = new Map(); // topic -> Set of callbacks
     this.reconnectAttempts = 0;
-    this.subscribers = new Map();
-    this.eventListeners = new Map();
-    this.heartbeatTimer = null;
-    this.reconnectTimer = null;
-    this.messageQueue = [];
-    this.pendingMessages = new Map();
-    
-    // Bind methods
-    this.connect = this.connect.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-    this.send = this.send.bind(this);
-    this.subscribe = this.subscribe.bind(this);
-    this.unsubscribe = this.unsubscribe.bind(this);
-    this.publish = this.publish.bind(this);
-    this.on = this.on.bind(this);
-    this.off = this.off.bind(this);
-  }
-
-  generateClientId() {
-    return 'client_' + Math.random().toString(36).substr(2, 9);
-  }
-
-  async connect() {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      return Promise.resolve();
-    }
-
-    return new Promise((resolve, reject) => {
-      try {
-        const wsUrl = `${this.url}/ws/${this.clientId}`;
-        this.ws = new WebSocket(wsUrl);
-
-        this.ws.onopen = () => {
-          console.log('🔗 WebSocket conectado:', this.clientId);
-          this.isConnected = true;
-          this.reconnectAttempts = 0;
-          this.startHeartbeat();
-          this.processMessageQueue();
-          this.emit('connected', { clientId: this.clientId });
-          resolve();
-        };
-
-        this.ws.onmessage = (event) => {
-          try {
-            const message = JSON.parse(event.data);
-            this.handleMessage(message);
-          } catch (error) {
-            console.error('❌ Erro ao processar mensagem:', error);
-          }
-        };
-
-        this.ws.onclose = (event) => {
-          console.log('🔌 WebSocket desconectado:', event.code, event.reason);
-          this.isConnected = false;
-          this.stopHeartbeat();
-          this.emit('disconnected', { code: event.code, reason: event.reason });
-          
-          if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
-            this.scheduleReconnect();
-          } else {
-            this.emit('reconnect_failed');
-          }
-        };
-
-        this.ws.onerror = (error) => {
-          console.error('❌ Erro no WebSocket:', error);
-          this.emit('error', error);
-          reject(error);
-        };
-
-      } catch (error) {
-        console.error('❌ Erro ao conectar WebSocket:', error);
-        reject(error);
-      }
-    });
-  }
-
-  disconnect() {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-    
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
-    
+    this.maxReconnectAttempts = 5;
+    this.reconnectDelay = 1000;
+    this.heartbeatInterval = null;
     this.isConnected = false;
-    this.reconnectAttempts = 0;
-  }
-
-  scheduleReconnect() {
-    this.reconnectAttempts++;
-    const delay = this.options.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1);
+    this.pendingMessages = [];
+    this.fallbackMode = false;
+    this.fallbackEndpoint = '/api/events';
     
-    console.log(`🔄 Tentativa de reconexão ${this.reconnectAttempts}/${this.options.maxReconnectAttempts} em ${delay}ms`);
-    
-    this.reconnectTimer = setTimeout(() => {
-      this.connect().catch(error => {
-        console.error('❌ Falha na reconexão:', error);
-      });
-    }, delay);
+    // Configurações
+    this.config = {
+      url: 'ws://localhost:3703/ws',
+      heartbeatInterval: 30000,
+      compressionThreshold: 1024,
+      rateLimit: 100,
+      maxRetries: 5
+    };
   }
 
-  startHeartbeat() {
-    this.heartbeatTimer = setInterval(() => {
-      if (this.isConnected) {
-        this.send({
-          type: 'heartbeat',
-          timestamp: Date.now()
-        });
-      }
-    }, this.options.heartbeatInterval);
-  }
-
-  stopHeartbeat() {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-  }
-
-  send(message) {
-    if (!this.isConnected) {
-      this.messageQueue.push(message);
-      return;
-    }
-
+  /**
+   * Conectar ao WebSocket
+   */
+  async connect(token) {
     try {
-      const messageStr = JSON.stringify(message);
-      this.ws.send(messageStr);
-    } catch (error) {
-      console.error('❌ Erro ao enviar mensagem:', error);
-      this.messageQueue.push(message);
-    }
-  }
-
-  processMessageQueue() {
-    while (this.messageQueue.length > 0) {
-      const message = this.messageQueue.shift();
-      this.send(message);
-    }
-  }
-
-  handleMessage(message) {
-    console.log('📨 Mensagem recebida:', message);
-    
-    switch (message.type) {
-      case 'event':
-        this.handleEvent(message);
-        break;
-      case 'response':
-        this.handleResponse(message);
-        break;
-      case 'heartbeat':
-        this.handleHeartbeat(message);
-        break;
-      default:
-        console.log('❓ Tipo de mensagem desconhecido:', message.type);
-    }
-  }
-
-  handleEvent(message) {
-    const topic = message.topic;
-    const eventData = message.data;
-    
-    // Notificar subscribers do tópico
-    if (this.subscribers.has(topic)) {
-      this.subscribers.get(topic).forEach(callback => {
-        try {
-          callback(eventData);
-        } catch (error) {
-          console.error('❌ Erro no callback do subscriber:', error);
-        }
-      });
-    }
-    
-    // Emitir evento global
-    this.emit('event', { topic, data: eventData });
-  }
-
-  handleResponse(message) {
-    const requestId = message.id;
-    if (this.pendingMessages.has(requestId)) {
-      const { resolve, reject } = this.pendingMessages.get(requestId);
-      this.pendingMessages.delete(requestId);
+      // Decodificar token para obter user_id
+      const payload = this.decodeToken(token);
+      this.userId = payload.id;
       
-      if (message.data && message.data.error) {
-        reject(new Error(message.data.error));
-      } else {
-        resolve(message.data);
-      }
+      // Construir URL com token
+      const wsUrl = `${this.config.url}?token=${encodeURIComponent(token)}`;
+      
+      this.ws = new WebSocket(wsUrl);
+      
+      this.ws.onopen = () => {
+        console.log('WebSocket connected');
+        this.isConnected = true;
+        this.reconnectAttempts = 0;
+        this.startHeartbeat();
+        this.processPendingMessages();
+      };
+      
+      this.ws.onmessage = (event) => {
+        this.handleMessage(event.data);
+      };
+      
+      this.ws.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        this.isConnected = false;
+        this.stopHeartbeat();
+        
+        // Tentar reconectar se não foi fechamento intencional
+        if (event.code !== 1000) {
+          this.scheduleReconnect();
+        }
+      };
+      
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.fallbackMode = true;
+      };
+      
+    } catch (error) {
+      console.error('Connection error:', error);
+      throw error;
     }
   }
 
-  handleHeartbeat(message) {
-    this.emit('heartbeat', message.data);
+  /**
+   * Desconectar do WebSocket
+   */
+  disconnect() {
+    if (this.ws) {
+      this.ws.close(1000, 'User disconnect');
+    }
+    this.stopHeartbeat();
+    this.isConnected = false;
+    this.topics.clear();
+    this.observers.clear();
   }
 
+  /**
+   * Inscrever em um tópico (Observable Pattern)
+   */
   subscribe(topic, callback) {
-    if (!this.subscribers.has(topic)) {
-      this.subscribers.set(topic, new Set());
+    if (!this.observers.has(topic)) {
+      this.observers.set(topic, new Set());
     }
+    this.observers.get(topic).add(callback);
     
-    this.subscribers.get(topic).add(callback);
-    
-    // Enviar comando de subscribe
-    this.send({
+    // Enviar subscribe para o servidor
+    this.sendMessage({
       type: 'subscribe',
-      topic: topic
+      topic: topic,
+      id: this.generateId()
     });
+    
+    this.topics.add(topic);
     
     return () => this.unsubscribe(topic, callback);
   }
 
+  /**
+   * Cancelar inscrição em um tópico
+   */
   unsubscribe(topic, callback) {
-    if (this.subscribers.has(topic)) {
-      this.subscribers.get(topic).delete(callback);
-      
-      if (this.subscribers.get(topic).size === 0) {
-        this.subscribers.delete(topic);
+    const topicObservers = this.observers.get(topic);
+    if (topicObservers) {
+      topicObservers.delete(callback);
+      if (topicObservers.size === 0) {
+        this.observers.delete(topic);
+        this.topics.delete(topic);
+        
+        // Enviar unsubscribe para o servidor
+        this.sendMessage({
+          type: 'unsubscribe',
+          topic: topic,
+          id: this.generateId()
+        });
       }
     }
-    
-    // Enviar comando de unsubscribe
-    this.send({
-      type: 'unsubscribe',
-      topic: topic
-    });
   }
 
-  publish(topic, data, priority = 'medium') {
-    this.send({
+  /**
+   * Publicar evento em um tópico
+   */
+  publish(topic, data) {
+    const message = {
       type: 'event',
       topic: topic,
       data: data,
-      priority: priority,
-      source: this.clientId
-    });
+      id: this.generateId(),
+      timestamp: Date.now()
+    };
+    
+    this.sendMessage(message);
+    
+    // Notificar observadores locais
+    this.notifyObservers(topic, message);
   }
 
-  async getMetrics() {
-    return this.sendCommand('get_metrics');
-  }
-
-  async getTopics() {
-    return this.sendCommand('get_topics');
-  }
-
-  async getClients() {
-    return this.sendCommand('get_clients');
-  }
-
-  sendCommand(command) {
-    return new Promise((resolve, reject) => {
-      const messageId = this.generateMessageId();
-      
-      this.pendingMessages.set(messageId, { resolve, reject });
-      
-      this.send({
-        type: 'command',
-        command: command,
-        id: messageId
-      });
-      
-      // Timeout para evitar promises pendentes
-      setTimeout(() => {
-        if (this.pendingMessages.has(messageId)) {
-          this.pendingMessages.delete(messageId);
-          reject(new Error('Timeout na resposta do comando'));
+  /**
+   * Enviar mensagem para o servidor
+   */
+  sendMessage(message) {
+    if (this.isConnected && this.ws) {
+      try {
+        const messageStr = JSON.stringify(message);
+        
+        // Comprimir se necessário
+        if (messageStr.length > this.config.compressionThreshold) {
+          message.compression = true;
+          message.data = this.compressData(messageStr);
         }
-      }, 10000);
-    });
-  }
-
-  generateMessageId() {
-    return 'msg_' + Math.random().toString(36).substr(2, 9);
-  }
-
-  on(event, callback) {
-    if (!this.eventListeners.has(event)) {
-      this.eventListeners.set(event, new Set());
-    }
-    this.eventListeners.get(event).add(callback);
-  }
-
-  off(event, callback) {
-    if (this.eventListeners.has(event)) {
-      this.eventListeners.get(event).delete(callback);
+        
+        this.ws.send(JSON.stringify(message));
+      } catch (error) {
+        console.error('Error sending message:', error);
+        this.pendingMessages.push(message);
+      }
+    } else {
+      // Fallback para HTTP
+      this.sendFallbackMessage(message);
     }
   }
 
-  emit(event, data) {
-    if (this.eventListeners.has(event)) {
-      this.eventListeners.get(event).forEach(callback => {
+  /**
+   * Processar mensagens recebidas
+   */
+  handleMessage(data) {
+    try {
+      const message = JSON.parse(data);
+      
+      switch (message.type) {
+        case 'connection':
+          this.connectionId = message.id;
+          console.log('Connection established:', message.data);
+          break;
+          
+        case 'event':
+          this.notifyObservers(message.topic, message);
+          break;
+          
+        case 'heartbeat':
+          this.handleHeartbeat(message);
+          break;
+          
+        case 'error':
+          console.error('Server error:', message.data);
+          break;
+          
+        case 'response':
+          this.handleResponse(message);
+          break;
+          
+        default:
+          console.log('Unknown message type:', message.type);
+      }
+    } catch (error) {
+      console.error('Error parsing message:', error);
+    }
+  }
+
+  /**
+   * Notificar observadores de um tópico
+   */
+  notifyObservers(topic, message) {
+    const observers = this.observers.get(topic);
+    if (observers) {
+      observers.forEach(callback => {
         try {
-          callback(data);
+          callback(message);
         } catch (error) {
-          console.error('❌ Erro no event listener:', error);
+          console.error('Observer error:', error);
         }
       });
     }
   }
 
-  // Métodos de conveniência para monitoramento
+  /**
+   * Iniciar heartbeat
+   */
+  startHeartbeat() {
+    this.heartbeatInterval = setInterval(() => {
+      this.sendMessage({
+        type: 'heartbeat',
+        id: this.generateId(),
+        timestamp: Date.now()
+      });
+    }, this.config.heartbeatInterval);
+  }
+
+  /**
+   * Parar heartbeat
+   */
+  stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
+  }
+
+  /**
+   * Processar heartbeat do servidor
+   */
+  handleHeartbeat(message) {
+    // Atualizar timestamp do último heartbeat
+    this.lastHeartbeat = message.timestamp;
+  }
+
+  /**
+   * Processar resposta do servidor
+   */
+  handleResponse(message) {
+    console.log('Server response:', message);
+  }
+
+  /**
+   * Agendar reconexão
+   */
+  scheduleReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+      
+      setTimeout(() => {
+        console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
+        this.connect(this.getStoredToken());
+      }, delay);
+    } else {
+      console.error('Max reconnection attempts reached');
+      this.fallbackMode = true;
+    }
+  }
+
+  /**
+   * Processar mensagens pendentes
+   */
+  processPendingMessages() {
+    while (this.pendingMessages.length > 0) {
+      const message = this.pendingMessages.shift();
+      this.sendMessage(message);
+    }
+  }
+
+  /**
+   * Fallback para HTTP
+   */
+  async sendFallbackMessage(message) {
+    try {
+      const response = await fetch(this.fallbackEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getStoredToken()}`
+        },
+        body: JSON.stringify(message)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('Fallback message sent:', result);
+    } catch (error) {
+      console.error('Fallback error:', error);
+    }
+  }
+
+  /**
+   * Comprimir dados
+   */
+  compressData(data) {
+    // Implementação básica de compressão
+    // Em produção, usar uma biblioteca como pako
+    return btoa(data);
+  }
+
+  /**
+   * Descomprimir dados
+   */
+  decompressData(data) {
+    try {
+      return atob(data);
+    } catch {
+      return data;
+    }
+  }
+
+  /**
+   * Gerar ID único
+   */
+  generateId() {
+    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Decodificar token JWT
+   */
+  decodeToken(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      throw new Error('Invalid token');
+    }
+  }
+
+  /**
+   * Obter token armazenado
+   */
+  getStoredToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  /**
+   * Obter status da conexão
+   */
   getConnectionStatus() {
     return {
-      isConnected: this.isConnected,
-      clientId: this.clientId,
-      reconnectAttempts: this.reconnectAttempts,
-      subscribersCount: this.subscribers.size,
-      queueSize: this.messageQueue.length,
-      pendingMessagesCount: this.pendingMessages.size
+      connected: this.isConnected,
+      connectionId: this.connectionId,
+      userId: this.userId,
+      topics: Array.from(this.topics),
+      observers: this.observers.size,
+      fallbackMode: this.fallbackMode,
+      reconnectAttempts: this.reconnectAttempts
     };
   }
 
-  getSubscribers() {
-    const result = {};
-    for (const [topic, callbacks] of this.subscribers) {
-      result[topic] = callbacks.size;
-    }
-    return result;
+  /**
+   * Obter métricas
+   */
+  getMetrics() {
+    return {
+      totalTopics: this.topics.size,
+      totalObservers: Array.from(this.observers.values()).reduce((sum, set) => sum + set.size, 0),
+      pendingMessages: this.pendingMessages.length,
+      lastHeartbeat: this.lastHeartbeat
+    };
   }
 }
 
 // Instância singleton
-const beaconWebSocket = new WebSocketService('ws://localhost:3703', {
-  clientId: 'beacon_frontend_' + Math.random().toString(36).substr(2, 9),
-  reconnectInterval: 3000,
-  maxReconnectAttempts: 5,
-  heartbeatInterval: 30000
-});
+const webSocketService = new WebSocketService();
 
-export default beaconWebSocket; 
+export default webSocketService; 
