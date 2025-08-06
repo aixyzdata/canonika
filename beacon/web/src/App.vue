@@ -55,28 +55,15 @@
               <span class="section-title">SOLUÇÕES</span>
             </div>
             <ul class="nav">
-              <!-- Dashboard -->
+              <!-- Home -->
               <li class="nav-item">
                 <router-link class="nav-link" to="/" @click="handleNavClick">
                   <div class="nav-icon">
-                    <i class="fas fa-tachometer-alt"></i>
+                    <i class="fas fa-home"></i>
                   </div>
                   <div class="nav-text">
-                    <div class="nav-title">Dashboard</div>
-                    <div class="service-subtitle">Visão Geral</div>
-                  </div>
-                </router-link>
-              </li>
-              
-              <!-- Status -->
-              <li class="nav-item">
-                <router-link class="nav-link" to="/status" @click="handleNavClick">
-                  <div class="nav-icon">
-                    <i class="fas fa-chart-line"></i>
-                  </div>
-                  <div class="nav-text">
-                    <div class="nav-title">Status</div>
-                    <div class="service-subtitle">Monitoramento</div>
+                    <div class="nav-title">Home</div>
+                    <div class="service-subtitle">Página Inicial</div>
                   </div>
                 </router-link>
               </li>
@@ -91,41 +78,41 @@
             <ul class="nav">
               <!-- Sinalização -->
               <li class="nav-item">
-                <a class="nav-link" href="#" @click="handleNavClick">
+                <router-link class="nav-link" to="/sinalizacao" @click="handleNavClick">
                   <div class="nav-icon">
                     <i class="fas fa-broadcast-tower"></i>
                   </div>
                   <div class="nav-text">
                     <div class="nav-title">Sinalização</div>
-                    <div class="service-subtitle">Transmissão</div>
+                    <div class="service-subtitle">Controle de Sinais</div>
                   </div>
-                </a>
+                </router-link>
               </li>
               
               <!-- Transmissão -->
               <li class="nav-item">
-                <a class="nav-link" href="#" @click="handleNavClick">
+                <router-link class="nav-link" to="/transmissao" @click="handleNavClick">
                   <div class="nav-icon">
-                    <i class="fas fa-wifi"></i>
+                    <i class="fas fa-satellite"></i>
                   </div>
                   <div class="nav-text">
                     <div class="nav-title">Transmissão</div>
-                    <div class="service-subtitle">Comunicação</div>
+                    <div class="service-subtitle">Broadcasts</div>
                   </div>
-                </a>
+                </router-link>
               </li>
               
               <!-- Configurações -->
               <li class="nav-item">
-                <a class="nav-link" href="#" @click="handleNavClick">
+                <router-link class="nav-link" to="/configuracoes" @click="handleNavClick">
                   <div class="nav-icon">
-                    <i class="fas fa-cogs"></i>
+                    <i class="fas fa-cog"></i>
                   </div>
                   <div class="nav-text">
                     <div class="nav-title">Configurações</div>
-                    <div class="service-subtitle">Sistema</div>
+                    <div class="service-subtitle">Parâmetros</div>
                   </div>
-                </a>
+                </router-link>
               </li>
             </ul>
           </div>
