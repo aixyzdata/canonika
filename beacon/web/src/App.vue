@@ -93,7 +93,7 @@
               <li class="nav-item">
                 <router-link class="nav-link" to="/api" @click="handleNavClick">
                   <div class="nav-icon">
-                    <i class="fas fa-satellite"></i>
+                    <i class="fas fa-code"></i>
                   </div>
                   <div class="nav-text">
                     <div class="nav-title">REST API</div>
