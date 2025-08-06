@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <MasterPage 
-      :hasLogin="false"
+      :hasLogin="true"
       :serviceConfig="beaconConfig"
       @view-changed="handleViewChange"
       @login="handleLogin"
