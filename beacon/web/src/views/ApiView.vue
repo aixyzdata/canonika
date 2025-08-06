@@ -3,17 +3,17 @@
     <!-- View Header -->
     <div class="view-header">
       <div class="view-title">
-        <h2>Sinalização</h2>
-        <span class="view-subtitle">Controle de sinais e alertas</span>
+        <h2>REST API Service</h2>
+        <span class="view-subtitle">Endpoints HTTP e documentação</span>
       </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
-        <span>Sistema Ativo</span>
+        <span>Serviço Ativo</span>
       </div>
       <div class="view-actions">
         <button class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Novo Sinal
+          <i class="fas fa-book"></i>
+          Documentação
         </button>
       </div>
     </div>
@@ -24,53 +24,89 @@
         <div class="service-card">
           <div class="card-header">
             <div class="card-icon">
-              <i class="fas fa-broadcast-tower"></i>
+              <i class="fas fa-satellite"></i>
             </div>
             <div class="card-title">
-              <h4>Sinais Ativos</h4>
-              <span class="card-subtitle">Transmissões em andamento</span>
+              <h4>Endpoints Ativos</h4>
+              <span class="card-subtitle">APIs disponíveis</span>
             </div>
             <div class="card-actions">
               <span class="status-badge online">24</span>
             </div>
           </div>
           <div class="card-content">
-            <div class="signals-list">
-              <div class="signal-item">
-                <div class="signal-icon emergency">
-                  <i class="fas fa-exclamation-triangle"></i>
+            <div class="endpoints-list">
+              <div class="endpoint-item">
+                <div class="endpoint-method get">GET</div>
+                <div class="endpoint-info">
+                  <div class="endpoint-path">/api/v1/status</div>
+                  <div class="endpoint-details">Status do sistema</div>
                 </div>
-                <div class="signal-info">
-                  <div class="signal-name">Alerta de Emergência</div>
-                  <div class="signal-details">Prioridade: Alta | Duração: 5min</div>
-                </div>
-                <div class="signal-status">
+                <div class="endpoint-status">
                   <span class="status-badge online">Ativo</span>
                 </div>
               </div>
-              <div class="signal-item">
-                <div class="signal-icon warning">
-                  <i class="fas fa-exclamation-circle"></i>
+              <div class="endpoint-item">
+                <div class="endpoint-method post">POST</div>
+                <div class="endpoint-info">
+                  <div class="endpoint-path">/api/v1/messages</div>
+                  <div class="endpoint-details">Enviar mensagem</div>
                 </div>
-                <div class="signal-info">
-                  <div class="signal-name">Aviso de Manutenção</div>
-                  <div class="signal-details">Prioridade: Média | Duração: 10min</div>
-                </div>
-                <div class="signal-status">
+                <div class="endpoint-status">
                   <span class="status-badge online">Ativo</span>
                 </div>
               </div>
-              <div class="signal-item">
-                <div class="signal-icon info">
-                  <i class="fas fa-info-circle"></i>
+              <div class="endpoint-item">
+                <div class="endpoint-method put">PUT</div>
+                <div class="endpoint-info">
+                  <div class="endpoint-path">/api/v1/config</div>
+                  <div class="endpoint-details">Atualizar configuração</div>
                 </div>
-                <div class="signal-info">
-                  <div class="signal-name">Informação Geral</div>
-                  <div class="signal-details">Prioridade: Baixa | Duração: 3min</div>
-                </div>
-                <div class="signal-status">
+                <div class="endpoint-status">
                   <span class="status-badge online">Ativo</span>
                 </div>
+              </div>
+              <div class="endpoint-item">
+                <div class="endpoint-method delete">DELETE</div>
+                <div class="endpoint-info">
+                  <div class="endpoint-path">/api/v1/connections</div>
+                  <div class="endpoint-details">Remover conexão</div>
+                </div>
+                <div class="endpoint-status">
+                  <span class="status-badge warning">Manutenção</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-title">
+              <h4>Métricas da API</h4>
+              <span class="card-subtitle">Performance e uso</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-value">850</span>
+                <span class="metric-label">Req/min</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">12ms</span>
+                <span class="metric-label">Response Time</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">99.9%</span>
+                <span class="metric-label">Uptime</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">0.1%</span>
+                <span class="metric-label">Error Rate</span>
               </div>
             </div>
           </div>
@@ -82,27 +118,34 @@
               <i class="fas fa-cog"></i>
             </div>
             <div class="card-title">
-              <h4>Configurações</h4>
-              <span class="card-subtitle">Parâmetros do sistema</span>
+              <h4>Configurações da API</h4>
+              <span class="card-subtitle">Parâmetros do serviço</span>
             </div>
           </div>
           <div class="card-content">
             <div class="settings-form">
               <div class="form-group">
-                <label>Frequência de Transmissão</label>
+                <label>Porta da API</label>
+                <input type="number" value="8000" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Rate Limiting</label>
                 <select class="form-control">
-                  <option>Alta (1 segundo)</option>
-                  <option>Média (5 segundos)</option>
-                  <option>Baixa (10 segundos)</option>
+                  <option>1000 req/min</option>
+                  <option>500 req/min</option>
+                  <option>100 req/min</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Volume do Sinal</label>
-                <input type="range" min="0" max="100" value="75" class="form-control">
+                <label>Timeout</label>
+                <input type="number" value="30" class="form-control" placeholder="segundos">
               </div>
               <div class="form-group">
-                <label>Duração Padrão</label>
-                <input type="number" value="5" class="form-control" placeholder="Minutos">
+                <label>CORS</label>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="api-cors" checked>
+                  <label for="api-cors">Habilitar CORS</label>
+                </div>
               </div>
               <button class="btn btn-primary">Salvar Configurações</button>
             </div>
@@ -115,7 +158,7 @@
 
 <script>
 export default {
-  name: 'SinalizacaoView'
+  name: 'ApiView'
 }
 </script>
 
@@ -249,17 +292,23 @@ export default {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
 .card-content {
   color: #e2e8f0;
 }
 
-.signals-list {
+.endpoints-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.signal-item {
+.endpoint-item {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -268,47 +317,85 @@ export default {
   border-radius: 8px;
 }
 
-.signal-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1rem;
+.endpoint-method {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: center;
 }
 
-.signal-icon.emergency {
-  background: #ef4444;
+.endpoint-method.get {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.signal-icon.warning {
-  background: #f59e0b;
+.endpoint-method.post {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-.signal-icon.info {
-  background: #3b82f6;
+.endpoint-method.put {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-.signal-info {
+.endpoint-method.delete {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.endpoint-info {
   flex: 1;
 }
 
-.signal-name {
+.endpoint-path {
   color: #e2e8f0;
   font-weight: 500;
+  font-family: 'Courier New', monospace;
   margin-bottom: 0.25rem;
 }
 
-.signal-details {
+.endpoint-details {
   color: #94a3b8;
   font-size: 0.8rem;
 }
 
-.signal-status {
+.endpoint-status {
   display: flex;
   align-items: center;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
 }
 
 .settings-form {
@@ -344,6 +431,23 @@ export default {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+}
+
+.checkbox-group label {
+  margin: 0;
+  cursor: pointer;
+}
+
 .btn {
   padding: 0.75rem 1rem;
   border: none;
@@ -375,6 +479,10 @@ export default {
 
 @media (max-width: 768px) {
   .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
     grid-template-columns: 1fr;
   }
 }

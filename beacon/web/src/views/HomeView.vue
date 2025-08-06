@@ -3,24 +3,24 @@
     <!-- View Header -->
     <div class="view-header">
       <div class="view-title">
-        <h2>Beacon - Sistema de Sinalização</h2>
-        <span class="view-subtitle">Monitoramento e controle de sinais</span>
+        <h2>Beacon - Plataforma de Comunicação</h2>
+        <span class="view-subtitle">Sistema integrado de sinalização e comunicação</span>
       </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
-        <span>Sistema Online</span>
+        <span>Plataforma Online</span>
       </div>
       <div class="view-actions">
         <button class="btn btn-primary">
           <i class="fas fa-sync"></i>
-          Atualizar
+          Atualizar Status
         </button>
       </div>
     </div>
 
     <!-- View Content -->
     <div class="view-content">
-      <!-- Estatísticas Principais -->
+      <!-- Status dos Serviços -->
       <div class="service-cards">
         <div class="service-card">
           <div class="card-header">
@@ -28,88 +28,184 @@
               <i class="fas fa-broadcast-tower"></i>
             </div>
             <div class="card-title">
-              <h4>Sinais Ativos</h4>
-              <span class="card-subtitle">Transmissões em tempo real</span>
+              <h4>WebSocket</h4>
+              <span class="card-subtitle">Comunicação em tempo real</span>
             </div>
             <div class="card-actions">
-              <span class="status-badge online">24</span>
+              <span class="status-badge online">Ativo</span>
             </div>
           </div>
           <div class="card-content">
             <div class="metric-grid">
               <div class="metric-item">
-                <span class="metric-value">24</span>
-                <span class="metric-label">Sinais Ativos</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-value">12</span>
-                <span class="metric-label">Em Espera</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-value">8</span>
-                <span class="metric-label">Conectados</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-wifi"></i>
-            </div>
-            <div class="card-title">
-              <h4>Conectividade</h4>
-              <span class="card-subtitle">Status das conexões</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge online">Online</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="connection-status">
-              <div class="status-item">
-                <div class="status-dot online"></div>
-                <span>WebSocket: Conectado</span>
-              </div>
-              <div class="status-item">
-                <div class="status-dot online"></div>
-                <span>API: Ativo</span>
-              </div>
-              <div class="status-item">
-                <div class="status-dot online"></div>
-                <span>Database: Sincronizado</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="card-title">
-              <h4>Performance</h4>
-              <span class="card-subtitle">Métricas do sistema</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge success">Excelente</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="performance-metrics">
-              <div class="metric-item">
-                <span class="metric-value">99.8%</span>
-                <span class="metric-label">Uptime</span>
+                <span class="metric-value">1.2K</span>
+                <span class="metric-label">Conexões</span>
               </div>
               <div class="metric-item">
                 <span class="metric-value">45ms</span>
                 <span class="metric-label">Latência</span>
               </div>
               <div class="metric-item">
-                <span class="metric-value">1.2K</span>
-                <span class="metric-label">Sinais/min</span>
+                <span class="metric-value">99.9%</span>
+                <span class="metric-label">Uptime</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-satellite"></i>
+            </div>
+            <div class="card-title">
+              <h4>REST API</h4>
+              <span class="card-subtitle">Endpoints HTTP</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">850</span>
+                <span class="metric-label">Req/min</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">12ms</span>
+                <span class="metric-label">Response</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">0.1%</span>
+                <span class="metric-label">Erro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div class="card-title">
+              <h4>Push Notifications</h4>
+              <span class="card-subtitle">Alertas e notificações</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">24</span>
+                <span class="metric-label">Ativos</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">156</span>
+                <span class="metric-label">Enviados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">98%</span>
+                <span class="metric-label">Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Serviços Adicionais -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="card-title">
+              <h4>Email Service</h4>
+              <span class="card-subtitle">Comunicação por email</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge warning">Manutenção</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">89</span>
+                <span class="metric-label">Enviados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">95%</span>
+                <span class="metric-label">Entrega</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">2min</span>
+                <span class="metric-label">Delay</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-sms"></i>
+            </div>
+            <div class="card-title">
+              <h4>SMS Gateway</h4>
+              <span class="card-subtitle">Mensagens SMS</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge offline">Offline</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">0</span>
+                <span class="metric-label">Ativos</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">--</span>
+                <span class="metric-label">Status</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">--</span>
+                <span class="metric-label">Conexão</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="card-title">
+              <h4>Voice Service</h4>
+              <span class="card-subtitle">Chamadas de voz</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">3</span>
+                <span class="metric-label">Ativas</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">12</span>
+                <span class="metric-label">Chamadas</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">4.2s</span>
+                <span class="metric-label">Média</span>
               </div>
             </div>
           </div>
@@ -132,7 +228,7 @@
             <div class="action-buttons">
               <button class="btn btn-primary">
                 <i class="fas fa-play"></i>
-                Iniciar Transmissão
+                Iniciar Todos
               </button>
               <button class="btn btn-secondary">
                 <i class="fas fa-pause"></i>
@@ -157,7 +253,7 @@
             </div>
             <div class="card-title">
               <h4>Atividade Recente</h4>
-              <span class="card-subtitle">Últimas transmissões</span>
+              <span class="card-subtitle">Últimas operações</span>
             </div>
           </div>
           <div class="card-content">
@@ -167,7 +263,7 @@
                   <i class="fas fa-check"></i>
                 </div>
                 <div class="activity-content">
-                  <div class="activity-title">Sinal de Emergência Transmitido</div>
+                  <div class="activity-title">WebSocket: Nova conexão estabelecida</div>
                   <div class="activity-time">Há 2 minutos</div>
                 </div>
               </div>
@@ -176,8 +272,8 @@
                   <i class="fas fa-info"></i>
                 </div>
                 <div class="activity-content">
-                  <div class="activity-title">Sistema Reiniciado</div>
-                  <div class="activity-time">Há 15 minutos</div>
+                  <div class="activity-title">Push Notification: 15 alertas enviados</div>
+                  <div class="activity-time">Há 5 minutos</div>
                 </div>
               </div>
               <div class="activity-item">
@@ -185,7 +281,16 @@
                   <i class="fas fa-exclamation"></i>
                 </div>
                 <div class="activity-content">
-                  <div class="activity-title">Conexão Perdida - Reconectado</div>
+                  <div class="activity-title">SMS Gateway: Falha de conexão</div>
+                  <div class="activity-time">Há 15 minutos</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon success">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">Voice Service: Chamada finalizada</div>
                   <div class="activity-time">Há 1 hora</div>
                 </div>
               </div>
@@ -342,10 +447,16 @@ export default {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.status-badge.success {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge.offline {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .card-content {
@@ -376,38 +487,6 @@ export default {
 .metric-label {
   font-size: 0.8rem;
   color: #94a3b8;
-}
-
-.connection-status {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 6px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.status-dot.online {
-  background: #10b981;
-  animation: pulse 2s infinite;
-}
-
-.performance-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
 }
 
 .action-buttons {
@@ -539,10 +618,6 @@ export default {
   }
   
   .metric-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .performance-metrics {
     grid-template-columns: 1fr;
   }
 }

@@ -76,28 +76,80 @@
               <span class="section-title">SERVIÇOS</span>
             </div>
             <ul class="nav">
-              <!-- Sinalização -->
+              <!-- WebSocket -->
               <li class="nav-item">
-                <router-link class="nav-link" to="/sinalizacao" @click="handleNavClick">
+                <router-link class="nav-link" to="/websocket" @click="handleNavClick">
                   <div class="nav-icon">
                     <i class="fas fa-broadcast-tower"></i>
                   </div>
                   <div class="nav-text">
-                    <div class="nav-title">Sinalização</div>
-                    <div class="service-subtitle">Controle de Sinais</div>
+                    <div class="nav-title">WebSocket</div>
+                    <div class="service-subtitle">Tempo Real</div>
                   </div>
                 </router-link>
               </li>
               
-              <!-- Transmissão -->
+              <!-- REST API -->
               <li class="nav-item">
-                <router-link class="nav-link" to="/transmissao" @click="handleNavClick">
+                <router-link class="nav-link" to="/api" @click="handleNavClick">
                   <div class="nav-icon">
                     <i class="fas fa-satellite"></i>
                   </div>
                   <div class="nav-text">
-                    <div class="nav-title">Transmissão</div>
-                    <div class="service-subtitle">Broadcasts</div>
+                    <div class="nav-title">REST API</div>
+                    <div class="service-subtitle">HTTP Endpoints</div>
+                  </div>
+                </router-link>
+              </li>
+              
+              <!-- Push Notifications -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/push" @click="handleNavClick">
+                  <div class="nav-icon">
+                    <i class="fas fa-bell"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Push Notifications</div>
+                    <div class="service-subtitle">Alertas</div>
+                  </div>
+                </router-link>
+              </li>
+              
+              <!-- Email Service -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/email" @click="handleNavClick">
+                  <div class="nav-icon">
+                    <i class="fas fa-envelope"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Email Service</div>
+                    <div class="service-subtitle">Comunicação</div>
+                  </div>
+                </router-link>
+              </li>
+              
+              <!-- SMS Gateway -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/sms" @click="handleNavClick">
+                  <div class="nav-icon">
+                    <i class="fas fa-sms"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">SMS Gateway</div>
+                    <div class="service-subtitle">Mensagens</div>
+                  </div>
+                </router-link>
+              </li>
+              
+              <!-- Voice Service -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/voice" @click="handleNavClick">
+                  <div class="nav-icon">
+                    <i class="fas fa-phone"></i>
+                  </div>
+                  <div class="nav-text">
+                    <div class="nav-title">Voice Service</div>
+                    <div class="service-subtitle">Chamadas</div>
                   </div>
                 </router-link>
               </li>

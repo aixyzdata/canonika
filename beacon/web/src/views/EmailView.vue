@@ -3,17 +3,17 @@
     <!-- View Header -->
     <div class="view-header">
       <div class="view-title">
-        <h2>Transmissão</h2>
-        <span class="view-subtitle">Controle de transmissões e broadcasts</span>
+        <h2>Email Service</h2>
+        <span class="view-subtitle">Sistema de comunicação por email</span>
       </div>
       <div class="view-status">
-        <div class="status-indicator online"></div>
-        <span>Transmissão Ativa</span>
+        <div class="status-indicator warning"></div>
+        <span>Em Manutenção</span>
       </div>
       <div class="view-actions">
         <button class="btn btn-primary">
-          <i class="fas fa-play"></i>
-          Iniciar Broadcast
+          <i class="fas fa-plus"></i>
+          Novo Email
         </button>
       </div>
     </div>
@@ -24,52 +24,52 @@
         <div class="service-card">
           <div class="card-header">
             <div class="card-icon">
-              <i class="fas fa-broadcast-tower"></i>
+              <i class="fas fa-envelope"></i>
             </div>
             <div class="card-title">
-              <h4>Broadcasts Ativos</h4>
-              <span class="card-subtitle">Transmissões em tempo real</span>
+              <h4>Emails Recentes</h4>
+              <span class="card-subtitle">Últimas comunicações</span>
             </div>
             <div class="card-actions">
-              <span class="status-badge online">12</span>
+              <span class="status-badge warning">89</span>
             </div>
           </div>
           <div class="card-content">
-            <div class="broadcast-list">
-              <div class="broadcast-item">
-                <div class="broadcast-icon">
-                  <i class="fas fa-broadcast-tower"></i>
+            <div class="emails-list">
+              <div class="email-item">
+                <div class="email-icon">
+                  <i class="fas fa-envelope"></i>
                 </div>
-                <div class="broadcast-info">
-                  <div class="broadcast-name">Canal Principal</div>
-                  <div class="broadcast-details">Frequência: 2.4GHz | Potência: 100W</div>
+                <div class="email-info">
+                  <div class="email-subject">Relatório Diário - Sistema</div>
+                  <div class="email-details">Para: admin@canonika.io | Status: Enviado | 2min atrás</div>
                 </div>
-                <div class="broadcast-status">
-                  <span class="status-badge online">Transmitindo</span>
-                </div>
-              </div>
-              <div class="broadcast-item">
-                <div class="broadcast-icon">
-                  <i class="fas fa-satellite"></i>
-                </div>
-                <div class="broadcast-info">
-                  <div class="broadcast-name">Canal Secundário</div>
-                  <div class="broadcast-details">Frequência: 5.8GHz | Potência: 50W</div>
-                </div>
-                <div class="broadcast-status">
-                  <span class="status-badge online">Transmitindo</span>
+                <div class="email-status">
+                  <span class="status-badge online">Enviado</span>
                 </div>
               </div>
-              <div class="broadcast-item">
-                <div class="broadcast-icon">
-                  <i class="fas fa-wifi"></i>
+              <div class="email-item">
+                <div class="email-icon">
+                  <i class="fas fa-envelope"></i>
                 </div>
-                <div class="broadcast-info">
-                  <div class="broadcast-name">Canal de Backup</div>
-                  <div class="broadcast-details">Frequência: 900MHz | Potência: 25W</div>
+                <div class="email-info">
+                  <div class="email-subject">Alerta de Segurança</div>
+                  <div class="email-details">Para: security@canonika.io | Status: Enviado | 15min atrás</div>
                 </div>
-                <div class="broadcast-status">
-                  <span class="status-badge warning">Em Espera</span>
+                <div class="email-status">
+                  <span class="status-badge online">Enviado</span>
+                </div>
+              </div>
+              <div class="email-item">
+                <div class="email-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="email-info">
+                  <div class="email-subject">Boas-vindas - Novo Usuário</div>
+                  <div class="email-details">Para: user@example.com | Status: Pendente | 1h atrás</div>
+                </div>
+                <div class="email-status">
+                  <span class="status-badge warning">Pendente</span>
                 </div>
               </div>
             </div>
@@ -82,27 +82,27 @@
               <i class="fas fa-chart-line"></i>
             </div>
             <div class="card-title">
-              <h4>Métricas de Transmissão</h4>
-              <span class="card-subtitle">Performance e qualidade</span>
+              <h4>Métricas de Entrega</h4>
+              <span class="card-subtitle">Performance do email</span>
             </div>
           </div>
           <div class="card-content">
             <div class="metrics-grid">
               <div class="metric-item">
-                <span class="metric-value">99.8%</span>
-                <span class="metric-label">Qualidade do Sinal</span>
+                <span class="metric-value">95%</span>
+                <span class="metric-label">Taxa de Entrega</span>
               </div>
               <div class="metric-item">
-                <span class="metric-value">-45dBm</span>
-                <span class="metric-label">Força do Sinal</span>
+                <span class="metric-value">2min</span>
+                <span class="metric-label">Tempo Médio</span>
               </div>
               <div class="metric-item">
-                <span class="metric-value">0.1%</span>
-                <span class="metric-label">Taxa de Erro</span>
+                <span class="metric-value">89</span>
+                <span class="metric-label">Total Enviados</span>
               </div>
               <div class="metric-item">
-                <span class="metric-value">1.2K</span>
-                <span class="metric-label">Pacotes/s</span>
+                <span class="metric-value">5%</span>
+                <span class="metric-label">Taxa de Falha</span>
               </div>
             </div>
           </div>
@@ -114,34 +114,33 @@
               <i class="fas fa-cog"></i>
             </div>
             <div class="card-title">
-              <h4>Configurações de Transmissão</h4>
-              <span class="card-subtitle">Parâmetros técnicos</span>
+              <h4>Configurações de Email</h4>
+              <span class="card-subtitle">Parâmetros do serviço</span>
             </div>
           </div>
           <div class="card-content">
             <div class="settings-form">
               <div class="form-group">
-                <label>Frequência Principal</label>
-                <select class="form-control">
-                  <option>2.4 GHz</option>
-                  <option>5.8 GHz</option>
-                  <option>900 MHz</option>
-                </select>
+                <label>Servidor SMTP</label>
+                <input type="text" value="smtp.gmail.com" class="form-control">
               </div>
               <div class="form-group">
-                <label>Potência de Transmissão</label>
-                <input type="range" min="0" max="100" value="75" class="form-control">
-                <span class="range-value">75%</span>
+                <label>Porta SMTP</label>
+                <input type="number" value="587" class="form-control">
               </div>
               <div class="form-group">
-                <label>Modo de Transmissão</label>
+                <label>Email Remetente</label>
+                <input type="email" value="noreply@canonika.io" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Rate Limiting</label>
                 <select class="form-control">
-                  <option>Contínuo</option>
-                  <option>Intermitente</option>
-                  <option>Sob Demanda</option>
+                  <option>100 emails/hora</option>
+                  <option>50 emails/hora</option>
+                  <option>10 emails/hora</option>
                 </select>
               </div>
-              <button class="btn btn-primary">Aplicar Configurações</button>
+              <button class="btn btn-primary">Salvar Configurações</button>
             </div>
           </div>
         </div>
@@ -152,7 +151,7 @@
 
 <script>
 export default {
-  name: 'TransmissaoView'
+  name: 'EmailView'
 }
 </script>
 
@@ -196,8 +195,8 @@ export default {
   border-radius: 50%;
 }
 
-.status-indicator.online {
-  background: #10b981;
+.status-indicator.warning {
+  background: #f59e0b;
   animation: pulse 2s infinite;
 }
 
@@ -296,13 +295,13 @@ export default {
   color: #e2e8f0;
 }
 
-.broadcast-list {
+.emails-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.broadcast-item {
+.email-item {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -311,7 +310,7 @@ export default {
   border-radius: 8px;
 }
 
-.broadcast-icon {
+.email-icon {
   width: 40px;
   height: 40px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -323,22 +322,22 @@ export default {
   font-size: 1rem;
 }
 
-.broadcast-info {
+.email-info {
   flex: 1;
 }
 
-.broadcast-name {
+.email-subject {
   color: #e2e8f0;
   font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
-.broadcast-details {
+.email-details {
   color: #94a3b8;
   font-size: 0.8rem;
 }
 
-.broadcast-status {
+.email-status {
   display: flex;
   align-items: center;
 }
@@ -400,12 +399,6 @@ export default {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.range-value {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  text-align: center;
 }
 
 .btn {
