@@ -3,6 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from './src/App.vue';
 import routes from './src/routes.js';
 
+// Importar FontAwesome
+import '@fortawesome/fontawesome-free/css/all.css';
+
 const router = createRouter({
   history: createWebHistory(),
   routes
