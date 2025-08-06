@@ -267,12 +267,12 @@ export default {
       // 6. Executar redirecionamento
       console.log('🚀 EXECUTANDO REDIRECIONAMENTO...');
       try {
-        // Redirecionar para Quarter com parâmetro de logout e redirect_to
+        // Redirecionar para Quarter com parâmetros corretos
         const currentUrl = window.location.href;
-        const redirectUrl = encodeURIComponent(currentUrl);
-        const quarterUrl = `http://localhost:3700?logout=1&redirect_to=${redirectUrl}`;
+        const returnUrl = encodeURIComponent(currentUrl);
+        const quarterUrl = `http://localhost:3700?return_url=${returnUrl}&service=beacon`;
         
-        console.log('🔄 Redirecionando para Quarter com logout e redirect_to...');
+        console.log('🔄 Redirecionando para Quarter com return_url e service...');
         console.log('🎯 URL de destino:', quarterUrl);
         window.location.href = quarterUrl;
         console.log('✅ Redirecionamento executado com sucesso');
@@ -282,8 +282,8 @@ export default {
         try {
           console.log('🔄 Tentando fallback...');
           const currentUrl = window.location.href;
-          const redirectUrl = encodeURIComponent(currentUrl);
-          const quarterUrl = `http://localhost:3700?logout=1&redirect_to=${redirectUrl}`;
+          const returnUrl = encodeURIComponent(currentUrl);
+          const quarterUrl = `http://localhost:3700?return_url=${returnUrl}&service=beacon`;
           window.location.assign(quarterUrl);
         } catch (error2) {
           console.error('❌ Erro no fallback:', error2);
