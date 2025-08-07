@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import MasterPage from '../../shared/templates/MasterPage.vue'
+import MasterPage from './components/MasterPage.shared.vue'
 import { getServiceMenu } from './config/service-menus.js'
 import config from './config/env.js'
 
