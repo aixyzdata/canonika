@@ -246,6 +246,56 @@ export default {
       }
     },
     
+    processAuthToken() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const token = urlParams.get('auth_token')
+      
+      if (token) {
+        console.log('🔑 Token recebido do Quarter')
+        
+        try {
+          // Decodificar token JWT
+          const payload = this.decodeToken(token)
+          
+          // Criar objeto usuário
+          this.user = {
+            id: payload.id,
+            name: payload.name,
+            email: payload.email,
+            roles: payload.roles || [],
+            permissions: payload.permissions || []
+          }
+          
+          // Salvar token no localStorage
+          localStorage.setItem('canonika_access_token', token)
+          localStorage.setItem('canonika_user', JSON.stringify(this.user))
+          
+          // Limpar URL
+          const newUrl = window.location.pathname
+          window.history.replaceState({}, document.title, newUrl)
+          
+          console.log('✅ Usuário autenticado:', this.user.name)
+          
+        } catch (error) {
+          console.error('❌ Erro ao processar token:', error)
+          // Se token inválido, redirecionar para Quarter
+          this.redirectToQuarter()
+        }
+      }
+    },
+    
+    decodeToken(token) {
+      try {
+        const parts = token.split('.')
+        if (parts.length !== 3) throw new Error('Token inválido')
+        
+        const payload = JSON.parse(atob(parts[1]))
+        return payload
+      } catch (error) {
+        throw new Error('Token inválido')
+      }
+    },
+    
     logout() {
       authService.logout();
       this.user = null
@@ -266,6 +316,9 @@ export default {
         this.$set(this.openSubmenus, item.id, false)
       }
     })
+    
+    // Processar token da URL se existir
+    this.processAuthToken()
     
     // Verificar autenticação usando o novo serviço
     await this.checkAuthentication()
