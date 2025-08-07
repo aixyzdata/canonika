@@ -182,6 +182,7 @@
 
 <script>
 import config from '../config/env.js'
+import authService from '../services/AuthService.js'
 
 export default {
   name: 'MasterPage',
@@ -232,7 +233,21 @@ export default {
       }
       this.$emit('login', this.user)
     },
+    async checkAuthentication() {
+      // Verificar se precisa renovar o token
+      const tokenValid = await authService.checkAndRefreshToken();
+      
+      if (tokenValid) {
+        this.user = authService.getCurrentUser();
+        console.log('Usuário autenticado:', this.user);
+      } else {
+        this.user = null;
+        console.log('Usuário não autenticado');
+      }
+    },
+    
     logout() {
+      authService.logout();
       this.user = null
       this.$emit('logout')
     },
@@ -244,7 +259,7 @@ export default {
       window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
     }
   },
-  mounted() {
+  async mounted() {
     // Inicializar submenus fechados
     this.serviceConfig.menuItems.forEach(item => {
       if (item.submenu) {
@@ -252,8 +267,13 @@ export default {
       }
     })
     
+    // Verificar autenticação usando o novo serviço
+    await this.checkAuthentication()
+    
     // Redirecionar automaticamente para Quarter se não tem login próprio e não está autenticado
+    console.log('MasterPage mounted - hasLogin:', this.hasLogin, 'user:', this.user)
     if (!this.hasLogin && !this.user) {
+      console.log('Redirecionando para Quarter...')
       this.redirectToQuarter()
     }
   }
