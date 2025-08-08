@@ -165,10 +165,12 @@ export default {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 .nav-item {
   margin-bottom: 0.25rem;
+  width: 100%;
 }
 
 .nav-link {
@@ -181,6 +183,8 @@ export default {
   font-size: 0.875rem;
   border-radius: 0.375rem;
   margin: 0 0.5rem;
+  width: calc(100% - 1rem);
+  box-sizing: border-box;
 }
 
 .nav-link:hover {
