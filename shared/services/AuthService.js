@@ -123,11 +123,28 @@ class AuthService {
     localStorage.removeItem(this.authKey);
     localStorage.removeItem(this.userKey);
     
-    // Redirecionar para Quarter
+    // Redirecionar para Quarter com logout e return_url (URL limpa)
     const quarterUrl = 'http://localhost:3700';
-    const currentUrl = window.location.href;
-    const redirectUrl = encodeURIComponent(currentUrl);
-    window.location.href = `${quarterUrl}?logout=1&return_url=${redirectUrl}`;
+    const baseUrl = window.location.origin + window.location.pathname;
+    const returnUrl = encodeURIComponent(baseUrl);
+    
+    // Determinar o serviço baseado na URL atual
+    let service = 'template'; // padrão
+    if (window.location.hostname === 'localhost') {
+      const port = window.location.port;
+      if (port === '3701') service = 'harbor';
+      else if (port === '3790') service = 'template';
+      else if (port === '3799') service = 'beacon';
+      // Adicionar outros serviços conforme necessário
+    }
+    
+    const quarterRedirectUrl = `${quarterUrl}?logout=1&return_url=${returnUrl}&service=${service}`;
+    
+    console.log('🚪 Iniciando logout...');
+    console.log('🔄 Redirecionando para Quarter (URL limpa):', quarterRedirectUrl);
+    
+    // Forçar redirecionamento
+    window.location.replace(quarterRedirectUrl);
   }
 
   /**

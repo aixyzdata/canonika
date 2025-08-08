@@ -508,9 +508,18 @@ export default {
     
     redirectToQuarter() {
       const quarterUrl = 'http://localhost:3700'
+      // Usar a URL completa do Template Service
       const currentUrl = window.location.href
-      const redirectUrl = encodeURIComponent(currentUrl)
-      window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
+      const returnUrl = encodeURIComponent(currentUrl)
+      
+      // Usar o padrão return_url e service como Harbor
+      const quarterRedirectUrl = `${quarterUrl}?return_url=${returnUrl}&service=template`
+      
+      console.log('🔄 Redirecionando para Quarter com URL:', currentUrl)
+      console.log('🔄 URL completa do Quarter:', quarterRedirectUrl)
+      
+      // Usar replace para evitar problemas de navegação
+      window.location.replace(quarterRedirectUrl)
     }
   }
 }
