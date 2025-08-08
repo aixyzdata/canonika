@@ -6,12 +6,21 @@
     @nav-click="handleNavClick"
     @sidebar-toggle="handleSidebarToggle"
   >
-    <!-- Conteúdo específico do Template -->
-    <div class="canonika-container">
-      <div class="text-center mb-5">
-        <h1 class="display-4 text-dark mb-3">🚀 Template Service</h1>
-        <p class="lead text-secondary">Serviço de validação da componentização</p>
-      </div>
+    <CanonikaViewContent 
+      title="🚀 Template Service" 
+      subtitle="Serviço de validação da componentização"
+      :actions="true"
+    >
+      <template #actions>
+        <button class="btn btn-canonika-primary btn-sm">
+          <i class="fas fa-sync-alt me-2"></i>
+          Atualizar
+        </button>
+        <button class="btn btn-secondary btn-sm">
+          <i class="fas fa-download me-2"></i>
+          Exportar
+        </button>
+      </template>
 
       <div class="d-flex flex-column gap-4">
         <!-- Seção de Validação -->
@@ -163,17 +172,32 @@
           </div>
         </div>
       </div>
-    </div>
+
+      <template #footer>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-secondary small">
+            <i class="fas fa-clock me-1"></i>
+            Última atualização: {{ new Date().toLocaleString() }}
+          </div>
+          <div class="text-secondary small">
+            <i class="fas fa-code me-1"></i>
+            Versão: 1.0.0
+          </div>
+        </div>
+      </template>
+    </CanonikaViewContent>
   </CanonikaMasterPage>
 </template>
 
 <script>
 import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
+import CanonikaViewContent from '../../../shared/components/ViewContent.vue'
 
 export default {
   name: 'TemplateApp',
   components: {
-    CanonikaMasterPage
+    CanonikaMasterPage,
+    CanonikaViewContent
   },
   data() {
     return {
@@ -285,12 +309,6 @@ export default {
 
 <style scoped>
 /* Estilos específicos do Template Service */
-.canonika-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
 .canonika-icon-bg {
   width: 2.5rem;
   height: 2.5rem;

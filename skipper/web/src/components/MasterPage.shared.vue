@@ -49,82 +49,67 @@
         <i class="fas fa-bars"></i>
       </button>
 
-      <!-- Sidebar componentizado -->
-      <Sidebar 
-        :serviceConfig="serviceConfig"
-        :user="user"
-        :sidebarCollapsed="sidebarCollapsed"
-        @toggle-sidebar="toggleSidebar"
-        @nav-click="handleNavClick"
-      />
+      <!-- Sidebar futurista -->
+      <nav class="canonika-sidebar" v-if="user" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+        <div class="sidebar-header">
+          <div class="nav-icon active">
+            <i class="nav-dot"></i>
+            <span v-if="!sidebarCollapsed">NAVEGAÇÃO</span>
+          </div>
+        </div>
+        
+        <ul class="nav-menu">
+          <!-- Menu items dinâmicos baseados na configuração -->
+          <template v-for="menuItem in serviceConfig.menuItems" :key="menuItem.id">
+            <!-- Item simples -->
+            <li v-if="!menuItem.submenu" class="nav-item" :class="{ active: currentView === menuItem.id }">
+              <div class="nav-link" @click="setView(menuItem.id)">
+                <div class="nav-icon">
+                  <i :class="menuItem.icon"></i>
+                </div>
+                <div v-if="!sidebarCollapsed" class="nav-text">
+                  <span class="nav-title">{{ menuItem.title }}</span>
+                  <span v-if="menuItem.subtitle" class="service-subtitle">{{ menuItem.subtitle }}</span>
+                </div>
+              </div>
+            </li>
+            
+            <!-- Item com submenu -->
+            <li v-else class="nav-item" :class="{ active: openSubmenus[menuItem.id] }">
+              <div class="nav-link" @click="toggleSubmenu(menuItem.id)">
+                <div class="nav-icon">
+                  <i :class="menuItem.icon"></i>
+                </div>
+                <div v-if="!sidebarCollapsed" class="nav-text">
+                  <span class="nav-title">{{ menuItem.title }}</span>
+                  <span v-if="menuItem.subtitle" class="service-subtitle">{{ menuItem.subtitle }}</span>
+                </div>
+                <i v-if="!sidebarCollapsed" :class="openSubmenus[menuItem.id] ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="submenu-icon"></i>
+              </div>
+              
+              <!-- Submenu -->
+              <ul v-if="!sidebarCollapsed" class="nav flex-column submenu" :class="{ show: openSubmenus[menuItem.id] }">
+                <li v-for="subItem in menuItem.submenu" :key="subItem.id" class="nav-item">
+                  <div class="nav-link" @click="setView(subItem.id)">
+                    <div class="nav-icon">
+                      <i :class="subItem.icon"></i>
+                    </div>
+                    <div class="nav-text">
+                      <div class="nav-title">{{ subItem.title }}</div>
+                      <div v-if="subItem.subtitle" class="service-subtitle">{{ subItem.subtitle }}</div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </template>
+        </ul>
+      </nav>
 
       <!-- Conteúdo principal -->
-      <main :class="['main-content', { 'sidebar-collapsed': sidebarCollapsed && user }]">
-        <!-- Tela de login -->
-        <div v-if="!user && hasLogin" class="login-container">
-          <div class="login-card">
-            <div class="login-header">
-              <div class="login-logo">
-                <div class="logo-hexagon-large"></div>
-                <div class="logo-pulse-large"></div>
-              </div>
-              <h2 class="login-title">Acesso ao {{ serviceConfig.name }}</h2>
-              <p class="login-subtitle">{{ serviceConfig.description }}</p>
-            </div>
-            <form @submit.prevent="login" class="login-form">
-              <div class="form-group">
-                <div class="input-container">
-                  <span class="input-icon">👤</span>
-                  <input 
-                    v-model="loginForm.username" 
-                    type="text" 
-                    placeholder="Usuário" 
-                    class="form-input"
-                    required
-                  >
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-container">
-                  <span class="input-icon">🔒</span>
-                  <input 
-                    v-model="loginForm.password" 
-                    type="password" 
-                    placeholder="Senha" 
-                    class="form-input"
-                    required
-                  >
-                </div>
-              </div>
-              <button type="submit" class="login-btn">
-                <span>🚀</span> Entrar
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Redirecionamento para Quarter -->
-        <div v-if="!user && !hasLogin" class="quarter-redirect">
-          <div class="redirect-card">
-            <div class="redirect-header">
-              <div class="redirect-logo">
-                <div class="logo-hexagon-large"></div>
-                <div class="logo-pulse-large"></div>
-              </div>
-              <h2 class="redirect-title">Acesso Centralizado</h2>
-              <p class="redirect-subtitle">Este módulo utiliza o Quarter para autenticação</p>
-            </div>
-            <div class="redirect-content">
-              <p>Para acessar o {{ serviceConfig.name }}, você precisa fazer login através do Quarter.</p>
-              <button @click="redirectToQuarter" class="redirect-btn">
-                <span>🚀</span> Ir para Quarter
-              </button>
-            </div>
-          </div>
-        </div>
-
+      <main :class="['canonika-main', { 'sidebar-collapsed': sidebarCollapsed }]">
         <!-- Conteúdo do serviço -->
-        <div v-else class="service-content">
+        <div class="service-content">
           <slot></slot>
         </div>
       </main>
@@ -133,14 +118,11 @@
 </template>
 
 <script>
-import Sidebar from '../components/Sidebar.vue'
 import config from '../config/env.js'
+import authService from '../services/AuthService.shared.js'
 
 export default {
   name: 'MasterPage',
-  components: {
-    Sidebar
-  },
   props: {
     serviceConfig: {
       type: Object,
@@ -149,13 +131,8 @@ export default {
         name: 'Serviço',
         description: 'Descrição do serviço',
         iconClass: 'icon-default',
-        icon: 'fas fa-broadcast-tower',
         menuItems: []
       })
-    },
-    hasLogin: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -163,45 +140,41 @@ export default {
       user: null,
       sidebarCollapsed: false,
       currentView: 'dashboard',
-      loginForm: {
-        username: '',
-        password: ''
-      }
+      openSubmenus: {}
     }
   },
   methods: {
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed
     },
-    handleNavClick() {
-      console.log('Navegação clicada')
+    setView(viewId) {
+      this.currentView = viewId
+      this.$emit('view-changed', viewId)
     },
-    
-    // Verificar autenticação
-    checkAuthentication() {
-      console.log('🔍 Verificando autenticação...')
+    toggleSubmenu(menuId) {
+      this.$set(this.openSubmenus, menuId, !this.openSubmenus[menuId])
+    },
+
+    async checkAuthentication() {
+      console.log('🔍 Verificando autenticação...');
       
-      // Verificar se está autenticado
-      const token = localStorage.getItem('canonika_access_token')
-      const userData = localStorage.getItem('canonika_user')
+      // Verificar se precisa renovar o token
+      const tokenValid = await authService.checkAndRefreshToken();
       
-      if (token && userData) {
-        try {
-          this.user = JSON.parse(userData)
-          console.log('✅ Usuário autenticado:', this.user.name)
-          return true
-        } catch (error) {
-          console.error('❌ Erro ao parsear dados do usuário:', error)
-          this.clearAuth()
-          return false
-        }
+      if (tokenValid) {
+        this.user = authService.getCurrentUser();
+        console.log('✅ Usuário autenticado:', this.user);
       } else {
-        console.log('❌ Usuário não autenticado')
-        return false
+        // Simular usuário logado para desenvolvimento (sem redirecionamento)
+        this.user = {
+          name: 'Usuário Demo',
+          role: 'admin',
+          email: 'demo@canonika.io'
+        };
+        console.log('🚀 Usuário demo logado para desenvolvimento');
       }
     },
     
-    // Processar token da URL
     processAuthToken() {
       const urlParams = new URLSearchParams(window.location.search)
       const token = urlParams.get('auth_token')
@@ -252,60 +225,41 @@ export default {
       }
     },
     
-    login() {
-      // Simular login
-      this.user = {
-        name: this.loginForm.username,
-        role: 'admin'
-      }
-      this.$emit('login', this.user)
-    },
-    
     logout() {
-      this.clearAuth()
+      authService.logout();
       this.user = null
       this.$emit('logout')
     },
-    
-    clearAuth() {
-      localStorage.removeItem('canonika_access_token')
-      localStorage.removeItem('canonika_user')
-    },
-    
     redirectToQuarter() {
       // Usar configuração centralizada
       const quarterUrl = config.getServiceUrl('quarter')
       const currentUrl = window.location.href
       const redirectUrl = encodeURIComponent(currentUrl)
       window.location.href = `${quarterUrl}?redirect_to=${redirectUrl}`
+    },
+    
+    redirectToHarbor() {
+      // Redirecionamento direto para Harbor (dashboard principal)
+      const harborUrl = config.getServiceUrl('harbor')
+      window.location.href = harborUrl
     }
   },
-      async mounted() {
-      // Processar token da URL se existir
-      this.processAuthToken()
-      
-      // Verificar autenticação
-      this.checkAuthentication()
-      
-      // Simular usuário logado para teste
-      if (!this.user) {
-        this.user = {
-          id: 1,
-          name: 'Administrador',
-          email: 'admin@canonika.com',
-          roles: ['admin'],
-          permissions: ['read', 'write']
-        }
-        console.log('✅ Usuário simulado para teste:', this.user.name)
+  async mounted() {
+    console.log('🚀 MASTERPAGE MOUNTED')
+    
+    // Inicializar submenus fechados
+    this.serviceConfig.menuItems.forEach(item => {
+      if (item.submenu) {
+        this.$set(this.openSubmenus, item.id, false)
       }
-      
-      // Redirecionar automaticamente para Quarter se não tem login próprio e não está autenticado
-      console.log('MasterPage mounted - hasLogin:', this.hasLogin, 'user:', this.user)
-      if (!this.hasLogin && !this.user) {
-        console.log('Redirecionando para Quarter...')
-        this.redirectToQuarter()
-      }
-    }
+    })
+    
+    // Processar token da URL se existir
+    this.processAuthToken()
+    
+    // Verificar autenticação
+    await this.checkAuthentication()
+  }
 }
 </script>
 
@@ -374,28 +328,10 @@ export default {
   margin: 0;
 }
 
-.logo-text-container {
-  display: flex;
-  flex-direction: column;
-}
-
 .logo-subtitle {
   font-size: 0.875rem;
   color: #94a3b8;
   font-weight: 500;
-}
-
-.module-title-with-icon {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.module-icon {
-  width: 1rem;
-  height: 1rem;
-  background: #3b82f6;
-  border-radius: 50%;
 }
 
 .header-actions {
@@ -407,20 +343,19 @@ export default {
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #3b82f6;
+  width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   font-weight: 600;
-  font-size: 0.875rem;
+  color: white;
 }
 
 .user-name {
@@ -428,48 +363,37 @@ export default {
   color: #e2e8f0;
 }
 
-.user-menu {
-  position: relative;
-}
-
 .logout-btn {
   background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   color: #ef4444;
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
 }
 
 .logout-btn:hover {
   background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
 }
 
 .system-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
   color: #10b981;
+  font-weight: 500;
 }
 
 .status-indicator {
   width: 0.5rem;
   height: 0.5rem;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-.status-indicator.online {
   background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .header-glow {
@@ -478,68 +402,179 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
   pointer-events: none;
 }
 
 .canonika-layout {
   display: flex;
-  height: calc(100vh - 60px);
-  overflow: hidden;
+  min-height: calc(100vh - 4rem);
 }
 
 .sidebar-toggle {
   position: fixed;
-  top: 80px;
+  top: 5rem;
   left: 1rem;
-  z-index: 1001;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid #475569;
-  color: #e2e8f0;
+  z-index: 1000;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
   padding: 0.5rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .sidebar-toggle:hover {
-  background: rgba(15, 23, 42, 0.9);
-  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.2);
 }
 
-.sidebar-toggle.sidebar-collapsed {
-  left: 1rem;
+.canonika-sidebar {
+  width: 280px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-right: 1px solid #475569;
+  transition: all 0.3s ease;
+  overflow-y: auto;
 }
 
-.main-content {
+.canonika-sidebar.sidebar-collapsed {
+  width: 4rem;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #475569;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.nav-item.active .nav-link {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border-right: 2px solid #3b82f6;
+}
+
+.nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-title {
+  font-weight: 500;
+  color: inherit;
+  font-size: 0.875rem;
+}
+
+.service-subtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.125rem;
+}
+
+.submenu-icon {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.nav-item.active .submenu-icon {
+  transform: rotate(90deg);
+}
+
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(15, 23, 42, 0.5);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.submenu.show {
+  max-height: 500px;
+}
+
+.submenu .nav-link {
+  padding-left: 2.5rem;
+  font-size: 0.875rem;
+}
+
+.canonika-main {
   flex: 1;
   padding: 2rem;
-  overflow-y: auto;
   transition: margin-left 0.3s ease;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
 }
 
-.main-content.sidebar-collapsed {
-  margin-left: 60px;
+.canonika-main.sidebar-collapsed {
+  margin-left: 4rem;
 }
 
-/* Login Screen */
 .login-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  min-height: calc(100vh - 4rem);
 }
 
 .login-card {
-  background: rgba(15, 23, 42, 0.8);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
   border-radius: 1rem;
   padding: 2rem;
   width: 100%;
   max-width: 400px;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .login-header {
@@ -578,7 +613,7 @@ export default {
   font-size: 1.5rem;
   font-weight: 700;
   color: #e2e8f0;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem;
 }
 
 .login-subtitle {
@@ -595,7 +630,6 @@ export default {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
 .input-container {
@@ -607,14 +641,14 @@ export default {
 .input-icon {
   position: absolute;
   left: 1rem;
-  color: #6c757d;
-  font-size: 1rem;
+  color: #64748b;
+  z-index: 1;
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.5);
   border: 1px solid #475569;
   border-radius: 0.5rem;
   color: #e2e8f0;
@@ -625,18 +659,14 @@ export default {
 .form-input:focus {
   outline: none;
   border-color: #3b82f6;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.form-input::placeholder {
-  color: #6c757d;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .login-btn {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border: none;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
@@ -648,117 +678,49 @@ export default {
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-/* Quarter Redirect */
-.quarter-redirect {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
-}
-
-.redirect-card {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid #475569;
-  border-radius: 1rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 500px;
-  backdrop-filter: blur(10px);
-  text-align: center;
-}
-
-.redirect-header {
-  margin-bottom: 2rem;
-}
-
-.redirect-logo {
-  position: relative;
-  width: 4rem;
-  height: 4rem;
-  margin: 0 auto 1rem;
-}
-
-.redirect-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin: 0 0 0.5rem 0;
-}
-
-.redirect-subtitle {
-  color: #94a3b8;
-  margin: 0;
-}
-
-.redirect-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.redirect-content p {
-  color: #cbd5e1;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.redirect-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: none;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0 auto;
-}
-
-.redirect-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .service-content {
   width: 100%;
-  height: 100%;
 }
 
-/* Animations */
+
+
+/* Animações */
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.2); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .canonika-layout {
-    flex-direction: column;
+  .canonika-sidebar {
+    position: fixed;
+    top: 4rem;
+    left: 0;
+    height: calc(100vh - 4rem);
+    z-index: 1000;
+    transform: translateX(-100%);
   }
   
-  .main-content {
-    margin-left: 0 !important;
+  .canonika-sidebar:not(.sidebar-collapsed) {
+    transform: translateX(0);
+  }
+  
+  .canonika-main {
+    margin-left: 0;
     padding: 1rem;
   }
   
   .sidebar-toggle {
-    position: fixed;
-    top: 70px;
-    left: 0.5rem;
+    display: flex;
   }
 }
 </style> 

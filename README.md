@@ -13,6 +13,7 @@ O **Canonika** é uma plataforma moderna de microserviços desenvolvida com arqu
 | **Quarter** | 80 | Ponto de entrada centralizado | ✅ Produção |
 | **Harbor** | 3701 | Dashboard principal | ✅ Produção |
 | **Guardian** | 3705 | Sistema de segurança | ✅ Produção |
+| **Beacon** | 3703 | Sistema de monitoramento | ✅ Produção |
 | **Keycloak** | 8080 | Identity Provider | ✅ Produção |
 | **PostgreSQL** | 5432 | Banco de dados principal | ✅ Produção |
 | **Redis** | 6379 | Cache e sessões | ✅ Produção |
@@ -72,6 +73,8 @@ canonika/
 │   └── web/                   # Frontend Vue.js
 ├── guardian/                  # Sistema de segurança
 │   └── web/                   # Frontend Vue.js
+├── beacon/                    # Sistema de monitoramento
+│   └── web/                   # Frontend Vue.js
 ├── shared/                    # Recursos compartilhados
 │   ├── styles/               # CSS compartilhado
 │   └── config/               # Configurações
@@ -94,12 +97,6 @@ docker-compose exec harbor npm test
 docker-compose exec guardian npm test
 ```
 
-### **Cobertura de Testes**
-- ✅ **TDD (Test-Driven Development)**: 95%+ cobertura
-- ✅ **BDD (Behavior-Driven Development)**: 100% fluxos críticos
-- ✅ **API Tests**: 90%+ endpoints
-- ✅ **E2E Tests**: Login, Logout, Navegação
-
 ## 🔐 Autenticação e Segurança
 
 ### **Fluxo de Autenticação**
@@ -115,55 +112,31 @@ docker-compose exec guardian npm test
 - ✅ **PostgreSQL**: Dados seguros
 - ✅ **ClickHouse**: Auditoria e logs
 
-## 🎯 Funcionalidades
+## 🛠️ Desenvolvimento
 
-### **Quarter - Ponto de Entrada**
-- ✅ Login centralizado
-- ✅ Redirecionamento para serviços
-- ✅ Interface responsiva
-- ✅ Testes TDD/BDD completos
+### **Ambiente de Desenvolvimento**
+```bash
+# Instalar dependências
+cd quarter/web && npm install
+cd harbor/web && npm install
+cd guardian/web && npm install
 
-### **Harbor - Dashboard Principal**
-- ✅ Dashboard interativo
-- ✅ Navegação entre serviços
-- ✅ Logout integrado
-- ✅ Interface moderna
+# Executar em modo desenvolvimento
+cd quarter/web && npm run dev
+cd harbor/web && npm run dev
+cd guardian/web && npm run dev
+```
 
-### **Guardian - Segurança**
-- ✅ Monitoramento de segurança
-- ✅ Políticas de acesso
-- ✅ Integração com Keycloak
-- ✅ Auditoria completa
+### **Script de Desenvolvimento**
+```bash
+# Iniciar ambiente de desenvolvimento
+./dev.sh start
 
-### **Stack Compartilhado**
-- ✅ **Keycloak**: Identity Provider
-- ✅ **PostgreSQL**: Banco principal
-- ✅ **Redis**: Cache e sessões
-- ✅ **OPA**: Políticas de segurança
-- ✅ **ClickHouse**: Analytics
+# Aplicar mudanças CSS
+./dev.sh css
 
-## 🔄 CI/CD
-
-### **Pipeline de Deploy**
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy Canonika
-on:
-  push:
-    branches: [main]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Tests
-        run: ./quarter/run-tests.sh
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to Production
-        run: docker-compose up -d
+# Ver status
+./dev.sh status
 ```
 
 ## 📊 Monitoramento
@@ -182,45 +155,6 @@ curl http://localhost:3701/api/health    # Harbor
 curl http://localhost:3705/api/health    # Guardian
 ```
 
-## 🛠️ Desenvolvimento
-
-### **Ambiente de Desenvolvimento**
-```bash
-# Instalar dependências
-cd quarter/web && npm install
-cd harbor/web && npm install
-cd guardian/web && npm install
-
-# Executar em modo desenvolvimento
-cd quarter/web && npm run dev
-cd harbor/web && npm run dev
-cd guardian/web && npm run dev
-```
-
-### **Estrutura de Testes**
-```
-quarter/
-├── tests/
-│   ├── unit/                 # Testes TDD
-│   └── e2e/                  # Testes BDD
-├── cypress/                  # Testes E2E
-└── run-tests.sh             # Script de execução
-```
-
-## 📈 Métricas de Qualidade
-
-### **Performance**
-- ⚡ **Tempo de resposta**: < 100ms
-- 🚀 **Carregamento**: < 2s
-- 📊 **Cobertura de testes**: > 90%
-- 🔒 **Segurança**: 100% endpoints protegidos
-
-### **Disponibilidade**
-- ✅ **Uptime**: 99.9%
-- 🔄 **Redundância**: Múltiplos serviços
-- 🛡️ **Backup**: Automático
-- 📝 **Logs**: Centralizados
-
 ## 🤝 Contribuição
 
 ### **Como Contribuir**
@@ -230,24 +164,13 @@ quarter/
 4. **Push** para a branch: `git push origin feature/nova-funcionalidade`
 5. **Abra** um Pull Request
 
-### **Padrões de Código**
-- ✅ **ESLint** + **Prettier** para JavaScript
-- ✅ **Black** + **Flake8** para Python
-- ✅ **TDD** + **BDD** para testes
-- ✅ **Docker** para containerização
-
 ## 📚 Documentação
 
 ### **Documentação Técnica**
-- 📖 [Arquitetura Detalhada](docs/ARCHITECTURE.md)
-- 🧪 [Guia de Testes](quarter/TESTES.md)
-- 🔐 [Segurança](docs/SECURITY.md)
-- 🚀 [Deploy](docs/DEPLOY.md)
-
-### **APIs**
-- 📡 [Quarter API](quarter/api/README.md)
-- 📡 [Harbor API](harbor/api/README.md)
-- 📡 [Guardian API](guardian/api/README.md)
+- 📖 [Arquitetura Detalhada](ARCHITECTURE.md)
+- 🛠️ [Guia de Desenvolvimento](DEVELOPMENT.md)
+- 🔧 [Troubleshooting](TROUBLESHOOTING.md)
+- 🔐 [Segurança](SECURITY.md)
 
 ## 🎉 Status do Projeto
 
@@ -256,6 +179,7 @@ quarter/
 - ✅ Autenticação centralizada (Quarter)
 - ✅ Dashboard principal (Harbor)
 - ✅ Sistema de segurança (Guardian)
+- ✅ Sistema de monitoramento (Beacon)
 - ✅ Stack compartilhado (Keycloak, PostgreSQL, Redis, OPA, ClickHouse)
 - ✅ Testes TDD e BDD completos
 - ✅ CI/CD pipeline
@@ -275,11 +199,6 @@ quarter/
 - 📧 **Email**: admin@canonika.io
 - 🐛 **Issues**: [GitHub Issues](https://github.com/aixyzdata/canonika/issues)
 - 📖 **Documentação**: [Wiki](https://github.com/aixyzdata/canonika/wiki)
-
-### **Comunidade**
-- 💬 **Discord**: [Canonika Community](https://discord.gg/canonika)
-- 📺 **YouTube**: [Canonika Channel](https://youtube.com/@canonika)
-- 📱 **Telegram**: [@canonika](https://t.me/canonika)
 
 ---
 

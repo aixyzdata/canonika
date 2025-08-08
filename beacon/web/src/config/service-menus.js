@@ -5,44 +5,49 @@ export const serviceMenus = {
     name: 'BEACON',
     description: 'Sistema de Sinalizadores e Alertas',
     iconClass: 'icon-beacon',
+    icon: 'fas fa-broadcast-tower',
     menuItems: [
       {
-        id: 'dashboard',
-        title: 'Dashboard',
-        subtitle: 'Visão Geral',
-        icon: 'fas fa-tachometer-alt'
+        id: 'websocket',
+        title: 'WebSocket',
+        subtitle: 'Tempo Real',
+        icon: 'fas fa-broadcast-tower',
+        path: '/websocket'
       },
       {
-        id: 'status',
-        title: 'Status',
-        subtitle: 'Monitoramento',
-        icon: 'fas fa-chart-line'
+        id: 'api',
+        title: 'REST API',
+        subtitle: 'HTTP Endpoints',
+        icon: 'fas fa-satellite',
+        path: '/api'
       },
       {
-        id: 'services',
-        title: 'Serviços',
-        subtitle: 'Gerenciamento',
-        icon: 'fas fa-server',
-        submenu: [
-          {
-            id: 'sinalizacao',
-            title: 'Sinalização',
-            subtitle: 'Transmissão',
-            icon: 'fas fa-broadcast-tower'
-          },
-          {
-            id: 'transmissao',
-            title: 'Transmissão',
-            subtitle: 'Comunicação',
-            icon: 'fas fa-wifi'
-          },
-          {
-            id: 'configuracoes',
-            title: 'Configurações',
-            subtitle: 'Sistema',
-            icon: 'fas fa-cogs'
-          }
-        ]
+        id: 'push',
+        title: 'Push',
+        subtitle: 'Notificações',
+        icon: 'fas fa-bell',
+        path: '/push'
+      },
+      {
+        id: 'email',
+        title: 'Email',
+        subtitle: 'Email',
+        icon: 'fas fa-envelope',
+        path: '/email'
+      },
+      {
+        id: 'sms',
+        title: 'SMS',
+        subtitle: 'SMS',
+        icon: 'fas fa-mobile-alt',
+        path: '/sms'
+      },
+      {
+        id: 'voice',
+        title: 'Voice',
+        subtitle: 'Voz',
+        icon: 'fas fa-phone',
+        path: '/voice'
       }
     ]
   },
@@ -474,26 +479,55 @@ export const serviceMenus = {
 
 // Função para obter configuração de um serviço
 export function getServiceMenu(serviceName) {
-  return serviceMenus[serviceName] || serviceMenus.harbor
+  // Adicionar verificação de segurança
+  if (!serviceMenus || typeof serviceMenus !== 'object') {
+    console.error('❌ serviceMenus não está definido corretamente');
+    return {
+      name: 'SERVIÇO',
+      description: 'Serviço não configurado',
+      iconClass: 'icon-default',
+      menuItems: []
+    };
+  }
+  
+  return serviceMenus[serviceName] || serviceMenus.harbor;
 }
 
 // Função para obter todos os serviços disponíveis
 export function getAllServices() {
-  return Object.keys(serviceMenus)
+  // Adicionar verificação de segurança
+  if (!serviceMenus || typeof serviceMenus !== 'object') {
+    console.error('❌ serviceMenus não está definido corretamente');
+    return [];
+  }
+  
+  return Object.keys(serviceMenus);
 }
 
 // Função para obter lista de serviços para o Harbor
 export function getHarborServices() {
-  const services = []
-  Object.keys(serviceMenus).forEach(serviceName => {
-    if (serviceName !== 'harbor') {
-      services.push({
-        name: serviceMenus[serviceName].name,
-        description: serviceMenus[serviceName].description,
-        iconClass: serviceMenus[serviceName].iconClass,
-        path: `/${serviceName}`
-      })
-    }
-  })
-  return services
+  const services = [];
+  
+  // Adicionar verificação de segurança
+  if (!serviceMenus || typeof serviceMenus !== 'object') {
+    console.error('❌ serviceMenus não está definido corretamente');
+    return services;
+  }
+  
+  try {
+    Object.keys(serviceMenus).forEach(serviceName => {
+      if (serviceName !== 'harbor') {
+        services.push({
+          name: serviceMenus[serviceName].name,
+          description: serviceMenus[serviceName].description,
+          iconClass: serviceMenus[serviceName].iconClass,
+          path: `/${serviceName}`
+        });
+      }
+    });
+  } catch (error) {
+    console.error('❌ Erro ao processar serviços:', error.message);
+  }
+  
+  return services;
 } 

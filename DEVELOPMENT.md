@@ -1,90 +1,26 @@
-# 🚀 Canonika - Ambiente de Desenvolvimento
+# 🛠️ Canonika - Guia de Desenvolvimento
 
 ## 📋 Visão Geral
 
-Este ambiente de desenvolvimento permite fazer mudanças em tempo real nos arquivos CSS sem precisar recompilar os containers Docker.
+Este guia cobre o ambiente de desenvolvimento, troubleshooting e melhores práticas para a plataforma Canonika.
 
-## 🛠️ Configuração
+## 🚀 Ambiente de Desenvolvimento
 
-### Pré-requisitos
+### **Pré-requisitos**
 - Docker e Docker Compose instalados
+- Node.js e npm
 - Acesso ao terminal
 
-### Estrutura de Arquivos
-```
-canonika/
-├── docker-compose.yml          # Produção
-├── docker-compose.dev.yml      # Desenvolvimento (com volumes)
-├── dev.sh                      # Script de desenvolvimento
-├── shared/styles/              # CSS compartilhado
-│   ├── canonika-theme.css
-│   └── canonika-icons.css
-└── [módulos]/
-```
-
-## 🎯 Como Usar
-
-### 1. Iniciar Ambiente de Desenvolvimento
+### **Iniciar Ambiente**
 ```bash
+# Ambiente de desenvolvimento (com volumes)
 ./dev.sh start
+
+# Ambiente de produção
+docker-compose up -d
 ```
 
-### 2. Fazer Mudanças CSS
-Edite qualquer arquivo em `./shared/styles/`:
-- `canonika-theme.css` - Tema principal
-- `canonika-icons.css` - Ícones dos módulos
-
-### 3. Aplicar Mudanças
-```bash
-./dev.sh css
-```
-
-### 4. Verificar Status
-```bash
-./dev.sh status
-```
-
-### 5. Ver Logs
-```bash
-./dev.sh logs
-```
-
-### 6. Parar Ambiente
-```bash
-./dev.sh stop
-```
-
-## 🌐 Acesso aos Módulos
-
-| Módulo | Porta | URL |
-|--------|-------|-----|
-| Harbor | 7721 | http://localhost:7721 |
-| Skipper | 7722 | http://localhost:7722 |
-| Wayfinder | 7723 | http://localhost:7723 |
-| Mapmaker | 7724 | http://localhost:7724 |
-| Quartermaster | 7725 | http://localhost:7725 |
-| Ledger | 7726 | http://localhost:7726 |
-| Seagull | 7727 | http://localhost:7727 |
-| Beacon | 7728 | http://localhost:7728 |
-| Dock | 7729 | http://localhost:7729 |
-| Guardian | 7730 | http://localhost:7730 |
-| Echo | 7731 | http://localhost:7731 |
-| Tollgate | 7732 | http://localhost:7732 |
-
-## ⚡ Vantagens do Ambiente de Desenvolvimento
-
-### ✅ **Antes (Produção)**
-- Mudanças CSS requerem rebuild completo
-- Tempo: 2-5 minutos por mudança
-- Processo: `docker-compose build` → `docker-compose up`
-
-### 🚀 **Agora (Desenvolvimento)**
-- Mudanças CSS aplicadas em segundos
-- Tempo: 10-30 segundos por mudança
-- Processo: `./dev.sh css`
-
-## 🔧 Comandos Disponíveis
-
+### **Comandos de Desenvolvimento**
 ```bash
 ./dev.sh start     # Inicia ambiente de desenvolvimento
 ./dev.sh stop      # Para todos os containers
@@ -95,124 +31,179 @@ Edite qualquer arquivo em `./shared/styles/`:
 ./dev.sh help      # Mostra ajuda
 ```
 
-## 📁 Volumes Montados
+## 🌐 Portas dos Serviços
 
-O ambiente de desenvolvimento usa volumes para os arquivos CSS:
+| Serviço | Porta | URL |
+|---------|-------|-----|
+| Quarter | 80 | http://localhost:80 |
+| Harbor | 3701 | http://localhost:3701 |
+| Guardian | 3705 | http://localhost:3705 |
+| Beacon | 3703 | http://localhost:3703 |
+| Skipper | 7722 | http://localhost:7722 |
+| Tollgate | 7732 | http://localhost:7732 |
 
-```yaml
-volumes:
-  - ./shared/styles:/usr/share/nginx/html/shared/styles
-```
+## ⚡ Desenvolvimento Rápido
 
-Isso permite que mudanças nos arquivos CSS sejam refletidas imediatamente nos containers.
-
-## 🎨 Exemplo de Fluxo de Trabalho
-
-1. **Iniciar ambiente:**
-   ```bash
-   ./dev.sh start
-   ```
-
-2. **Editar CSS:**
-   ```bash
-   # Edite ./shared/styles/canonika-theme.css
-   # Faça suas mudanças
-   ```
-
-3. **Aplicar mudanças:**
-   ```bash
-   ./dev.sh css
-   ```
-
-4. **Verificar resultado:**
-   - Acesse qualquer módulo (ex: http://localhost:7721)
-   - As mudanças estarão aplicadas
-
-## 🔍 Troubleshooting
-
-### Containers não iniciam
+### **Mudanças CSS (Rápido - 10-30 segundos)**
 ```bash
-# Verificar logs
-./dev.sh logs
-
-# Reiniciar tudo
-./dev.sh stop
-./dev.sh start
-```
-
-### Mudanças CSS não aparecem
-```bash
-# Forçar reinicialização dos containers
+# Editar arquivos em ./shared/styles/
+# Aplicar mudanças
 ./dev.sh css
-
-# Ou reiniciar tudo
-./dev.sh restart
 ```
 
-### Problemas de permissão
+### **Mudanças Estruturais (Lento - 2-5 minutos)**
 ```bash
-# Tornar script executável
-chmod +x dev.sh
-```
-
-## 🚀 Produção vs Desenvolvimento
-
-| Aspecto | Produção | Desenvolvimento |
-|---------|----------|-----------------|
-| Arquivo | `docker-compose.yml` | `docker-compose.dev.yml` |
-| Volumes | Não | Sim (CSS compartilhado) |
-| Rebuild | Necessário | Não necessário |
-| Tempo de mudança | 2-5 min | 10-30 seg |
-| Comando | `docker-compose up` | `./dev.sh start` |
-
-## 📝 Notas Importantes
-
-- O ambiente de desenvolvimento usa volumes para os arquivos CSS
-- Mudanças são aplicadas reiniciando apenas os containers necessários
-- O script `dev.sh` automatiza todo o processo
-- Para produção, use o `docker-compose.yml` original
-
-## 🎯 Próximos Passos
-
-1. Use `./dev.sh start` para iniciar o ambiente
-2. Faça suas mudanças CSS
-3. Use `./dev.sh css` para aplicar
-4. Desfrute do desenvolvimento mais rápido! 🚀
-
-## ⚠️ Limitações
-
-### Quando Recompilar é Necessário
-
-Para mudanças que **NÃO** são apenas CSS, você ainda precisa recompilar:
-
-- **Mudanças em HTML/Vue.js** - Requer rebuild
-- **Mudanças em JavaScript** - Requer rebuild  
-- **Mudanças em Dockerfile** - Requer rebuild
-- **Mudanças em dependências** - Requer rebuild
-- **Mudanças estruturais** - Requer rebuild
-
-### Comando para Recompilar
-
-```bash
-# Para mudanças que não são apenas CSS
+# Para mudanças em HTML/Vue.js/JavaScript
 docker-compose build [serviço]
 docker-compose up -d [serviço]
 ```
 
-### Exemplo de Fluxo Completo
+## 🔧 Troubleshooting
 
+### **Problemas Comuns**
+
+#### 1. CSS Quebrado / Páginas Sem Estilo
 ```bash
-# 1. Para mudanças CSS apenas (rápido)
-./dev.sh css
+# Solução rápida
+git reset --hard 05d1121
+docker-compose down
+docker system prune -f
+docker-compose build --no-cache
+docker-compose up -d
+```
 
-# 2. Para mudanças estruturais (mais lento)
+#### 2. Erro 500 no Harbor
+```bash
+# Verificar configuração do nginx
+cat harbor/nginx/nginx.conf
+
+# Rebuild do Harbor
 docker-compose build harbor
 docker-compose up -d harbor
 ```
 
-## 🎯 Resumo
+#### 3. Hot Reload Não Funciona
+```bash
+# Usar modo de desenvolvimento
+cd harbor/web && npm run dev
+```
 
-- **CSS apenas**: Use `./dev.sh css` (10-30 segundos)
-- **Mudanças estruturais**: Use `docker-compose build` (2-5 minutos)
-- **Desenvolvimento**: Use `./dev.sh start`
-- **Produção**: Use `docker-compose up` 
+#### 4. Portas em Conflito
+```bash
+# Verificar portas em uso
+lsof -i :3701
+lsof -i :7721
+
+# Parar processos conflitantes
+kill -9 <PID>
+```
+
+### **Comandos de Diagnóstico**
+```bash
+# Verificar status dos containers
+docker-compose ps
+
+# Ver logs
+docker-compose logs
+docker logs canonika_harbor
+
+# Testar endpoints
+curl -I http://localhost:3701
+curl -I http://localhost:7722
+```
+
+## 🧪 Testes
+
+### **Executar Testes**
+```bash
+# Testes do Quarter (TDD + BDD)
+cd quarter
+./run-tests.sh
+
+# Testes de todos os serviços
+docker-compose exec quarter npm test
+docker-compose exec harbor npm test
+docker-compose exec guardian npm test
+```
+
+### **Cobertura de Testes**
+- ✅ **TDD (Test-Driven Development)**: 95%+ cobertura
+- ✅ **BDD (Behavior-Driven Development)**: 100% fluxos críticos
+- ✅ **API Tests**: 90%+ endpoints
+- ✅ **E2E Tests**: Login, Logout, Navegação
+
+## 📊 Monitoramento
+
+### **Health Checks**
+```bash
+# Verificar status dos serviços
+docker-compose ps
+
+# Logs em tempo real
+docker-compose logs -f
+
+# Health checks individuais
+curl http://localhost:80/api/health      # Quarter
+curl http://localhost:3701/api/health    # Harbor
+curl http://localhost:3705/api/health    # Guardian
+```
+
+## 🎯 Melhores Práticas
+
+### **Desenvolvimento**
+- Use `./dev.sh start` para desenvolvimento
+- Use `docker-compose up` para produção
+- Faça commits frequentes
+- Teste antes de fazer push
+
+### **Código**
+- Siga os padrões ESLint + Prettier
+- Use TDD + BDD para testes
+- Documente APIs e componentes
+- Mantenha consistência visual
+
+### **Deploy**
+- Sempre teste em desenvolvimento primeiro
+- Use tags para releases
+- Mantenha backup dos dados
+- Monitore logs em produção
+
+## 📚 Recursos Úteis
+
+### **Documentação**
+- [Arquitetura](ARCHITECTURE.md)
+- [Troubleshooting](TROUBLESHOOTING.md)
+- [Segurança](SECURITY.md)
+
+### **Comandos Úteis**
+```bash
+# Limpar cache do Docker
+docker system prune -f
+
+# Ver logs em tempo real
+docker-compose logs -f [serviço]
+
+# Entrar no container
+docker exec -it canonika_harbor sh
+
+# Verificar arquivos no container
+ls -la /usr/share/nginx/html/dist/
+```
+
+## 🚨 Emergência
+
+### **Reset Completo**
+```bash
+git reset --hard 05d1121
+docker-compose down
+docker system prune -f
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### **Commit Estável**
+`05d1121` - "feat: padronização completa do view-header em todas as views"
+
+---
+
+**🎯 Objetivo**: Manter um ambiente de desenvolvimento rápido, estável e produtivo para a equipe Canonika. 

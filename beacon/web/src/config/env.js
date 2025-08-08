@@ -1,33 +1,33 @@
-// Configuração de ambiente para Canonika
-// Centraliza todas as URLs dos serviços
+// Configuração de ambiente para Beacon
+// Versão simplificada para o browser
 
 const config = {
   // URLs dos microserviços
   services: {
-    quarter: import.meta.env.VITE_QUARTER_URL || 'http://localhost:3700',
-    harbor: import.meta.env.VITE_HARBOR_URL || 'http://localhost:3701',
-    guardian: import.meta.env.VITE_GUARDIAN_URL || 'http://localhost:3705',
-    skipper: import.meta.env.VITE_SKIPPER_URL || 'http://localhost:3702',
-    beacon: import.meta.env.VITE_BEACON_URL || 'http://localhost:3703',
-    fisher: import.meta.env.VITE_FISHER_URL || 'http://localhost:3706',
-    tollgate: import.meta.env.VITE_TOLLGATE_URL || 'http://localhost:3707',
-    ledger: import.meta.env.VITE_LEDGER_URL || 'http://localhost:3708'
+    quarter: 'http://localhost:3700',
+    harbor: 'http://localhost:3701',
+    guardian: 'http://localhost:3705',
+    skipper: 'http://localhost:3702',
+    beacon: 'http://localhost:3704',
+    fisher: 'http://localhost:3706',
+    tollgate: 'http://localhost:3707',
+    ledger: 'http://localhost:3708'
   },
 
   // URLs da infraestrutura
   infrastructure: {
-    keycloak: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
-    postgres: import.meta.env.VITE_POSTGRES_URL || 'postgresql://canonika:canonika123@localhost:5432/canonika',
-    redis: import.meta.env.VITE_REDIS_URL || 'redis://localhost:6379',
-    opa: import.meta.env.VITE_OPA_URL || 'http://localhost:8181',
-    clickhouse: import.meta.env.VITE_CLICKHOUSE_URL || 'http://localhost:8123'
+    keycloak: 'http://localhost:8080',
+    postgres: 'postgresql://canonika:canonika123@localhost:5432/canonika',
+    redis: 'redis://localhost:6379',
+    opa: 'http://localhost:8181',
+    clickhouse: 'http://localhost:8123'
   },
 
   // Configurações gerais
   general: {
-    devMode: import.meta.env.VITE_DEV_MODE === 'true',
-    apiTimeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,
-    retryAttempts: parseInt(import.meta.env.VITE_RETRY_ATTEMPTS) || 3
+    devMode: true,
+    apiTimeout: 30000,
+    retryAttempts: 3
   },
 
   // Métodos utilitários

@@ -1,8 +1,8 @@
-# 🔧 Canonika - Guia de Troubleshooting
+# 🔧 Canonika - Troubleshooting
 
 ## 🚨 Problemas Comuns e Soluções
 
-### 1. CSS Quebrado / Páginas Sem Estilo
+### **1. CSS Quebrado / Páginas Sem Estilo**
 
 **Sintomas:**
 - Páginas aparecem sem CSS
@@ -31,7 +31,7 @@ cd harbor/web && npm run build
 cd ../.. && docker cp harbor/web/dist/. canonika_harbor:/usr/share/nginx/html/dist/
 ```
 
-### 2. Erro 500 no Harbor
+### **2. Erro 500 no Harbor**
 
 **Sintomas:**
 - `curl -I http://localhost:3701` retorna 500
@@ -48,7 +48,7 @@ docker-compose build harbor
 docker-compose up -d harbor
 ```
 
-### 3. Hot Reload Não Funciona
+### **3. Hot Reload Não Funciona**
 
 **Sintomas:**
 - Mudanças não aparecem automaticamente
@@ -60,10 +60,10 @@ docker-compose up -d harbor
 cd harbor/web && npm run dev
 
 # Ou usar script de desenvolvimento
-./dev-harbor.sh
+./dev.sh start
 ```
 
-### 4. Portas em Conflito
+### **4. Portas em Conflito**
 
 **Sintomas:**
 - Containers não iniciam
@@ -82,7 +82,7 @@ kill -9 <PID>
 # Ou mudar portas no docker-compose.yml
 ```
 
-### 5. Build Falha
+### **5. Build Falha**
 
 **Sintomas:**
 - Erro no build do Vite
@@ -101,12 +101,12 @@ npm run build
 
 ## 🔍 Comandos de Diagnóstico
 
-### Verificar Status dos Containers
+### **Verificar Status dos Containers**
 ```bash
 docker-compose ps
 ```
 
-### Ver Logs
+### **Ver Logs**
 ```bash
 # Todos os containers
 docker-compose logs
@@ -115,7 +115,7 @@ docker-compose logs
 docker logs canonika_harbor
 ```
 
-### Testar Endpoints
+### **Testar Endpoints**
 ```bash
 # Harbor
 curl -I http://localhost:3701
@@ -127,7 +127,7 @@ curl -I http://localhost:7722
 curl -I http://localhost:7732
 ```
 
-### Verificar Arquivos no Container
+### **Verificar Arquivos no Container**
 ```bash
 # Entrar no container
 docker exec -it canonika_harbor sh
@@ -138,25 +138,25 @@ ls -la /usr/share/nginx/html/dist/
 
 ## 📋 Checklist de Recuperação
 
-### ✅ Sistema Funcionando
+### **✅ Sistema Funcionando**
 - [ ] Harbor responde em http://localhost:3701
 - [ ] CSS carrega corretamente
 - [ ] Todas as views funcionam
 - [ ] Hot reload funciona (se em dev)
 
-### ✅ Build Correto
+### **✅ Build Correto**
 - [ ] `npm run build` sem erros
 - [ ] Arquivos copiados para container
 - [ ] Nginx configurado corretamente
 
-### ✅ Containers
+### **✅ Containers**
 - [ ] Todos os containers rodando
 - [ ] Portas corretas
 - [ ] Logs sem erros
 
 ## 🚀 Comandos de Recuperação Rápida
 
-### Reset Completo
+### **Reset Completo**
 ```bash
 git reset --hard 05d1121
 docker-compose down
@@ -167,7 +167,7 @@ cd harbor/web && npm run build
 cd ../.. && docker cp harbor/web/dist/. canonika_harbor:/usr/share/nginx/html/dist/
 ```
 
-### Rebuild Apenas Harbor
+### **Rebuild Apenas Harbor**
 ```bash
 docker-compose build harbor
 docker-compose up -d harbor
@@ -175,7 +175,7 @@ cd harbor/web && npm run build
 cd ../.. && docker cp harbor/web/dist/. canonika_harbor:/usr/share/nginx/html/dist/
 ```
 
-## 📞 Contatos de Emergência
+## 📞 Informações de Emergência
 
 **Commit Estável:** `05d1121` - "feat: padronização completa do view-header em todas as views"
 
@@ -188,4 +188,39 @@ cd ../.. && docker cp harbor/web/dist/. canonika_harbor:/usr/share/nginx/html/di
 **Arquivos Críticos:**
 - `harbor/nginx/nginx.conf`
 - `harbor/web/vite.config.js`
-- `docker-compose.yml` 
+- `docker-compose.yml`
+
+## 🔧 Problemas Específicos
+
+### **Vite Cache Issues**
+```bash
+# Limpar cache do Vite
+cd harbor/web
+rm -rf node_modules/.vite
+npm run dev
+```
+
+### **Docker Space Issues**
+```bash
+# Limpar espaço do Docker
+docker system prune -a -f
+docker volume prune -f
+```
+
+### **Node Modules Issues**
+```bash
+# Reinstalar node_modules
+cd harbor/web
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## 📚 Recursos Adicionais
+
+- [Guia de Desenvolvimento](DEVELOPMENT.md)
+- [Arquitetura](ARCHITECTURE.md)
+- [Documentação Completa](README.md)
+
+---
+
+**🎯 Objetivo**: Fornecer soluções rápidas e eficazes para problemas comuns da plataforma Canonika. 

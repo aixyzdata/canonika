@@ -116,13 +116,15 @@ export default {
   padding: 2rem;
   overflow-y: auto;
   transition: all 0.3s ease;
-  background: #f8f9fa;
-  color: #212529;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  color: #e2e8f0;
 }
 
-/* When sidebar is collapsed */
+/* When sidebar is collapsed (user authenticated) */
 .main-content.sidebar-collapsed {
   margin-left: 0;
+  background: #f8f9fa;
+  color: #212529;
 }
 
 /* Responsive */

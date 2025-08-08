@@ -1,0 +1,565 @@
+/* Canonika Theme - Identidade Visual Unificada */
+
+:root {
+  /* Cores principais */
+  --canonika-blue: #002F6C;
+  --canonika-green: #00BFA6;
+  --canonika-white: #FFFFFF;
+  --canonika-dark: #1F1F1F;
+  --canonika-gray: #94A3B8;
+  --canonika-light-gray: #E2E8F0;
+  
+  /* Gradientes */
+  --canonika-gradient-primary: linear-gradient(135deg, var(--canonika-blue) 0%, var(--canonika-dark) 100%);
+  --canonika-gradient-header: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+  --canonika-gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  
+  /* Sombras */
+  --canonika-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --canonika-shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+  --canonika-glow: 0 0 20px rgba(0, 191, 166, 0.3);
+  
+  /* Bordas */
+  --canonika-border-radius: 8px;
+  --canonika-border-radius-large: 12px;
+  
+  /* Transições */
+  --canonika-transition: all 0.3s ease;
+}
+
+/* Reset e base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--canonika-gradient-primary);
+  color: var(--canonika-white);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Header unificado */
+.canonika-header {
+  background: var(--canonika-gradient-header);
+  padding: 1rem 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--canonika-shadow);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--canonika-green);
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0, 191, 166, 0.5);
+}
+
+.logo-subtitle {
+  font-size: 0.875rem;
+  color: var(--canonika-gray);
+  margin-left: 0.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--canonika-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--canonika-white);
+}
+
+/* Layout principal */
+
+/* Modal System */
+.canonika-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.canonika-modal {
+  background: var(--canonika-gradient-card);
+  border-radius: var(--canonika-border-radius-large);
+  box-shadow: var(--canonika-shadow-hover);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 800px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.canonika-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.canonika-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.canonika-modal-icon {
+  color: var(--canonika-green);
+  font-size: 1.25rem;
+}
+
+.canonika-modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 120px);
+}
+
+/* Form System */
+.canonika-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.canonika-form-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--canonika-border-radius);
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.canonika-section-subheader {
+  margin-bottom: 1.5rem;
+}
+
+.canonika-section-subheader h4 {
+  color: var(--canonika-green);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canonika-section-subheader p {
+  color: var(--canonika-gray);
+  margin: 0;
+}
+
+.canonika-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.canonika-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.canonika-form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--canonika-white);
+  font-size: 0.875rem;
+}
+
+.canonika-form-label i {
+  color: var(--canonika-green);
+  width: 16px;
+}
+
+.canonika-form-input,
+.canonika-form-select,
+.canonika-form-textarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius);
+  padding: 0.75rem;
+  color: var(--canonika-white);
+  font-size: 0.875rem;
+  transition: var(--canonika-transition);
+}
+
+.canonika-form-input:focus,
+.canonika-form-select:focus,
+.canonika-form-textarea:focus {
+  outline: none;
+  border-color: var(--canonika-green);
+  box-shadow: 0 0 0 2px rgba(0, 191, 166, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.canonika-form-input::placeholder,
+.canonika-form-textarea::placeholder {
+  color: var(--canonika-gray);
+}
+
+.canonika-form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canonika-form-check-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--canonika-green);
+}
+
+.canonika-form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--canonika-white);
+  cursor: pointer;
+}
+
+.canonika-form-check-label i {
+  color: var(--canonika-green);
+}
+
+.canonika-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.canonika-text-sm {
+  font-size: 0.875rem;
+}
+
+.canonika-text-muted {
+  color: var(--canonika-gray);
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+  .canonika-modal {
+    width: 95vw;
+    margin: 1rem;
+  }
+  
+  .canonika-form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .canonika-modal-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .canonika-modal-body {
+    padding: 1.5rem;
+  }
+}
+.canonika-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar unificado */
+.canonika-sidebar {
+  position: relative;
+  height: 100vh;
+  width: 280px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--canonika-transition);
+  padding-top: 80px;
+  flex-shrink: 0;
+}
+
+/* Conteúdo principal */
+.canonika-main {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem;
+  background: var(--canonika-gradient-bg);
+}
+
+.sidebar-collapsed {
+  width: 80px;
+}
+
+/* Quando sidebar está colapsado, ajusta o conteúdo */
+.canonika-layout.sidebar-collapsed .canonika-main {
+  margin-left: 0;
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0.5rem 1rem;
+}
+
+.canonika-sidebar .nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px;
+  color: var(--canonika-gray);
+  text-decoration: none;
+  transition: var(--canonika-transition);
+  cursor: pointer;
+  border-radius: var(--canonika-border-radius);
+  margin: 0 1rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 3.5rem;
+}
+
+.nav-link:hover {
+  color: var(--canonika-green);
+  transform: translateX(5px);
+}
+
+.nav-item.active .nav-link {
+  background: rgba(0, 191, 166, 0.2);
+  color: var(--canonika-green);
+}
+
+.nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  flex: 0 0 1.5rem;
+}
+
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  min-height: 2.5rem;
+  gap: 0.125rem;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
+}
+
+.service-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+  white-space: nowrap;
+  color: inherit;
+}
+
+/* Cards unificados */
+.canonika-card {
+  background: var(--canonika-gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--canonika-shadow);
+  transition: var(--canonika-transition);
+}
+
+.canonika-card:hover {
+  box-shadow: var(--canonika-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--canonika-white);
+  margin: 0;
+}
+
+/* Botões unificados */
+.canonika-btn {
+  background: var(--canonika-green);
+  color: var(--canonika-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--canonika-border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--canonika-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.canonika-btn:hover {
+  background: #00a896;
+  transform: translateY(-1px);
+  box-shadow: var(--canonika-glow);
+}
+
+.canonika-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--canonika-green);
+  color: var(--canonika-green);
+}
+
+.canonika-btn-secondary:hover {
+  background: var(--canonika-green);
+  color: var(--canonika-white);
+}
+
+/* Formulários unificados */
+.canonika-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--canonika-white);
+  font-size: 0.875rem;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--canonika-white);
+  padding: 0.75rem 1rem;
+  border-radius: var(--canonika-border-radius);
+  transition: var(--canonika-transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--canonika-green);
+  box-shadow: 0 0 0 3px rgba(0, 191, 166, 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--canonika-gray);
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-online {
+  background: var(--canonika-green);
+  box-shadow: 0 0 8px rgba(0, 191, 166, 0.5);
+}
+
+.status-offline {
+  background: #dc3545;
+  box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+}
+
+.status-warning {
+  background: #ffc107;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .canonika-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-open .canonika-sidebar {
+    transform: translateX(0);
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* Animações */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(0, 191, 166, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 191, 166, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(0, 191, 166, 0.5); }
+}
+
+.glow {
+  animation: glow 2s infinite;
+} 
