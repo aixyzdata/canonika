@@ -1,7 +1,7 @@
 <template>
   <div class="canonika-app">
     <!-- Header -->
-    <CanonikaHeader
+    <CanonikaHeader 
       :logo-text="headerConfig.logoText"
       :logo-subtitle="headerConfig.logoSubtitle"
       :user="headerConfig.user"
@@ -9,16 +9,16 @@
       :is-online="headerConfig.isOnline"
       @logout="$emit('logout')"
     />
-
+    
     <!-- Layout -->
     <div class="canonika-layout">
       <!-- Sidebar -->
       <CanonikaSidebar
         :brand-text="sidebarConfig.brandText"
         :brand-icon="sidebarConfig.brandIcon"
+        :collapsed="sidebarCollapsed"
         :user="sidebarConfig.user"
         :navigation-sections="sidebarConfig.navigationSections"
-        :collapsed="sidebarCollapsed"
         @nav-click="$emit('nav-click', $event)"
         @sidebar-toggle="toggleSidebar"
       />
@@ -88,49 +88,6 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Reset e base - Estilo idêntico ao beacon_old */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.canonika-app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #e2e8f0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Layout */
-.canonika-layout {
-  display: flex;
-  height: calc(100vh - 60px);
-  overflow: hidden;
-}
-
-/* Main Content */
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
-  color: #e2e8f0;
-}
-
-/* When sidebar is collapsed (user authenticated) */
-.main-content.sidebar-collapsed {
-  margin-left: 0;
-  background: #f8f9fa;
-  color: #212529;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
-  }
-}
+<style>
+@import '../styles/masterpage.css';
 </style> 

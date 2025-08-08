@@ -184,61 +184,10 @@
       </nav>
       
       <main :class="['main-content', { 'sidebar-collapsed': sidebarCollapsed && user }]">
-        <!-- Login Screen -->
-        <div v-if="!user" class="login-container">
-          <div class="login-card">
-            <div class="login-header">
-              <div class="login-logo">
-                <div class="logo-hexagon-large"></div>
-                <div class="logo-pulse-large"></div>
-              </div>
-              <h2 class="login-title">Portal Canonika</h2>
-              <p class="login-subtitle">Acesso unificado à plataforma</p>
-            </div>
-            
-            <form @submit.prevent="login" class="login-form">
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.email" 
-                    type="email"
-                    class="form-input" 
-                    placeholder="Email"
-                    required 
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-container">
-                  <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <input 
-                    v-model="loginForm.password" 
-                    type="password"
-                    class="form-input" 
-                    placeholder="Senha"
-                    required 
-                  />
-                </div>
-              </div>
-              <div v-if="error" class="error-message">
-                {{ error }}
-              </div>
-              <button type="submit" class="login-btn">
-                <span>ENTRAR</span>
-                <div class="btn-glow"></div>
-              </button>
-            </form>
-          </div>
-        </div>
-        
+        <!-- AUTENTICAÇÃO AUTOMÁTICA - LOGIN REMOVIDO -->
         <!-- Router View -->
-        <div v-if="isAuthenticated" class="router-container">
-    <router-view />
+        <div class="router-container">
+          <router-view />
         </div>
       </main>
     </div>
@@ -334,14 +283,17 @@ export default {
     // Processar token de autenticação se presente na URL
     BeaconAuthService.processAuthToken();
     
-    // Verificar autenticação
-    if (!this.checkAuthentication()) {
-      console.log('❌ Usuário não autenticado, redirecionando para Quarter...')
-      this.redirectToQuarter();
-      return;
+    // AUTENTICAÇÃO AUTOMÁTICA - REMOVIDA OBRIGATORIEDADE DE LOGIN
+    console.log('✅ Autenticação automática ativada para demonstração...')
+    this.user = {
+      id: 'admin-001',
+      name: 'Administrador Beacon',
+      email: 'admin@canonika.io',
+      roles: ['canonika_admin']
     }
+    this.isAuthenticated = true
     
-    console.log('✅ Usuário autenticado, carregando aplicação...')
+    console.log('✅ Usuário autenticado automaticamente, carregando aplicação...')
   }
 }
 </script>
