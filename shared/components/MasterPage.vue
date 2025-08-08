@@ -80,8 +80,15 @@ export default {
   },
   methods: {
     toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed
-      this.$emit('sidebar-toggle', this.sidebarCollapsed)
+      // Se estiver recolhido, sempre expandir
+      if (this.sidebarCollapsed) {
+        this.sidebarCollapsed = false
+        this.$emit('sidebar-toggle', false)
+      } else {
+        // Se estiver expandido, permitir recolher
+        this.sidebarCollapsed = true
+        this.$emit('sidebar-toggle', true)
+      }
     }
   },
   emits: ['logout', 'nav-click', 'sidebar-toggle']

@@ -366,37 +366,181 @@ export default {
         showLogout: true
       },
       sidebarConfig: {
-        title: 'Template Service',
-        icon: 'fas fa-rocket',
-        menuItems: [
+        brandText: 'Template Service',
+        brandIcon: 'fas fa-rocket',
+        user: {
+          name: 'Administrador',
+          role: 'Admin',
+          initial: 'A'
+        },
+        navigationSections: [
           {
-            id: 'dashboard',
-            title: 'Dashboard',
-            subtitle: 'Visão Geral',
-            icon: 'fas fa-tachometer-alt',
-            href: '#',
-            active: true
-          },
-          {
-            id: 'components',
-            title: 'Componentes',
-            subtitle: 'Validação',
-            icon: 'fas fa-cube',
-            href: '#'
-          },
-          {
-            id: 'tests',
-            title: 'Testes',
-            subtitle: 'Funcionalidades',
-            icon: 'fas fa-vial',
-            href: '#'
-          },
-          {
-            id: 'info',
-            title: 'Informações',
-            subtitle: 'Detalhes',
-            icon: 'fas fa-info-circle',
-            href: '#'
+            title: 'Navegação',
+            items: [
+              {
+                id: 'dashboard',
+                title: 'Dashboard',
+                subtitle: 'Visão Geral',
+                icon: 'fas fa-tachometer-alt',
+                href: '#',
+                active: true
+              },
+              {
+                id: 'components',
+                title: 'Componentes',
+                subtitle: 'Validação',
+                icon: 'fas fa-cube',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'header',
+                    title: 'Header',
+                    subtitle: 'Cabeçalho',
+                    icon: 'fas fa-heading',
+                    href: '#header'
+                  },
+                  {
+                    id: 'sidebar',
+                    title: 'Sidebar',
+                    subtitle: 'Menu Lateral',
+                    icon: 'fas fa-bars',
+                    href: '#sidebar'
+                  },
+                  {
+                    id: 'masterpage',
+                    title: 'MasterPage',
+                    subtitle: 'Layout Principal',
+                    icon: 'fas fa-layer-group',
+                    href: '#masterpage'
+                  },
+                  {
+                    id: 'viewcontent',
+                    title: 'ViewContent',
+                    subtitle: 'Conteúdo',
+                    icon: 'fas fa-file-alt',
+                    href: '#viewcontent'
+                  },
+                  {
+                    id: 'viewheader',
+                    title: 'ViewHeader',
+                    subtitle: 'Cabeçalho da View',
+                    icon: 'fas fa-window-maximize',
+                    href: '#viewheader'
+                  }
+                ]
+              },
+              {
+                id: 'services',
+                title: 'Serviços',
+                subtitle: 'Integração',
+                icon: 'fas fa-server',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'auth',
+                    title: 'Autenticação',
+                    subtitle: 'Login/Logout',
+                    icon: 'fas fa-key',
+                    href: '#auth'
+                  },
+                  {
+                    id: 'quarter',
+                    title: 'Quarter',
+                    subtitle: 'Identity Provider',
+                    icon: 'fas fa-shield-alt',
+                    href: '#quarter'
+                  },
+                  {
+                    id: 'harbor',
+                    title: 'Harbor',
+                    subtitle: 'Portal Principal',
+                    icon: 'fas fa-anchor',
+                    href: '#harbor'
+                  },
+                  {
+                    id: 'beacon',
+                    title: 'Beacon',
+                    subtitle: 'Monitoramento',
+                    icon: 'fas fa-broadcast-tower',
+                    href: '#beacon'
+                  }
+                ]
+              },
+              {
+                id: 'tests',
+                title: 'Testes',
+                subtitle: 'Funcionalidades',
+                icon: 'fas fa-vial',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'unit',
+                    title: 'Unitários',
+                    subtitle: 'Testes Unitários',
+                    icon: 'fas fa-microchip',
+                    href: '#unit'
+                  },
+                  {
+                    id: 'integration',
+                    title: 'Integração',
+                    subtitle: 'Testes de Integração',
+                    icon: 'fas fa-plug',
+                    href: '#integration'
+                  },
+                  {
+                    id: 'e2e',
+                    title: 'End-to-End',
+                    subtitle: 'Testes E2E',
+                    icon: 'fas fa-route',
+                    href: '#e2e'
+                  },
+                  {
+                    id: 'performance',
+                    title: 'Performance',
+                    subtitle: 'Testes de Performance',
+                    icon: 'fas fa-tachometer-alt',
+                    href: '#performance'
+                  }
+                ]
+              },
+              {
+                id: 'info',
+                title: 'Informações',
+                subtitle: 'Detalhes',
+                icon: 'fas fa-info-circle',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'docs',
+                    title: 'Documentação',
+                    subtitle: 'Guias e Tutoriais',
+                    icon: 'fas fa-book',
+                    href: '#docs'
+                  },
+                  {
+                    id: 'api',
+                    title: 'API',
+                    subtitle: 'Endpoints',
+                    icon: 'fas fa-code',
+                    href: '#api'
+                  },
+                  {
+                    id: 'config',
+                    title: 'Configuração',
+                    subtitle: 'Settings',
+                    icon: 'fas fa-cog',
+                    href: '#config'
+                  },
+                  {
+                    id: 'about',
+                    title: 'Sobre',
+                    subtitle: 'Informações do Sistema',
+                    icon: 'fas fa-info',
+                    href: '#about'
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
