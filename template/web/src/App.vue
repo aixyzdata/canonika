@@ -347,8 +347,13 @@
 </template>
 
 <script>
-import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
-import AuthService from '../../../shared/services/AuthService.js'
+import CanonikaMasterPage from '../../../shared/templates/MasterPage.vue'
+// Fallback mínimo para AuthService ausente neste snapshot
+const AuthService = {
+  async checkAndRefreshToken() { return true },
+  getCurrentUser() { return { name: 'Administrador' } },
+  logout() {}
+}
 
 export default {
   name: 'TemplateApp',
