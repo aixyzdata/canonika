@@ -1,0 +1,27 @@
+# Configuração para adicionar ao docker-compose.yml
+services:
+  template:
+    build:
+      context: ./template/api
+      dockerfile: Dockerfile
+    ports:
+      - "8015:8015"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@postgres:5432/template
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - canonika-network
+
+  template-web:
+    build:
+      context: ./template/web
+      dockerfile: Dockerfile
+    ports:
+      - "3715:80"
+    depends_on:
+      - template
+    networks:
+      - canonika-network
