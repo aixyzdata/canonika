@@ -17,8 +17,8 @@ services:
 
   template-web:
     build:
-      context: ./template/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./template/web/Dockerfile
     ports:
       - "3715:80"
     depends_on:

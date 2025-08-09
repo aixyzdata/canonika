@@ -13,6 +13,46 @@ npm install
 npm run dev
 ```
 
+### **API via Docker (recomendado)**
+```bash
+# Build da imagem
+docker build -t canonika_template_api:latest -f template/api/Dockerfile template/api
+
+# Verificar/crear rede compartilhada (usada pelo Canonika)
+docker network ls | grep canonika_canonika-network \
+  || docker network create --subnet 172.20.0.0/16 canonika_canonika-network
+
+# Subir API na porta 8015 e conectar na rede
+docker run -d --name canonika_template_api \
+  --network canonika_canonika-network \
+  -p 8015:8015 canonika_template_api:latest
+
+# Health check
+curl -s http://localhost:8015/health
+```
+
+### **Conflito de Porta (8015 já em uso)**
+Se aparecer o erro "port is already allocated" ao subir a API:
+```bash
+# 1) Descobrir quem ocupa a porta 8015
+lsof -i :8015
+docker ps --format 'table {{.Names}}\t{{.Ports}}'
+
+# 2a) Parar o container existente
+docker rm -f canonika_template_api
+
+# 2b) OU subir em outra porta do host (ex.: 3815)
+docker run -d --name canonika_template_api_alt \
+  --network canonika_canonika-network \
+  -p 3815:8015 canonika_template_api:latest
+```
+
+### **Conectar container existente à rede**
+Se a API foi iniciada sem rede, conecte-a à rede compartilhada:
+```bash
+docker network connect canonika_canonika-network canonika_template_api
+```
+
 ### **Acesso**
 - **URL**: http://localhost:3790
 - **Porta Web**: 3790
