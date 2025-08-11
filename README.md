@@ -10,7 +10,8 @@ O **Canonika** é uma plataforma moderna de microserviços desenvolvida com arqu
 
 | Serviço | Porta | Descrição | Status |
 |---------|-------|-----------|--------|
-| **Quarter** | 80 | Ponto de entrada centralizado | ✅ Produção |
+| **Quarter** | 3700 | Ponto de entrada centralizado | ✅ Produção |
+| **Template** | 3790 | Layout oficial da plataforma | ✅ Produção |
 | **Harbor** | 3701 | Dashboard principal | ✅ Produção |
 | **Guardian** | 3705 | Sistema de segurança | ✅ Produção |
 | **Beacon** | 3703 | Sistema de monitoramento | ✅ Produção |
@@ -30,6 +31,7 @@ O **Canonika** é uma plataforma moderna de microserviços desenvolvida com arqu
 - **Segurança**: OPA (Open Policy Agent)
 - **Containerização**: Docker + Docker Compose
 - **Testes**: TDD + BDD (Vitest + Cypress)
+- **Estilos**: SCSS + Design System compartilhado
 
 ## 🚀 Quick Start
 
@@ -54,7 +56,7 @@ cd canonika
 docker-compose up -d
 
 # 3. Acesse o Quarter (ponto de entrada)
-open http://localhost:80
+open http://localhost:3700
 ```
 
 ### **Credenciais de Acesso**
@@ -69,6 +71,8 @@ canonika/
 │   ├── web/                   # Frontend Vue.js
 │   ├── api/                   # Backend FastAPI
 │   └── nginx/                 # Proxy reverso
+├── template/                  # Layout oficial da plataforma
+│   └── web/                   # Frontend Vue.js
 ├── harbor/                    # Dashboard principal
 │   └── web/                   # Frontend Vue.js
 ├── guardian/                  # Sistema de segurança
@@ -76,8 +80,10 @@ canonika/
 ├── beacon/                    # Sistema de monitoramento
 │   └── web/                   # Frontend Vue.js
 ├── shared/                    # Recursos compartilhados
-│   ├── styles/               # CSS compartilhado
+│   ├── styles/               # SCSS compartilhado
+│   ├── components/           # Componentes Vue.js
 │   └── config/               # Configurações
+├── docs/                      # Documentação organizada
 ├── scripts/                   # Scripts de inicialização
 ├── policies/                  # Políticas OPA
 └── docker-compose.yml         # Orquestração
@@ -100,7 +106,7 @@ docker-compose exec guardian npm test
 ## 🔐 Autenticação e Segurança
 
 ### **Fluxo de Autenticação**
-1. **Quarter** (porta 80) - Ponto de entrada
+1. **Quarter** (porta 3700) - Ponto de entrada
 2. **Login** com credenciais
 3. **Redirecionamento** para Harbor
 4. **Logout** retorna ao Quarter
@@ -118,11 +124,13 @@ docker-compose exec guardian npm test
 ```bash
 # Instalar dependências
 cd quarter/web && npm install
+cd template/web && npm install
 cd harbor/web && npm install
 cd guardian/web && npm install
 
 # Executar em modo desenvolvimento
 cd quarter/web && npm run dev
+cd template/web && npm run dev
 cd harbor/web && npm run dev
 cd guardian/web && npm run dev
 ```
@@ -150,9 +158,10 @@ docker-compose ps
 docker-compose logs -f
 
 # Health checks individuais
-curl http://localhost:80/api/health      # Quarter
-curl http://localhost:3701/api/health    # Harbor
-curl http://localhost:3705/api/health    # Guardian
+curl http://localhost:3700/api/health      # Quarter
+curl http://localhost:3790/api/health      # Template
+curl http://localhost:3701/api/health      # Harbor
+curl http://localhost:3705/api/health      # Guardian
 ```
 
 ## 🤝 Contribuição
@@ -166,24 +175,26 @@ curl http://localhost:3705/api/health    # Guardian
 
 ## 📚 Documentação
 
-### **Documentação Técnica**
-- 📖 [Arquitetura Detalhada](ARCHITECTURE.md)
-- 🛠️ [Guia de Desenvolvimento](DEVELOPMENT.md)
-- 🔧 [Troubleshooting](TROUBLESHOOTING.md)
-- 🔐 [Segurança](SECURITY.md)
+### **Documentação Organizada**
+- 📖 [Documentação Principal](docs/README.md)
+- 🏗️ [Arquitetura](docs/architecture/)
+- 🛠️ [Desenvolvimento](docs/development/)
+- 📖 [Guias](docs/guides/)
 
 ## 🎉 Status do Projeto
 
 ### **✅ Implementado**
 - ✅ Arquitetura de microserviços
 - ✅ Autenticação centralizada (Quarter)
+- ✅ Layout oficial (Template)
 - ✅ Dashboard principal (Harbor)
 - ✅ Sistema de segurança (Guardian)
 - ✅ Sistema de monitoramento (Beacon)
 - ✅ Stack compartilhado (Keycloak, PostgreSQL, Redis, OPA, ClickHouse)
+- ✅ Design System compartilhado (SCSS)
 - ✅ Testes TDD e BDD completos
 - ✅ CI/CD pipeline
-- ✅ Documentação completa
+- ✅ Documentação organizada
 
 ### **🚀 Próximos Passos**
 - 🔄 Integração com Keycloak avançada
@@ -198,7 +209,7 @@ curl http://localhost:3705/api/health    # Guardian
 ### **Contato**
 - 📧 **Email**: admin@canonika.io
 - 🐛 **Issues**: [GitHub Issues](https://github.com/aixyzdata/canonika/issues)
-- 📖 **Documentação**: [Wiki](https://github.com/aixyzdata/canonika/wiki)
+- 📖 **Documentação**: [docs/](docs/)
 
 ---
 
@@ -209,8 +220,9 @@ curl http://localhost:3705/api/health    # Guardian
 **🧪 Qualidade garantida por testes**
 **📊 Monitoramento completo**
 **🔄 CI/CD automatizado**
+**🎨 Design System compartilhado**
 
-**Acesse agora: http://localhost:80** 🚪
+**Acesse agora: http://localhost:3700** 🚪
 
 ---
 
