@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build-styles": "sass src/styles/scss/main.scss:src/styles/dist/template-design-system.css --style=compressed"
   },
   "dependencies": {
     "vue": "^3.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
-    "vite": "^4.0.0"
+    "vite": "^4.0.0",
+    "sass": "^1.69.0"
   }
 }

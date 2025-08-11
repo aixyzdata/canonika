@@ -1,0 +1,81 @@
+// =============================================================================
+// TEMPLATE SERVICE - SPECIFIC STYLES
+// =============================================================================
+
+// Template-specific icon background
+.canonika-icon-bg {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  border-radius: $border-radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Template service cards
+.template-service-card {
+  background: rgba($dark-surface, 0.8);
+  border: 1px solid $dark-border;
+  border-radius: $border-radius-xl;
+  padding: $spacing-xl;
+  backdrop-filter: blur(10px);
+  transition: all $transition-normal;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Template validation section
+.template-validation {
+  .validation-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    background: rgba($success, 0.1);
+    border: 1px solid rgba($success, 0.3);
+    border-radius: $border-radius-md;
+    margin-bottom: $spacing-md;
+
+    .validation-icon {
+      color: $success;
+      font-size: $font-size-lg;
+    }
+
+    .validation-text {
+      color: $dark-text;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// Template metrics
+.template-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+  margin-top: $spacing-xl;
+
+  .metric-card {
+    background: rgba($dark-surface, 0.6);
+    border: 1px solid $dark-border;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    text-align: center;
+
+    .metric-value {
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      margin-bottom: $spacing-sm;
+    }
+
+    .metric-label {
+      color: $dark-text-secondary;
+      font-size: $font-size-sm;
+    }
+  }
+} 
