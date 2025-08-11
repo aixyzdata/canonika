@@ -5,5 +5,12 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3790
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "../../shared/styles/scss/main";`
+      }
+    }
   }
 })

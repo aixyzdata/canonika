@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "build-styles": "sass src/styles/scss/main.scss:src/styles/dist/template-design-system.css --style=compressed"
+    "preview": "vite preview"
   },
   "dependencies": {
     "vue": "^3.3.0"

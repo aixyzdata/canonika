@@ -12,7 +12,7 @@ RUN npm ci || npm install
 COPY template/web ./
 COPY shared /app/shared
 
-# Build de produção
+# Build de produção (Vite processará o SCSS automaticamente)
 RUN npm run build
 
 # Stage 2: Nginx para servir os assets
