@@ -1,0 +1,127 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - RESPONSIVE UTILITIES
+// =============================================================================
+
+// Responsive breakpoints
+@media (max-width: $breakpoint-sm) {
+  .d-sm-none { display: none !important; }
+  .d-sm-block { display: block !important; }
+  .d-sm-flex { display: flex !important; }
+  .d-sm-inline { display: inline !important; }
+  .d-sm-inline-block { display: inline-block !important; }
+}
+
+@media (max-width: $breakpoint-md) {
+  .d-md-none { display: none !important; }
+  .d-md-block { display: block !important; }
+  .d-md-flex { display: flex !important; }
+  .d-md-inline { display: inline !important; }
+  .d-md-inline-block { display: inline-block !important; }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .d-lg-none { display: none !important; }
+  .d-lg-block { display: block !important; }
+  .d-lg-flex { display: flex !important; }
+  .d-lg-inline { display: inline !important; }
+  .d-lg-inline-block { display: inline-block !important; }
+}
+
+@media (max-width: $breakpoint-xl) {
+  .d-xl-none { display: none !important; }
+  .d-xl-block { display: block !important; }
+  .d-xl-flex { display: flex !important; }
+  .d-xl-inline { display: inline !important; }
+  .d-xl-inline-block { display: inline-block !important; }
+}
+
+// Responsive text alignment
+@media (max-width: $breakpoint-sm) {
+  .text-sm-left { text-align: left !important; }
+  .text-sm-center { text-align: center !important; }
+  .text-sm-right { text-align: right !important; }
+}
+
+@media (max-width: $breakpoint-md) {
+  .text-md-left { text-align: left !important; }
+  .text-md-center { text-align: center !important; }
+  .text-md-right { text-align: right !important; }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .text-lg-left { text-align: left !important; }
+  .text-lg-center { text-align: center !important; }
+  .text-lg-right { text-align: right !important; }
+}
+
+// Responsive flex utilities
+@media (max-width: $breakpoint-sm) {
+  .flex-sm-row { flex-direction: row !important; }
+  .flex-sm-column { flex-direction: column !important; }
+  .flex-sm-wrap { flex-wrap: wrap !important; }
+  .flex-sm-nowrap { flex-wrap: nowrap !important; }
+}
+
+@media (max-width: $breakpoint-md) {
+  .flex-md-row { flex-direction: row !important; }
+  .flex-md-column { flex-direction: column !important; }
+  .flex-md-wrap { flex-wrap: wrap !important; }
+  .flex-md-nowrap { flex-wrap: nowrap !important; }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .flex-lg-row { flex-direction: row !important; }
+  .flex-lg-column { flex-direction: column !important; }
+  .flex-lg-wrap { flex-wrap: wrap !important; }
+  .flex-lg-nowrap { flex-wrap: nowrap !important; }
+}
+
+// Responsive grid utilities
+@media (max-width: $breakpoint-sm) {
+  .grid-sm-1 { grid-template-columns: repeat(1, 1fr) !important; }
+  .grid-sm-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-sm-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-sm-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+@media (max-width: $breakpoint-md) {
+  .grid-md-1 { grid-template-columns: repeat(1, 1fr) !important; }
+  .grid-md-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-md-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-md-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .grid-lg-1 { grid-template-columns: repeat(1, 1fr) !important; }
+  .grid-lg-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-lg-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-lg-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+// Responsive spacing
+@media (max-width: $breakpoint-sm) {
+  .p-sm-0 { padding: 0 !important; }
+  .p-sm-1 { padding: $spacing-xs !important; }
+  .p-sm-2 { padding: $spacing-sm !important; }
+  .p-sm-3 { padding: $spacing-md !important; }
+  .p-sm-4 { padding: $spacing-lg !important; }
+  .p-sm-5 { padding: $spacing-xl !important; }
+}
+
+@media (max-width: $breakpoint-md) {
+  .p-md-0 { padding: 0 !important; }
+  .p-md-1 { padding: $spacing-xs !important; }
+  .p-md-2 { padding: $spacing-sm !important; }
+  .p-md-3 { padding: $spacing-md !important; }
+  .p-md-4 { padding: $spacing-lg !important; }
+  .p-md-5 { padding: $spacing-xl !important; }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .p-lg-0 { padding: 0 !important; }
+  .p-lg-1 { padding: $spacing-xs !important; }
+  .p-lg-2 { padding: $spacing-sm !important; }
+  .p-lg-3 { padding: $spacing-md !important; }
+  .p-lg-4 { padding: $spacing-lg !important; }
+  .p-lg-5 { padding: $spacing-xl !important; }
+} 

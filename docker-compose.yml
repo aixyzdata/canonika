@@ -350,6 +350,35 @@ services:
     volumes:
       - clickhouse_data:/var/lib/clickhouse
 
+  # Template - Layout Oficial
+  template:
+    build:
+      context: ./template/api
+      dockerfile: Dockerfile
+    container_name: canonika_template
+    ports:
+      - "8015:8015"
+    networks:
+      - canonika-network
+    environment:
+      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  template-web:
+    build:
+      context: .
+      dockerfile: ./template/web/Dockerfile
+    container_name: canonika_template_web
+    ports:
+      - "3790:80"
+    depends_on:
+      - template
+    networks:
+      - canonika-network
+
 volumes:
   postgres_data:
   redis_data:

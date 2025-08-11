@@ -1,0 +1,86 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - STATUS VIEWS
+// =============================================================================
+
+.status-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: $spacing-3xl;
+}
+
+.status-icon {
+  width: 6rem;
+  height: 6rem;
+  margin-bottom: $spacing-xl;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.status-title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-md;
+  color: $dark-text;
+}
+
+.status-message {
+  font-size: $font-size-lg;
+  color: $dark-text-secondary;
+  margin-bottom: $spacing-xl;
+  max-width: 500px;
+}
+
+.status-actions {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+// Success status
+.status-success {
+  .status-icon {
+    background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+    color: $white;
+  }
+}
+
+// Error status
+.status-error {
+  .status-icon {
+    background: linear-gradient(135deg, $error 0%, darken($error, 10%) 100%);
+    color: $white;
+  }
+}
+
+// Warning status
+.status-warning {
+  .status-icon {
+    background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+    color: $white;
+  }
+}
+
+// Info status
+.status-info {
+  .status-icon {
+    background: linear-gradient(135deg, $info 0%, darken($info, 10%) 100%);
+    color: $white;
+  }
+}
+
+// Loading status
+.status-loading {
+  .status-icon {
+    background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+    color: $white;
+    animation: rotate 2s linear infinite;
+  }
+} 

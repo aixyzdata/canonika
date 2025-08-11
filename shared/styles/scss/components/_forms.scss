@@ -1,0 +1,121 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - FORMS
+// =============================================================================
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.form-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $dark-text;
+}
+
+.form-input {
+  width: 100%;
+  padding: $input-padding-y $input-padding-x;
+  background: rgba($white, 0.1);
+  border: 1px solid $dark-border;
+  border-radius: $border-radius-md;
+  color: $dark-text;
+  font-size: $font-size-sm;
+  transition: all $transition-fast;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    background: rgba($white, 0.15);
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.form-textarea {
+  @extend .form-input;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-select {
+  @extend .form-input;
+  cursor: pointer;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: $primary-color;
+  }
+
+  .form-checkbox-label {
+    font-size: $font-size-sm;
+    color: $dark-text;
+  }
+}
+
+.form-radio {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+
+  input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: $primary-color;
+  }
+
+  .form-radio-label {
+    font-size: $font-size-sm;
+    color: $dark-text;
+  }
+}
+
+.form-error {
+  color: $error;
+  font-size: $font-size-xs;
+  margin-top: $spacing-xs;
+}
+
+.form-help {
+  color: $dark-text-secondary;
+  font-size: $font-size-xs;
+  margin-top: $spacing-xs;
+}
+
+// Input with icon
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon {
+    position: absolute;
+    left: $spacing-md;
+    color: $gray-500;
+    font-size: $font-size-base;
+    z-index: 2;
+  }
+
+  .form-input {
+    padding-left: 2.5rem;
+  }
+} 

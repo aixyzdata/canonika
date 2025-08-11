@@ -1,0 +1,87 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - BUTTONS
+// =============================================================================
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $button-padding-y $button-padding-x;
+  border: none;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all $transition-normal;
+  background: transparent;
+  color: $dark-text;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Primary button
+.btn-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  color: $white;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// Secondary button
+.btn-secondary {
+  background: rgba($secondary-color, 0.1);
+  border: 1px solid rgba($secondary-color, 0.3);
+  color: $secondary-color;
+
+  &:hover {
+    background: rgba($secondary-color, 0.2);
+    border-color: rgba($secondary-color, 0.5);
+  }
+}
+
+// Success button
+.btn-success {
+  background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+  color: $white;
+}
+
+// Warning button
+.btn-warning {
+  background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+  color: $white;
+}
+
+// Error button
+.btn-error {
+  background: linear-gradient(135deg, $error 0%, darken($error, 10%) 100%);
+  color: $white;
+}
+
+// Small button
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: $font-size-xs;
+}
+
+// Large button
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: $font-size-lg;
+} 

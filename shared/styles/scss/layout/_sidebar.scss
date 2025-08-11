@@ -1,0 +1,102 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - SIDEBAR LAYOUT
+// =============================================================================
+
+.sidebar {
+  width: $sidebar-width;
+  height: calc(100vh - $header-height);
+  background: rgba($dark-surface, 0.9);
+  border-right: 1px solid $dark-border;
+  backdrop-filter: blur(10px);
+  transition: all $transition-normal;
+  overflow-y: auto;
+  position: fixed;
+  left: 0;
+  top: $header-height;
+  z-index: $z-fixed;
+
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+  }
+}
+
+.sidebar-header {
+  padding: $spacing-lg;
+  border-bottom: 1px solid $dark-border;
+}
+
+.sidebar-nav {
+  padding: $spacing-md;
+}
+
+.nav-item {
+  margin-bottom: $spacing-xs;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  color: $dark-text-secondary;
+  text-decoration: none;
+  border-radius: $border-radius-md;
+  transition: all $transition-fast;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &:hover {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+
+  &.active {
+    background: rgba($primary-color, 0.2);
+    color: $primary-color;
+    border-left: 3px solid $primary-color;
+  }
+
+  .nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-text {
+    flex: 1;
+  }
+}
+
+.sidebar.collapsed {
+  .nav-text {
+    display: none;
+  }
+
+  .nav-link {
+    justify-content: center;
+    padding: $spacing-md;
+  }
+}
+
+// Sidebar toggle button
+.sidebar-toggle {
+  position: fixed;
+  left: $spacing-md;
+  top: calc($header-height + $spacing-md);
+  z-index: $z-fixed;
+  background: rgba($dark-surface, 0.9);
+  border: 1px solid $dark-border;
+  border-radius: $border-radius-md;
+  padding: $spacing-sm;
+  color: $dark-text;
+  cursor: pointer;
+  transition: all $transition-fast;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+} 
