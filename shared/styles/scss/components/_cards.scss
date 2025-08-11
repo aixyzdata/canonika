@@ -1,40 +1,41 @@
 // =============================================================================
-// CANONIKA DESIGN SYSTEM - CARDS
+// CANONIKA DESIGN SYSTEM - CARDS COMPONENTS
 // =============================================================================
 
-.card {
-  background: rgba($dark-surface, 0.8);
-  border: 1px solid $dark-border;
-  border-radius: $border-radius-lg;
-  padding: $card-padding;
+.card,
+.service-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid #475569;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
   backdrop-filter: blur(10px);
-  transition: all $transition-normal;
+  transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: $shadow-lg;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
-  margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-md;
-  border-bottom: 1px solid $dark-border;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #475569;
 }
 
 .card-icon {
   width: 3rem;
   height: 3rem;
-  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
-  border-radius: $border-radius-md;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $white;
-  font-size: $font-size-lg;
+  color: #fff;
+  font-size: 1.125rem;
 }
 
 .card-title {
@@ -42,12 +43,12 @@
 
   h4 {
     margin: 0;
-    color: $dark-text;
+    color: #e2e8f0;
   }
 
   .card-subtitle {
-    color: $dark-text-secondary;
-    font-size: $font-size-sm;
+    color: #94a3b8;
+    font-size: 0.875rem;
     margin: 0;
   }
 }
@@ -55,68 +56,292 @@
 .card-actions {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
+  gap: 0.5rem;
 }
 
 .card-content {
-  color: $dark-text-secondary;
+  color: #94a3b8;
 }
 
-// Service cards
-.service-card {
-  @extend .card;
-  
-  .service-metrics {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: $spacing-md;
-    margin-top: $spacing-lg;
-  }
-
-  .metric-item {
-    text-align: center;
-    padding: $spacing-md;
-    background: rgba($dark-surface, 0.5);
-    border-radius: $border-radius-md;
-
-    .metric-value {
-      font-size: $font-size-2xl;
-      font-weight: $font-weight-bold;
-      color: $primary-color;
-      margin-bottom: $spacing-xs;
-    }
-
-    .metric-label {
-      font-size: $font-size-xs;
-      color: $dark-text-secondary;
-    }
-  }
+.service-card .service-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-// Status badges
+.service-card .metric-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 0.5rem;
+}
+
+.service-card .metric-item .metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.service-card .metric-item .metric-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
 .status-badge {
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $border-radius-sm;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-semibold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
 
-  &.online {
-    background: rgba($success, 0.1);
-    color: $success;
-    border: 1px solid rgba($success, 0.3);
+.status-badge.online {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.offline {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+// Feature cards
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.feature-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #64748b;
+  transition: all 0.3s ease;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+  }
+}
+
+.feature-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.25rem;
+  margin: 0 auto 1rem;
+}
+
+.feature-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+}
+
+.feature-description {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+// Info cards
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.info-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #64748b;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+  }
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.info-description {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+// Test cards
+.test-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.test-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #64748b;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+  }
+}
+
+.test-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.test-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.test-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem;
+}
+
+.test-description {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+.test-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+// Canonika specific cards
+.canonika-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.5rem;
+  border: 1px solid #64748b;
+  transition: all 0.3s ease;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+  }
+}
+
+.canonika-feature {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.5rem;
+  border: 1px solid #64748b;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+    transform: translateY(-1px);
+    border-color: #3b82f6;
+  }
+}
+
+.canonika-info-card {
+  padding: 1rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.5rem;
+  border: 1px solid #64748b;
+  text-align: center;
+}
+
+.canonika-test-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-radius: 0.5rem;
+  border: 1px solid #64748b;
+  height: 100%;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .card,
+  .service-card,
+  .feature-card,
+  .info-card,
+  .test-card {
+    padding: 1rem;
   }
 
-  &.offline {
-    background: rgba($error, 0.1);
-    color: $error;
-    border: 1px solid rgba($error, 0.3);
+  .card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
   }
 
-  &.warning {
-    background: rgba($warning, 0.1);
-    color: $warning;
-    border: 1px solid rgba($warning, 0.3);
+  .feature-cards,
+  .info-cards,
+  .test-cards {
+    grid-template-columns: 1fr;
   }
 } 

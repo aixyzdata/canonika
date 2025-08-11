@@ -4,29 +4,35 @@
 
 .canonika-app {
   min-height: 100vh;
-  background: linear-gradient(135deg, $dark-bg 0%, $dark-surface 100%);
-  color: $dark-text;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
 }
 
 .canonika-layout {
   display: flex;
-  min-height: calc(100vh - $header-height);
-  margin-top: $header-height;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  position: relative;
 }
 
 .main-content {
   flex: 1;
-  margin-left: $sidebar-width;
-  padding: $spacing-xl;
-  transition: margin-left $transition-normal;
+  padding: 2rem;
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  color: #e2e8f0;
+  margin-left: 280px;
+  min-height: calc(100vh - 60px);
+  box-sizing: border-box;
 
   &.sidebar-collapsed {
-    margin-left: $sidebar-collapsed-width;
+    margin-left: 60px;
   }
 
-  @media (max-width: $breakpoint-md) {
+  @media (max-width: 768px) {
+    padding: 1rem;
     margin-left: 0;
-    padding: $spacing-md;
   }
 }
 
@@ -35,15 +41,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - $header-height);
-  background: linear-gradient(135deg, $dark-surface 0%, $gray-800 50%, $gray-700 100%);
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #1e293b 0%, #1f2937 50%, #374151 100%);
 }
 
 .login-card {
-  background: rgba($dark-bg, 0.8);
-  border: 1px solid $dark-border;
-  border-radius: $border-radius-xl;
-  padding: $spacing-2xl;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 3rem;
   width: 100%;
   max-width: 400px;
   backdrop-filter: blur(10px);
@@ -51,20 +57,20 @@
 
 .login-header {
   text-align: center;
-  margin-bottom: $spacing-2xl;
+  margin-bottom: 3rem;
 }
 
 .login-logo {
   position: relative;
   width: 4rem;
   height: 4rem;
-  margin: 0 auto $spacing-md;
+  margin: 0 auto 1rem;
 }
 
 .logo-hexagon-large {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   animation: rotate 10s linear infinite;
 }
@@ -76,45 +82,45 @@
   transform: translate(-50%, -50%);
   width: 2rem;
   height: 2rem;
-  background: rgba($primary-color, 0.3);
+  background: rgba(59, 130, 246, 0.3);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
 }
 
 .login-title {
-  font-size: $font-size-2xl;
-  font-weight: $font-weight-bold;
-  color: $dark-text;
-  margin: 0 0 $spacing-sm 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 0.5rem 0;
 }
 
 .login-subtitle {
-  color: $dark-text-secondary;
+  color: #94a3b8;
   margin: 0;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 1rem;
 }
 
 .login-btn {
-  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border: none;
-  color: $white;
-  padding: $button-padding-y $button-padding-x;
-  border-radius: $border-radius-md;
-  font-weight: $font-weight-semibold;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all $transition-fast;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $spacing-sm;
+  gap: 0.5rem;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba($primary-color, 0.3);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
   }
 } 

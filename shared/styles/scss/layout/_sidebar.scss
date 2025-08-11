@@ -39,10 +39,6 @@
     padding: 0.75rem 0.5rem;
     min-height: 50px;
   }
-
-  .sidebar.collapsed .sidebar-toggle {
-    margin: 0 auto;
-  }
 }
 
 .sidebar-brand {
@@ -112,7 +108,7 @@
 
   .sidebar.collapsed &:hover {
     background: rgba(148, 163, 184, 0.2);
-    border-color: #94a3b866;
+    border-color: rgba(148, 163, 184, 0.4);
     color: #e2e8f0;
   }
 }
@@ -287,8 +283,6 @@
       color: #3b82f6;
     }
 
-    position: relative;
-
     &:hover:after {
       content: attr(data-title);
       position: absolute;
@@ -401,14 +395,14 @@
   color: #94a3b8;
   font-size: 0.75rem;
   transition: transform 0.3s ease;
-}
 
-.nav-item:hover .nav-arrow {
-  color: #e2e8f0;
-}
+  .nav-item:hover & {
+    color: #e2e8f0;
+  }
 
-.nav-arrow.rotated {
-  transform: rotate(180deg);
+  &.rotated {
+    transform: rotate(180deg);
+  }
 }
 
 .nav-submenu {
@@ -470,10 +464,10 @@
   height: 1.5rem;
   color: #64748b;
   font-size: 0.875rem;
-}
 
-.nav-sublink:hover .nav-subicon {
-  color: #3b82f6;
+  .nav-sublink:hover & {
+    color: #3b82f6;
+  }
 }
 
 .nav-subtext {
