@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: ./template/web/Dockerfile
     ports:
-      - "3715:80"
+      - "3790:80"
     depends_on:
       - template
     networks:

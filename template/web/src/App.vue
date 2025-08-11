@@ -667,7 +667,7 @@ export default {
     redirectToQuarter() {
       const quarterUrl = 'http://localhost:3700'
       // Usar a URL completa do Template Service com porta explícita
-      const currentUrl = `http://localhost:3715${window.location.pathname}${window.location.search}`
+      const currentUrl = `http://localhost:3790${window.location.pathname}${window.location.search}`
       const redirectTo = encodeURIComponent(currentUrl)
       
       // Usar o padrão redirect_to (padrão do Quarter)
