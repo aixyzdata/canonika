@@ -170,17 +170,17 @@ npm run test:complete
 ## 🔄 Fluxo de Autenticação Funcionando
 
 ### Cenário 1: Acesso sem Autenticação
-1. Usuário acessa `http://localhost:3715`
+1. Usuário acessa `http://localhost:3790`
 2. Template detecta que não há autenticação
-3. Template redireciona para `http://localhost:3700?redirect_to=http%3A%2F%2Flocalhost%3A3715%2F`
+3. Template redireciona para `http://localhost:3700?redirect_to=http%3A%2F%2Flocalhost%3A3790%2F`
 4. Quarter exibe formulário de login
 5. Usuário preenche credenciais e clica em "Entrar"
-6. Quarter gera token e redireciona para `http://localhost:3715?auth_token=...`
+6. Quarter gera token e redireciona para `http://localhost:3790?auth_token=...`
 7. Template processa token e mantém usuário autenticado
 8. **RESULTADO:** ✅ Usuário autenticado no Template
 
 ### Cenário 2: Acesso com Token Válido
-1. Usuário acessa `http://localhost:3715` com token válido
+1. Usuário acessa `http://localhost:3790` com token válido
 2. Template detecta token e processa autenticação
 3. Template mantém usuário autenticado
 4. **RESULTADO:** ✅ Usuário permanece no Template
@@ -209,7 +209,7 @@ docker ps | grep quarter
 ### 2. Verificar Funcionamento
 ```bash
 # Testar Template
-curl -I http://localhost:3715
+curl -I http://localhost:3790
 
 # Testar Quarter
 curl -I http://localhost:3700
@@ -220,7 +220,7 @@ node test-complete-auth.js
 ```
 
 ### 3. URLs de Acesso
-- **Template Service:** `http://localhost:3715`
+- **Template Service:** `http://localhost:3790`
 - **Quarter Service:** `http://localhost:3700`
 - **Template API:** `http://localhost:3791`
 
