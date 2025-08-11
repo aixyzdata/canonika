@@ -99,6 +99,4 @@ export default {
 }
 </script>
 
-<style>
-@import '../styles/masterpage.css';
-</style> 
+<!-- Estilos agora são gerenciados pelo SCSS compartilhado --> 

@@ -43,6 +43,6 @@ export default {
 }
 </script>
 
+<!-- Estilos agora são gerenciados pelo SCSS compartilhado -->
 <style>
-@import '../styles/view-header.css';
 </style> 

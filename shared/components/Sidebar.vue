@@ -127,6 +127,4 @@ export default {
 }
 </script>
 
-<style>
-@import '../styles/sidebar.css';
-</style> 
+<!-- Estilos agora são gerenciados pelo SCSS compartilhado --> 
