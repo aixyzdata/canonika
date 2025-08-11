@@ -77,6 +77,19 @@
     font-weight: $font-weight-semibold;
   }
 
+  .module-title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .module-icon {
+    width: 1rem;
+    height: 1rem;
+    background: $primary-color;
+    border-radius: 50%;
+  }
+
   .header-actions {
     display: flex;
     align-items: center;
