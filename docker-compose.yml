@@ -21,7 +21,7 @@ services:
     networks:
       - canonika-network
     environment:
-      - DEV_MODE=true
+      - DEV_MODE=false
       - QUARTER_URL=http://quarter:80
       - HARBOR_URL=http://harbor:3701
       - GUARDIAN_URL=http://guardian:3705
