@@ -1,0 +1,17 @@
+{
+  "name": "template-service-tests",
+  "version": "1.0.0",
+  "description": "BDD Tests for Template Service Authentication Journey",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:auth": "cucumber-js tests/bdd/authentication_journey.feature",
+    "test:debug": "cucumber-js --format progress-bar --format html:cucumber-report.html"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^9.5.1",
+    "@babel/register": "^7.22.5",
+    "chai": "^4.3.7",
+    "puppeteer": "^21.3.6",
+    "cucumber-html-reporter": "^7.0.0"
+  }
+} 

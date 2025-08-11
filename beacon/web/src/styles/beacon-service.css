@@ -1,0 +1,110 @@
+/* Beacon Service - Estilos Específicos */
+
+/* Estilos específicos do Beacon */
+.beacon-service {
+  /* Estilos específicos do serviço */
+}
+
+/* Personalizações do Beacon */
+.canonika-icon-bg {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cores específicas do Beacon */
+.beacon-primary {
+  color: #3b82f6;
+}
+
+.beacon-secondary {
+  color: #1d4ed8;
+}
+
+.beacon-accent {
+  color: #60a5fa;
+}
+
+/* Animações específicas do Beacon */
+@keyframes beacon-pulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.05);
+  }
+}
+
+.beacon-pulse {
+  animation: beacon-pulse 2s ease-in-out infinite;
+}
+
+/* Status indicators específicos do Beacon */
+.beacon-status-online {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.beacon-status-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.beacon-status-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Cards específicos do Beacon */
+.beacon-service-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.beacon-service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Métricas específicas do Beacon */
+.beacon-metric {
+  text-align: center;
+  padding: 1rem;
+}
+
+.beacon-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+  display: block;
+}
+
+.beacon-metric-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+/* Responsive específico do Beacon */
+@media (max-width: 768px) {
+  .beacon-service-card {
+    margin-bottom: 1rem;
+  }
+  
+  .beacon-metric-value {
+    font-size: 1.5rem;
+  }
+} 

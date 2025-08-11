@@ -97,6 +97,10 @@ export default {
       expandedItems: []
     }
   },
+  mounted() {
+    console.log('🔍 Sidebar - navigationSections recebido:', this.navigationSections)
+    console.log('🔍 Sidebar - sections count:', this.navigationSections.length)
+  },
   methods: {
     handleItemClick(item) {
       // Se o sidebar estiver recolhido, sempre expandir primeiro

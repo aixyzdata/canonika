@@ -10,7 +10,9 @@ networks:
 services:
   # Quarter - Ponto de Entrada
   quarter:
-    build: ./quarter
+    build:
+      context: .
+      dockerfile: ./quarter/Dockerfile
     container_name: canonika_quarter
     ports:
       - "3700:80"

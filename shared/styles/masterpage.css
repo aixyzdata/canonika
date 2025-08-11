@@ -1,6 +1,6 @@
-/* MasterPage - Padrão Canonika */
+/* MasterPage - Layout Principal da Plataforma Canonika */
 
-/* Reset e base - Estilo idêntico ao beacon_old */
+/* Reset e base */
 * {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Layout */
+/* Layout Principal */
 .canonika-layout {
   display: flex;
   height: calc(100vh - 60px);
@@ -22,7 +22,7 @@
   position: relative;
 }
 
-/* Main Content */
+/* Conteúdo Principal */
 .main-content {
   flex: 1;
   padding: 2rem;
@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-/* When sidebar is collapsed (user authenticated) */
+/* Quando sidebar está colapsado */
 .main-content.sidebar-collapsed {
   margin-left: 60px; /* Largura do sidebar recolhido */
 }
@@ -44,5 +44,10 @@
 @media (max-width: 768px) {
   .main-content {
     padding: 1rem;
+    margin-left: 0;
+  }
+  
+  .main-content.sidebar-collapsed {
+    margin-left: 0;
   }
 } 

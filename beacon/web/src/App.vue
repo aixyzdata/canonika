@@ -1,193 +1,507 @@
 <template>
-  <div id="app" class="canonika-app">
-    <!-- Header -->
-    <header class="canonika-header">
-      <div class="header-content">
-        <div class="logo-section">
-          <h1 class="logo-title">🚀 Beacon</h1>
-          <p class="logo-subtitle">Sistema de Monitoramento</p>
+  <CanonikaMasterPage
+    :header-config="headerConfig"
+    :sidebar-config="sidebarConfig"
+    @logout="handleLogout"
+    @nav-click="handleNavClick"
+    @sidebar-toggle="handleSidebarToggle"
+  >
+    <div class="canonika-view">
+      <!-- View Header seguindo padrão das outras views -->
+      <div class="view-header">
+        <div class="view-title">
+          <i class="fas fa-broadcast-tower"></i>
+          <div class="title-content">
+            <h1>Beacon</h1>
+            <p>Sistema de Monitoramento</p>
+          </div>
         </div>
-        <div class="header-actions">
-          <button class="btn-primary">Login</button>
+        <div class="view-status">
+          <div class="status-indicator online"></div>
+          <span>Sistema Operacional</span>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-primary btn-sm">
+            <i class="fas fa-sync-alt me-2"></i>
+            Atualizar
+          </button>
+          <button class="btn btn-secondary btn-sm">
+            <i class="fas fa-cog me-2"></i>
+            Configurar
+          </button>
         </div>
       </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="canonika-main">
-      <!-- Sidebar -->
-      <aside class="canonika-sidebar">
-        <nav class="sidebar-nav">
-          <router-link to="/" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-          </router-link>
-          <router-link to="/websocket" class="nav-item">
-            <i class="fas fa-broadcast-tower"></i>
-            <span>WebSocket</span>
-          </router-link>
-          <router-link to="/api" class="nav-item">
-            <i class="fas fa-code"></i>
-            <span>API</span>
-          </router-link>
-          <router-link to="/configuracoes" class="nav-item">
-            <i class="fas fa-cog"></i>
-            <span>Configurações</span>
-          </router-link>
-        </nav>
-      </aside>
+      <!-- View Content -->
+      <div class="view-content">
+        <!-- Seção: Status do Sistema -->
+        <div class="canonika-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <i class="fas fa-chart-line text-success me-2"></i>
+              Status do Sistema
+            </h3>
+            <p class="section-description">
+              Monitoramento em tempo real dos serviços do Beacon.
+            </p>
+          </div>
+          
+          <div class="section-content">
+            <div class="service-cards">
+              <div class="service-card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="fas fa-broadcast-tower"></i>
+                  </div>
+                  <div class="card-title">
+                    <h4>WebSocket</h4>
+                    <span class="card-subtitle">Conexão em tempo real</span>
+                  </div>
+                  <div class="card-actions">
+                    <span class="status-badge online">Ativo</span>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div class="metric-grid">
+                    <div class="metric-item">
+                      <span class="metric-value">100%</span>
+                      <span class="metric-label">Disponibilidade</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">0ms</span>
+                      <span class="metric-label">Latência</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">24/7</span>
+                      <span class="metric-label">Uptime</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-      <!-- Content Area -->
-      <div class="canonika-content">
-        <router-view />
+              <div class="service-card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="fas fa-satellite"></i>
+                  </div>
+                  <div class="card-title">
+                    <h4>REST API</h4>
+                    <span class="card-subtitle">HTTP Endpoints</span>
+                  </div>
+                  <div class="card-actions">
+                    <span class="status-badge online">Funcionando</span>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div class="metric-grid">
+                    <div class="metric-item">
+                      <span class="metric-value">200</span>
+                      <span class="metric-label">Status OK</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">Fast</span>
+                      <span class="metric-label">Performance</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">Secure</span>
+                      <span class="metric-label">Autenticação</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="service-card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="fas fa-bell"></i>
+                  </div>
+                  <div class="card-title">
+                    <h4>Push Notifications</h4>
+                    <span class="card-subtitle">Sistema de alertas</span>
+                  </div>
+                  <div class="card-actions">
+                    <span class="status-badge online">Ativo</span>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div class="metric-grid">
+                    <div class="metric-item">
+                      <span class="metric-value">Real-time</span>
+                      <span class="metric-label">Entrega</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">Multi</span>
+                      <span class="metric-label">Plataformas</span>
+                    </div>
+                    <div class="metric-item">
+                      <span class="metric-value">Smart</span>
+                      <span class="metric-label">Filtros</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção: Serviços de Comunicação -->
+        <div class="canonika-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <i class="fas fa-comments text-info me-2"></i>
+              Serviços de Comunicação
+            </h3>
+            <p class="section-description">
+              Canais de comunicação disponíveis para envio de notificações.
+            </p>
+          </div>
+          
+          <div class="section-content">
+            <div class="feature-cards">
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="feature-title">Email Service</div>
+                <div class="feature-description">Envio de emails transacionais</div>
+              </div>
+              
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <i class="fas fa-sms"></i>
+                </div>
+                <div class="feature-title">SMS Gateway</div>
+                <div class="feature-description">Mensagens de texto</div>
+              </div>
+              
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <i class="fas fa-phone"></i>
+                </div>
+                <div class="feature-title">Voice Service</div>
+                <div class="feature-description">Chamadas de voz</div>
+              </div>
+              
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <i class="fas fa-cog"></i>
+                </div>
+                <div class="feature-title">Configurações</div>
+                <div class="feature-description">Parâmetros do sistema</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção: Informações do Serviço -->
+        <div class="canonika-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <i class="fas fa-info-circle text-info me-2"></i>
+              Informações do Serviço
+            </h3>
+            <p class="section-description">
+              Detalhes sobre o Beacon e sua configuração atual.
+            </p>
+          </div>
+          
+          <div class="section-content">
+            <div class="info-cards">
+              <div class="info-card">
+                <div class="info-label">Nome</div>
+                <div class="info-value">Beacon</div>
+                <div class="info-description">Sistema de Monitoramento</div>
+              </div>
+              
+              <div class="info-card">
+                <div class="info-label">Porta</div>
+                <div class="info-value">3703</div>
+                <div class="info-description">Porta de desenvolvimento</div>
+              </div>
+              
+              <div class="info-card">
+                <div class="info-label">Status</div>
+                <div class="info-value">Online</div>
+                <div class="info-description">Serviço ativo</div>
+              </div>
+              
+              <div class="info-card">
+                <div class="info-label">Versão</div>
+                <div class="info-value">1.0.0</div>
+                <div class="info-description">Versão atual</div>
+              </div>
+              
+              <div class="info-card">
+                <div class="info-label">Framework</div>
+                <div class="info-value">Vue.js 3</div>
+                <div class="info-description">Frontend framework</div>
+              </div>
+              
+              <div class="info-card">
+                <div class="info-label">Build Tool</div>
+                <div class="info-value">Vite</div>
+                <div class="info-description">Development server</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="canonika-footer">
+          <div class="footer-info">
+            <div class="footer-item">
+              <i class="fas fa-code"></i>
+              <span>Beacon v1.0.0</span>
+            </div>
+            <div class="footer-item">
+              <i class="fas fa-clock"></i>
+              <span>Última atualização: {{ new Date().toLocaleDateString('pt-BR') }}</span>
+            </div>
+            <div class="footer-item">
+              <i class="fas fa-shield-alt"></i>
+              <span>Status: Online</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </CanonikaMasterPage>
 </template>
 
 <script>
+import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
+import AuthService from '../../../shared/services/AuthService.js'
+
 export default {
-  name: 'App',
-  mounted() {
-    console.log('✅ App.vue montado com sucesso!')
+  name: 'BeaconApp',
+  components: {
+    CanonikaMasterPage
+  },
+  data() {
+    return {
+      user: null,
+      headerConfig: {
+        logoText: 'CANONIKA',
+        logoSubtitle: 'BEACON',
+        user: {
+          name: 'Administrador Canonika',
+          initial: 'A'
+        },
+        systemStatus: 'ONLINE',
+        isOnline: true
+      },
+      sidebarConfig: {
+        brandText: 'BEACON',
+        brandIcon: 'fas fa-broadcast-tower',
+        user: {
+          name: 'Administrador Canonika',
+          role: 'Admin',
+          initial: 'A'
+        },
+        navigationSections: [
+          {
+            title: 'SOLUÇÕES',
+            items: [
+              {
+                id: 'home',
+                title: 'Home',
+                subtitle: 'Página Inicial',
+                icon: 'fas fa-home',
+                href: '#',
+                active: true
+              }
+            ]
+          },
+          {
+            title: 'SERVIÇOS',
+            items: [
+              {
+                id: 'websocket',
+                title: 'WebSocket',
+                subtitle: 'Tempo Real',
+                icon: 'fas fa-broadcast-tower',
+                href: '#websocket'
+              },
+              {
+                id: 'api',
+                title: 'REST API',
+                subtitle: 'HTTP Endpoints',
+                icon: 'fas fa-satellite',
+                href: '#api'
+              },
+              {
+                id: 'notifications',
+                title: 'Push Notifications',
+                subtitle: 'Alertas',
+                icon: 'fas fa-bell',
+                href: '#notifications'
+              },
+              {
+                id: 'email',
+                title: 'Email Service',
+                subtitle: 'Comunicação',
+                icon: 'fas fa-envelope',
+                href: '#email'
+              },
+              {
+                id: 'sms',
+                title: 'SMS Gateway',
+                subtitle: 'Mensagens',
+                icon: 'fas fa-sms',
+                href: '#sms'
+              },
+              {
+                id: 'voice',
+                title: 'Voice Service',
+                subtitle: 'Chamadas',
+                icon: 'fas fa-phone',
+                href: '#voice'
+              },
+              {
+                id: 'config',
+                title: 'Configurações',
+                subtitle: 'Parâmetros',
+                icon: 'fas fa-cog',
+                href: '#config'
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  async mounted() {
+    console.log('🚀 BEACON APP MOUNTED')
+    
+    // Processar token da URL se existir (padrão Harbor)
+    this.processAuthToken()
+    
+    // Verificar autenticação
+    await this.checkAuthentication()
+  },
+  methods: {
+    async checkAuthentication() {
+      console.log('🔍 Verificando autenticação...')
+      
+      // Verificar se precisa renovar o token
+      const tokenValid = await AuthService.checkAndRefreshToken()
+      
+      if (tokenValid) {
+        this.user = AuthService.getCurrentUser()
+        console.log('✅ Usuário autenticado:', this.user)
+      } else {
+        // Verificar se há token no localStorage (fallback)
+        const storedToken = localStorage.getItem('canonika_access_token')
+        const storedUser = localStorage.getItem('canonika_user')
+        
+        if (storedToken && storedUser) {
+          try {
+            this.user = JSON.parse(storedUser)
+            console.log('✅ Usuário recuperado do localStorage:', this.user)
+          } catch (error) {
+            console.log('❌ Erro ao parsear usuário do localStorage')
+            this.redirectToQuarter()
+          }
+        } else {
+          // Se não há autenticação válida, redirecionar para Quarter
+          console.log('❌ Usuário não autenticado, redirecionando para Quarter')
+          this.redirectToQuarter()
+        }
+      }
+    },
+    
+    processAuthToken() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const token = urlParams.get('auth_token')
+      
+      if (token) {
+        console.log('🔑 Token recebido do Quarter')
+        
+        try {
+          // Decodificar token JWT
+          const payload = this.decodeToken(token)
+          
+          // Criar objeto usuário
+          this.user = {
+            id: payload.id,
+            name: payload.name,
+            email: payload.email,
+            roles: payload.roles || [],
+            permissions: payload.permissions || []
+          }
+          
+          // Salvar token no localStorage
+          localStorage.setItem('canonika_access_token', token)
+          localStorage.setItem('canonika_user', JSON.stringify(this.user))
+          
+          // Limpar URL
+          const newUrl = window.location.pathname
+          window.history.replaceState({}, document.title, newUrl)
+          
+          console.log('✅ Usuário autenticado:', this.user.name)
+          
+        } catch (error) {
+          console.error('❌ Erro ao processar token:', error)
+          // Se token inválido, redirecionar para Quarter
+          this.redirectToQuarter()
+        }
+      }
+    },
+    
+    decodeToken(token) {
+      try {
+        const parts = token.split('.')
+        if (parts.length !== 3) throw new Error('Token inválido')
+        
+        const payload = JSON.parse(atob(parts[1]))
+        return payload
+      } catch (error) {
+        throw new Error('Token inválido')
+      }
+    },
+    
+    handleLogout() {
+      console.log('🚪 Logout solicitado')
+      AuthService.logout()
+      this.user = null
+    },
+    
+    handleNavClick(item) {
+      console.log('Navegação clicada:', item)
+    },
+    
+    handleSidebarToggle(collapsed) {
+      console.log('Sidebar toggle:', collapsed)
+    },
+    
+    redirectToQuarter() {
+      const quarterUrl = 'http://localhost:3700'
+      // Usar a URL completa do Beacon
+      const currentUrl = window.location.href
+      const returnUrl = encodeURIComponent(currentUrl)
+      
+      // Usar o padrão return_url e service como Harbor
+      const quarterRedirectUrl = `${quarterUrl}?return_url=${returnUrl}&service=beacon`
+      
+      console.log('🔄 Redirecionando para Quarter com URL:', currentUrl)
+      console.log('🔄 URL completa do Quarter:', quarterRedirectUrl)
+      
+      // Usar replace para evitar problemas de navegação
+      window.location.replace(quarterRedirectUrl)
+    }
   }
 }
 </script>
 
 <style scoped>
-/* Layout Principal */
-.canonika-app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #e2e8f0;
-}
-
-/* Header */
-.canonika-header {
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 1rem 2rem;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.logo-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.logo-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #60a5fa;
-  margin: 0;
-}
-
-.logo-subtitle {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.header-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.btn-primary {
+/* Estilos específicos do Beacon */
+.canonika-icon-bg {
+  width: 2.5rem;
+  height: 2.5rem;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-/* Main Content */
-.canonika-main {
-  display: flex;
-  flex: 1;
-}
-
-/* Sidebar */
-.canonika-sidebar {
-  width: 250px;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(148, 163, 184, 0.1);
-  padding: 2rem 0;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0 1rem;
-}
-
-.nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #94a3b8;
-  text-decoration: none;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
-  font-weight: 500;
-}
-
-.nav-item:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
-}
-
-.nav-item.router-link-active {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-  border-left: 3px solid #3b82f6;
-}
-
-.nav-item i {
-  width: 1rem;
-  text-align: center;
-}
-
-/* Content Area */
-.canonika-content {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .canonika-sidebar {
-    width: 200px;
-  }
-  
-  .header-content {
-    padding: 0 1rem;
-  }
-  
-  .canonika-content {
-    padding: 1rem;
-  }
+  justify-content: center;
 }
 </style> 

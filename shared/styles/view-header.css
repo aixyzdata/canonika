@@ -1,5 +1,16 @@
 /* View Header - Padrão Canonika baseado no beacon_old */
 
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #475569;
+  background: #334155;
+  padding: 2rem 2rem 1rem;
+}
+
 .canonika-view-header {
   display: flex;
   justify-content: space-between;
@@ -81,6 +92,13 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
   .canonika-view-header {
     flex-direction: column;
     align-items: flex-start;

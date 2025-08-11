@@ -1,131 +1,138 @@
 <template>
-  <CanonikaViewTemplate
-    title="Status do Seagull"
-    description="Monitoramento e Status do Sistema de Vigilância"
-    header-icon="fas fa-chart-line"
-    status-text="ONLINE"
-    :primary-action="{
-      text: 'Atualizar Status',
-      icon: 'fas fa-sync-alt',
-      handler: refreshStatus
-    }"
-    @refresh="refreshStatus"
-  >
-    <div class="service-cards">
-      <!-- Status do Serviço -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Status do Serviço</h3>
-          <div class="card-icon">
-            <i class="fas fa-server"></i>
-          </div>
+  <div class="canonika-view">
+    <div class="view-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="fas fa-chart-line"></i>
         </div>
-        <div class="card-content">
-          <div class="balance-display">
-            <div class="balance-value">{{ serviceStatus.status }}</div>
-            <div class="balance-label">{{ serviceStatus.description }}</div>
-          </div>
-          <div class="balance-details">
-            <div class="detail-item">
-              <span class="detail-label">Uptime:</span>
-              <span class="detail-value">{{ serviceStatus.uptime }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Porta:</span>
-              <span class="detail-value">{{ serviceStatus.port }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Versão:</span>
-              <span class="detail-value">{{ serviceStatus.version }}</span>
-            </div>
-          </div>
+        <div class="header-text">
+          <h1>Status do Seagull</h1>
+          <p>Monitoramento e Status do Sistema de Vigilância</p>
+        </div>
+        <div class="header-status">
+          <span class="status-badge online">ONLINE</span>
         </div>
       </div>
-
-      <!-- Métricas de Performance -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Métricas de Performance</h3>
-          <div class="card-icon">
-            <i class="fas fa-tachometer-alt"></i>
+      <div class="header-actions">
+        <button class="btn btn-primary" @click="refreshStatus">
+          <i class="fas fa-sync-alt"></i>
+          Atualizar Status
+        </button>
+      </div>
+    </div>
+    
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Status do Serviço -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Status do Serviço</h3>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">{{ serviceStatus.status }}</div>
+              <div class="balance-label">{{ serviceStatus.description }}</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Uptime:</span>
+                <span class="detail-value">{{ serviceStatus.uptime }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Porta:</span>
+                <span class="detail-value">{{ serviceStatus.port }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Versão:</span>
+                <span class="detail-value">{{ serviceStatus.version }}</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div class="transaction-list">
-            <div v-for="metric in performanceMetrics" :key="metric.id" class="transaction-item">
-              <div class="transaction-icon success">
-                <i :class="metric.icon"></i>
-              </div>
-              <div class="transaction-details">
-                <div class="transaction-title">{{ metric.name }}</div>
-                <div class="transaction-amount success">
-                  {{ metric.value }}
+
+        <!-- Métricas de Performance -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Métricas de Performance</h3>
+            <div class="card-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="transaction-list">
+              <div v-for="metric in performanceMetrics" :key="metric.id" class="transaction-item">
+                <div class="transaction-icon success">
+                  <i :class="metric.icon"></i>
                 </div>
-                <div class="transaction-time">{{ metric.description }}</div>
+                <div class="transaction-details">
+                  <div class="transaction-title">{{ metric.name }}</div>
+                  <div class="transaction-amount success">
+                    {{ metric.value }}
+                  </div>
+                  <div class="transaction-time">{{ metric.description }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Logs Recentes -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Logs Recentes</h3>
-          <div class="card-icon">
-            <i class="fas fa-list-alt"></i>
+        <!-- Logs Recentes -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Logs Recentes</h3>
+            <div class="card-icon">
+              <i class="fas fa-list-alt"></i>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="alerts-list">
-            <div v-for="log in recentLogs" :key="log.id" :class="`alert-item ${log.level}`">
-              <div class="alert-icon">
-                <i :class="log.icon"></i>
-              </div>
-              <div class="alert-content">
-                <div class="alert-title">{{ log.title }}</div>
-                <div class="alert-message">{{ log.message }}</div>
-                <div class="alert-time">{{ log.timestamp }}</div>
+          <div class="card-content">
+            <div class="alerts-list">
+              <div v-for="log in recentLogs" :key="log.id" :class="`alert-item ${log.level}`">
+                <div class="alert-icon">
+                  <i :class="log.icon"></i>
+                </div>
+                <div class="alert-content">
+                  <div class="alert-title">{{ log.title }}</div>
+                  <div class="alert-message">{{ log.message }}</div>
+                  <div class="alert-time">{{ log.timestamp }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Configurações do Sistema -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Configurações</h3>
-          <div class="card-icon">
-            <i class="fas fa-cog"></i>
+        <!-- Configurações do Sistema -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Configurações</h3>
+            <div class="card-icon">
+              <i class="fas fa-cog"></i>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="plans-grid">
-            <div 
-              v-for="config in systemConfigs" 
-              :key="config.id" 
-              class="plan-item"
-            >
-              <div class="plan-name">{{ config.name }}</div>
-              <div class="plan-price">{{ config.value }}</div>
-              <div class="plan-credits">{{ config.status }}</div>
+          <div class="card-content">
+            <div class="plans-grid">
+              <div 
+                v-for="config in systemConfigs" 
+                :key="config.id" 
+                class="plan-item"
+              >
+                <div class="plan-name">{{ config.name }}</div>
+                <div class="plan-price">{{ config.value }}</div>
+                <div class="plan-credits">{{ config.status }}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </CanonikaViewTemplate>
+  </div>
 </template>
 
 <script>
-import CanonikaViewTemplate from '../../shared/templates/CanonikaViewTemplate.vue'
-
 export default {
   name: 'SeagullStatusView',
-  components: {
-    CanonikaViewTemplate
-  },
   data() {
     return {
       serviceStatus: {

@@ -554,6 +554,12 @@ export default {
     
     // Verificar autenticação
     await this.checkAuthentication()
+    
+    // Se ainda não há usuário após verificação, forçar redirecionamento
+    if (!this.user) {
+      console.log('❌ Nenhum usuário encontrado após verificação, forçando redirecionamento para Quarter')
+      this.redirectToQuarter()
+    }
   },
   methods: {
     async checkAuthentication() {
@@ -626,12 +632,20 @@ export default {
     
     decodeToken(token) {
       try {
+        // Verificar se é um JWT real (3 partes) ou token simulado (base64 simples)
         const parts = token.split('.')
-        if (parts.length !== 3) throw new Error('Token inválido')
         
-        const payload = JSON.parse(atob(parts[1]))
-        return payload
+        if (parts.length === 3) {
+          // JWT real - decodificar payload (parte 1)
+          const payload = JSON.parse(atob(parts[1]))
+          return payload
+        } else {
+          // Token simulado do Quarter - decodificar diretamente
+          const payload = JSON.parse(atob(token))
+          return payload
+        }
       } catch (error) {
+        console.error('Erro ao decodificar token:', error)
         throw new Error('Token inválido')
       }
     },
@@ -652,12 +666,12 @@ export default {
     
     redirectToQuarter() {
       const quarterUrl = 'http://localhost:3700'
-      // Usar a URL completa do Template Service
-      const currentUrl = window.location.href
-      const returnUrl = encodeURIComponent(currentUrl)
+      // Usar a URL completa do Template Service com porta explícita
+      const currentUrl = `http://localhost:3715${window.location.pathname}${window.location.search}`
+      const redirectTo = encodeURIComponent(currentUrl)
       
-      // Usar o padrão return_url e service como Harbor
-      const quarterRedirectUrl = `${quarterUrl}?return_url=${returnUrl}&service=template`
+      // Usar o padrão redirect_to (padrão do Quarter)
+      const quarterRedirectUrl = `${quarterUrl}?redirect_to=${redirectTo}`
       
       console.log('🔄 Redirecionando para Quarter com URL:', currentUrl)
       console.log('🔄 URL completa do Quarter:', quarterRedirectUrl)

@@ -78,6 +78,10 @@ export default {
       sidebarCollapsed: this.initialSidebarCollapsed
     }
   },
+  mounted() {
+    console.log('🔍 MasterPage - sidebarConfig recebido:', this.sidebarConfig)
+    console.log('🔍 MasterPage - navigationSections:', this.sidebarConfig.navigationSections)
+  },
   methods: {
     toggleSidebar() {
       // Se estiver recolhido, sempre expandir

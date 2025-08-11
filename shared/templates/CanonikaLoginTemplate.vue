@@ -10,10 +10,7 @@
           </div>
           <div class="logo-text-container">
             <h1 class="logo-text">CANONIKA</h1>
-            <div class="module-title-with-icon">
-              <div :class="['module-icon', moduleIconClass]"></div>
-              <span class="logo-subtitle">{{ moduleName.toUpperCase() }}</span>
-            </div>
+            <span class="logo-subtitle">{{ moduleName.toUpperCase() }}</span>
           </div>
         </div>
         <div class="header-actions">
@@ -23,7 +20,6 @@
           </div>
         </div>
       </div>
-      <div class="header-glow"></div>
     </header>
 
     <!-- Login Container -->
@@ -37,7 +33,8 @@
           <h2 class="login-title">Portal Canonika</h2>
           <p class="login-subtitle">Acesso ao {{ moduleName }}</p>
         </div>
-        
+
+
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
             <div class="input-container">
@@ -104,6 +101,10 @@ export default {
     defaultPassword: {
       type: String,
       default: 'Admin@123'
+    },
+    showDevHint: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -177,20 +178,19 @@ html, body {
 
 /* Header */
 .canonika-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom: 1px solid #475569;
   position: relative;
   overflow: hidden;
-  height: 60px;
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 2rem;
   position: relative;
   z-index: 2;
-  height: 100%;
 }
 
 .logo-section {
@@ -201,8 +201,8 @@ html, body {
 
 .logo-icon {
   position: relative;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
 }
 
 .logo-hexagon {
@@ -210,10 +210,7 @@ html, body {
   height: 100%;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  animation: rotate 10s linear infinite;
 }
 
 .logo-pulse {
@@ -221,13 +218,20 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 0.25rem;
-  height: 0.25rem;
-  background: #ffffff;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(59, 130, 246, 0.3);
   border-radius: 50%;
-  z-index: 2;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
 }
 
 .logo-text-container {
@@ -235,33 +239,18 @@ html, body {
   flex-direction: column;
 }
 
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.1em;
-  line-height: 1;
-  margin: 0;
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+.logo-subtitle {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
-.logo-subtitle {
-  font-size: 0.75rem;
-  color: #cbd5e1;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  opacity: 0.8;
-}
+
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .system-status {
@@ -269,29 +258,20 @@ html, body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
 .status-indicator {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  background: #10b981;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .status-indicator.online {
   background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-}
-
-.header-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 /* Login */
@@ -360,6 +340,8 @@ html, body {
   color: #94a3b8;
   margin: 0;
 }
+
+
 
 .login-form {
   display: flex;
