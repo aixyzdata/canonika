@@ -13,16 +13,19 @@
       </div>
       
       <div class="header-actions">
-        <div class="user-info">
-          <div class="user-avatar">
-            <span>{{ user ? user.initial : 'A' }}</span>
+        <!-- User info e logout só aparecem se o usuário estiver autenticado -->
+        <template v-if="isAuthenticated">
+          <div class="user-info">
+            <div class="user-avatar">
+              <span>{{ user ? user.initial : 'A' }}</span>
+            </div>
+            <span class="user-name">{{ user ? user.name : 'Administrador' }}</span>
           </div>
-          <span class="user-name">{{ user ? user.name : 'Administrador' }}</span>
-        </div>
-        <button @click="$emit('logout')" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          Sair
-        </button>
+          <button @click="$emit('logout')" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Sair
+          </button>
+        </template>
         <div class="system-status">
           <div :class="['status-indicator', isOnline ? 'online' : 'offline']"></div>
           <span>{{ systemStatus }}</span>
@@ -59,6 +62,10 @@ export default {
     isOnline: {
       type: Boolean,
       default: true
+    },
+    isAuthenticated: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['logout']

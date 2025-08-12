@@ -7,6 +7,7 @@
       :user="headerConfig.user"
       :system-status="headerConfig.systemStatus"
       :is-online="headerConfig.isOnline"
+      :is-authenticated="true"
       @logout="$emit('logout')"
     />
     
