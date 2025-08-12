@@ -134,7 +134,7 @@ class AuthService {
       const port = window.location.port;
       if (port === '3701') service = 'harbor';
       else if (port === '3790') service = 'template';
-      else if (port === '3799') service = 'beacon';
+      else if (port === '3703') service = 'beacon';
       // Adicionar outros serviços conforme necessário
     }
     
