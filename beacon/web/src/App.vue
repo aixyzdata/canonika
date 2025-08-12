@@ -91,6 +91,16 @@ export default {
     
     // Verificar autenticação
     await this.checkAuthentication()
+    
+    // Atualizar estado ativo inicial
+    this.updateActiveState()
+  },
+  
+  watch: {
+    '$route'(to, from) {
+      console.log('Rota mudou de', from?.path, 'para', to.path)
+      this.updateActiveState()
+    }
   },
   methods: {
     async checkAuthentication() {
@@ -181,12 +191,34 @@ export default {
     handleNavClick(item) {
       console.log('Navegação clicada:', item)
       if (item.href && item.href !== '#') {
-        this.$router.push(item.href)
+        try {
+          this.$router.push(item.href).catch(err => {
+            console.error('Erro na navegação:', err)
+            if (err.name === 'NavigationDuplicated') {
+              // Ignorar erro de navegação duplicada
+              return
+            }
+            // Em caso de erro, tentar navegar para home
+            this.$router.push('/')
+          })
+        } catch (error) {
+          console.error('Erro ao navegar:', error)
+          this.$router.push('/')
+        }
       }
     },
     
     handleSidebarToggle(collapsed) {
       console.log('Sidebar toggle:', collapsed)
+    },
+    
+    updateActiveState() {
+      // Atualizar estado ativo dos itens do sidebar
+      this.sidebarConfig.navigationSections.forEach(section => {
+        section.items.forEach(item => {
+          item.active = this.$route.name === item.id
+        })
+      })
     },
     
     redirectToQuarter() {
