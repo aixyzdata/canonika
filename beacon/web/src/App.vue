@@ -506,15 +506,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos do Beacon */
-.canonika-icon-bg {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-</style> 
+ 

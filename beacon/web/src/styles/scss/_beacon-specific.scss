@@ -9,7 +9,106 @@
   // Beacon-specific customizations can go here
 }
 
-// Ensure Beacon uses the official header styles
-.canonika-header {
-  // Use official styles from shared design system
+// Personalizações do Beacon
+.canonika-icon-bg {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  border-radius: $border-radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Cores específicas do Beacon
+.beacon-primary {
+  color: $primary-color;
+}
+
+.beacon-secondary {
+  color: $primary-dark;
+}
+
+.beacon-accent {
+  color: $primary-light;
+}
+
+// Animações específicas do Beacon
+@keyframes beacon-pulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.05);
+  }
+}
+
+.beacon-pulse {
+  animation: beacon-pulse 2s ease-in-out infinite;
+}
+
+// Status indicators específicos do Beacon
+.beacon-status-online {
+  background: rgba($success, 0.1);
+  color: $success;
+  border: 1px solid rgba($success, 0.2);
+}
+
+.beacon-status-warning {
+  background: rgba($warning, 0.1);
+  color: $warning;
+  border: 1px solid rgba($warning, 0.2);
+}
+
+.beacon-status-error {
+  background: rgba($error, 0.1);
+  color: $error;
+  border: 1px solid rgba($error, 0.2);
+}
+
+// Cards específicos do Beacon
+.beacon-service-card {
+  background: rgba($dark-surface, 0.6);
+  border: 1px solid rgba($dark-border, 0.2);
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+  transition: all $transition-normal;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-color: rgba($primary-color, 0.3);
+  }
+}
+
+// Métricas específicas do Beacon
+.beacon-metric {
+  text-align: center;
+  padding: $spacing-lg;
+}
+
+.beacon-metric-value {
+  font-size: 2rem;
+  font-weight: $font-weight-bold;
+  color: $primary-color;
+  display: block;
+}
+
+.beacon-metric-label {
+  font-size: $font-size-sm;
+  color: $dark-text-secondary;
+  margin-top: $spacing-sm;
+}
+
+// Responsive específico do Beacon
+@media (max-width: $breakpoint-md) {
+  .beacon-service-card {
+    margin-bottom: $spacing-lg;
+  }
+  
+  .beacon-metric-value {
+    font-size: 1.5rem;
+  }
 } 
