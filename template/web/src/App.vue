@@ -37,10 +37,10 @@
         <!-- Seção: Validação de Componentes -->
         <div class="canonika-section">
           <div class="section-header">
-            <h3 class="section-title">
+            <span class="section-title">
               <i class="fas fa-check-circle text-success me-2"></i>
               Validação da Componentização
-            </h3>
+            </span>
             <p class="section-description">
               Este serviço valida se os componentes compartilhados estão funcionando corretamente.
             </p>
@@ -147,10 +147,10 @@
         <!-- Seção: Funcionalidades Testadas -->
         <div class="canonika-section">
           <div class="section-header">
-            <h3 class="section-title">
+            <span class="section-title">
               <i class="fas fa-star text-warning me-2"></i>
               Funcionalidades Testadas
-            </h3>
+            </span>
             <p class="section-description">
               Componentes e funcionalidades que foram validados e estão funcionando corretamente.
             </p>
@@ -212,10 +212,10 @@
         <!-- Seção: Informações do Serviço -->
         <div class="canonika-section">
           <div class="section-header">
-            <h3 class="section-title">
+            <span class="section-title">
               <i class="fas fa-info-circle text-info me-2"></i>
               Informações do Serviço
-            </h3>
+            </span>
             <p class="section-description">
               Detalhes sobre o Template Service e sua configuração atual.
             </p>
@@ -265,10 +265,10 @@
         <!-- Seção: Testes de Componentes -->
         <div class="canonika-section">
           <div class="section-header">
-            <h3 class="section-title">
+            <span class="section-title">
               <i class="fas fa-vial text-primary me-2"></i>
               Testes de Componentes
-            </h3>
+            </span>
             <p class="section-description">
               Testes de funcionalidade dos componentes compartilhados.
             </p>
