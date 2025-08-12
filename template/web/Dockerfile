@@ -21,6 +21,9 @@ FROM nginx:1.25-alpine
 # Copia os arquivos estáticos gerados para o root do Nginx
 COPY --from=build /app/template/web/dist /usr/share/nginx/html
 
+# Copia a configuração personalizada do Nginx
+COPY template/web/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

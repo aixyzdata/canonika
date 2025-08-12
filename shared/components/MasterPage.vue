@@ -46,16 +46,7 @@ export default {
   props: {
     headerConfig: {
       type: Object,
-      default: () => ({
-        logoText: 'CANONIKA',
-        logoSubtitle: 'SERVICE',
-        user: {
-          name: 'Administrador',
-          initial: 'A'
-        },
-        systemStatus: 'SERVICE ONLINE', // Padronizado: [SERVIÇO] [STATUS]
-        isOnline: true
-      })
+      required: true
     },
     sidebarConfig: {
       type: Object,
