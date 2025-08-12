@@ -18,6 +18,7 @@
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
+  font-family: $font-family-base;
 
   &.collapsed {
     width: 60px;
