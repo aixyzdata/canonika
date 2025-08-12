@@ -1,10 +1,7 @@
 <template>
   <CanonikaMasterPage
-    :header-config="headerConfig"
-    :sidebar-config="sidebarConfig"
-    @logout="handleLogout"
-    @nav-click="handleNavClick"
-    @sidebar-toggle="handleSidebarToggle"
+    :service-config="serviceConfig"
+    :has-login="false"
   >
     <div class="canonika-view">
       <!-- View Header seguindo padrão das outras views -->
@@ -347,7 +344,7 @@
 </template>
 
 <script>
-import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
+import CanonikaMasterPage from '../../../shared/templates/MasterPage.vue'
 import AuthService from '../../../shared/services/AuthService.js'
 import { checkServiceStatus } from '../../../shared/config/status-standardization.js'
 
@@ -359,15 +356,12 @@ export default {
   data() {
     return {
       user: null,
-      headerConfig: {
-        logoText: 'CANONIKA',
-        logoSubtitle: 'TEMPLATE',
-        user: {
-          name: 'Administrador',
-          initial: 'A'
-        },
-        systemStatus: 'TEMPLATE ONLINE',
-        isOnline: true
+      serviceConfig: {
+        name: 'TEMPLATE',
+        description: 'Serviço de validação da componentização',
+        iconClass: 'icon-template',
+        icon: 'fas fa-rocket',
+        menuItems: []
       },
       sidebarConfig: {
         brandText: 'Template Service',
@@ -550,23 +544,14 @@ export default {
       }
     }
   },
-  async mounted() {
+  mounted() {
     console.log('🚀 Template App iniciado')
-    
-    // Verificar status do Template
-    this.checkTemplateStatus()
     
     // Verificar autenticação
     this.checkAuthentication()
     
     // Processar token se presente na URL
     this.processAuthToken()
-    
-    // Se ainda não há usuário após verificação, forçar redirecionamento
-    if (!this.user) {
-      console.log('❌ Nenhum usuário encontrado após verificação, forçando redirecionamento para Quarter')
-      this.redirectToQuarter()
-    }
   },
   methods: {
     async checkAuthentication() {
@@ -669,29 +654,6 @@ export default {
     
     handleSidebarToggle(collapsed) {
       console.log('Sidebar toggle:', collapsed)
-    },
-    
-    async checkTemplateStatus() {
-      try {
-        // Verificar status do Template usando sistema padronizado
-        const result = await checkServiceStatus('template', '', 3000)
-        
-        // Atualizar status do header
-        this.headerConfig.systemStatus = result.status
-        this.headerConfig.isOnline = result.isOnline
-        
-        if (result.success) {
-          console.log('✅ Status do Template atualizado:', this.headerConfig.systemStatus)
-        } else {
-          console.log('❌ Status do Template atualizado:', this.headerConfig.systemStatus)
-        }
-      } catch (error) {
-        console.error('❌ Erro ao verificar status do Template:', error)
-        
-        // Em caso de erro, definir como offline
-        this.headerConfig.systemStatus = 'TEMPLATE OFFLINE'
-        this.headerConfig.isOnline = false
-      }
     },
     
     redirectToQuarter() {
