@@ -269,8 +269,9 @@
 </template>
 
 <script>
-import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
-import AuthService from '../../../shared/services/AuthService.js'
+import CanonikaMasterPage from '/app/shared/components/MasterPage.vue'
+import AuthService from '/app/shared/services/AuthService.js'
+import { checkServiceStatus } from '/app/shared/config/status-standardization.js'
 
 export default {
   name: 'BeaconApp',
@@ -287,7 +288,7 @@ export default {
           name: 'Administrador Canonika',
           initial: 'A'
         },
-        systemStatus: 'ONLINE',
+        systemStatus: 'BEACON ONLINE',
         isOnline: true
       },
       sidebarConfig: {
