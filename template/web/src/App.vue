@@ -1,7 +1,10 @@
 <template>
   <CanonikaMasterPage
-    :service-config="serviceConfig"
-    :has-login="false"
+    :header-config="headerConfig"
+    :sidebar-config="sidebarConfig"
+    @logout="handleLogout"
+    @nav-click="handleNavClick"
+    @sidebar-toggle="handleSidebarToggle"
   >
     <div class="canonika-view">
       <!-- View Header seguindo padrão das outras views -->
@@ -344,9 +347,9 @@
 </template>
 
 <script>
-import CanonikaMasterPage from '../../../shared/templates/MasterPage.vue'
-import AuthService from '../../../shared/services/AuthService.js'
-import { checkServiceStatus } from '../../../shared/config/status-standardization.js'
+import CanonikaMasterPage from '/app/shared/components/MasterPage.vue'
+import AuthService from '/app/shared/services/AuthService.js'
+import { checkServiceStatus } from '/app/shared/config/status-standardization.js'
 
 export default {
   name: 'TemplateApp',
@@ -356,12 +359,15 @@ export default {
   data() {
     return {
       user: null,
-      serviceConfig: {
-        name: 'TEMPLATE',
-        description: 'Serviço de validação da componentização',
-        iconClass: 'icon-template',
-        icon: 'fas fa-rocket',
-        menuItems: []
+      headerConfig: {
+        logoText: 'CANONIKA',
+        logoSubtitle: 'TEMPLATE',
+        user: {
+          name: 'Administrador',
+          initial: 'A'
+        },
+        systemStatus: 'TEMPLATE ONLINE',
+        isOnline: true
       },
       sidebarConfig: {
         brandText: 'Template Service',
