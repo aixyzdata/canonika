@@ -7,6 +7,7 @@ import time
 import asyncio
 import json
 import logging
+import random
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional, List, Set, Callable
 from enum import Enum
@@ -755,6 +756,220 @@ async def events_endpoint(request: Request, user: Dict = Depends(get_current_use
         await redis_client.publish(f"topic:{topic}", json.dumps(data))
     
     return {"status": "published", "topic": topic}
+
+# =============================================================================
+# TESTE ENDPOINTS
+# =============================================================================
+
+@app.post("/api/test/websocket")
+async def test_websocket_endpoint(request: Request, user: Dict = Depends(get_current_user)):
+    """Endpoint para iniciar teste de WebSocket"""
+    data = await request.json()
+    message_count = data.get("message_count", 10)
+    test_type = data.get("test_type", "random")
+    topic = data.get("topic", "test")
+    delay_ms = data.get("delay_ms", 1000)
+    
+    # Gerar ID único para o teste
+    test_id = f"test_{user['id']}_{int(time.time() * 1000)}"
+    
+    # Iniciar teste em background
+    asyncio.create_task(run_websocket_test(test_id, message_count, test_type, topic, delay_ms, user['id']))
+    
+    return {
+        "test_id": test_id,
+        "status": "started",
+        "message_count": message_count,
+        "test_type": test_type,
+        "topic": topic,
+        "delay_ms": delay_ms
+    }
+
+@app.get("/api/test/status/{test_id}")
+async def get_test_status(test_id: str, user: Dict = Depends(get_current_user)):
+    """Endpoint para verificar status do teste"""
+    if test_id in manager.running_tasks:
+        task = manager.running_tasks[test_id]
+        return {
+            "test_id": test_id,
+            "status": task.get("status", "running"),
+            "progress": task.get("progress", 0),
+            "sent_count": task.get("sent_count", 0),
+            "total_count": task.get("total_count", 0),
+            "start_time": task.get("start_time"),
+            "errors": task.get("errors", [])
+        }
+    else:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+@app.post("/api/test/stop/{test_id}")
+async def stop_test(test_id: str, user: Dict = Depends(get_current_user)):
+    """Endpoint para parar teste em execução"""
+    if test_id in manager.running_tasks:
+        manager.running_tasks[test_id]["status"] = "stopped"
+        return {"test_id": test_id, "status": "stopped"}
+    else:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+async def run_websocket_test(test_id: str, message_count: int, test_type: str, topic: str, delay_ms: int, user_id: str):
+    """Executar teste de WebSocket em background"""
+    try:
+        # Registrar teste
+        manager.running_tasks[test_id] = {
+            "status": "running",
+            "progress": 0,
+            "sent_count": 0,
+            "total_count": message_count,
+            "start_time": time.time(),
+            "errors": [],
+            "test_type": test_type,
+            "topic": topic,
+            "user_id": user_id
+        }
+        
+        logger.info(f"Starting WebSocket test {test_id}: {message_count} messages, type={test_type}, topic={topic}")
+        
+        for i in range(message_count):
+            # Verificar se teste foi parado
+            if manager.running_tasks[test_id]["status"] == "stopped":
+                break
+                
+            try:
+                # Gerar mensagem baseada no tipo de teste
+                message = generate_test_message(test_type, i + 1, message_count)
+                
+                # Enviar via WebSocket para conexões do usuário
+                sent_count = 0
+                if user_id in manager.active_connections:
+                    for websocket in manager.active_connections[user_id]:
+                        try:
+                            await websocket.send_text(json.dumps(message))
+                            sent_count += 1
+                        except Exception as e:
+                            logger.error(f"Error sending to WebSocket: {e}")
+                            manager.running_tasks[test_id]["errors"].append({
+                                "message": f"WebSocket send error: {str(e)}",
+                                "timestamp": time.time()
+                            })
+                
+                # Enviar via Redis para tópico se especificado
+                if topic and redis_client:
+                    try:
+                        await redis_client.publish(f"topic:{topic}", json.dumps(message))
+                        sent_count += 1
+                    except Exception as e:
+                        logger.error(f"Error publishing to Redis: {e}")
+                        manager.running_tasks[test_id]["errors"].append({
+                            "message": f"Redis publish error: {str(e)}",
+                            "timestamp": time.time()
+                        })
+                
+                # Atualizar progresso
+                manager.running_tasks[test_id]["sent_count"] = i + 1
+                manager.running_tasks[test_id]["progress"] = ((i + 1) / message_count) * 100
+                
+                # Aguardar delay
+                await asyncio.sleep(delay_ms / 1000)
+                
+            except Exception as e:
+                logger.error(f"Error in test iteration {i}: {e}")
+                manager.running_tasks[test_id]["errors"].append({
+                    "message": f"Test iteration error: {str(e)}",
+                    "timestamp": time.time()
+                })
+        
+        # Finalizar teste
+        manager.running_tasks[test_id]["status"] = "completed"
+        manager.running_tasks[test_id]["progress"] = 100
+        
+        logger.info(f"WebSocket test {test_id} completed: {manager.running_tasks[test_id]['sent_count']} messages sent")
+        
+    except Exception as e:
+        logger.error(f"Error in WebSocket test {test_id}: {e}")
+        if test_id in manager.running_tasks:
+            manager.running_tasks[test_id]["status"] = "error"
+            manager.running_tasks[test_id]["errors"].append({
+                "message": f"Test execution error: {str(e)}",
+                "timestamp": time.time()
+            })
+
+def generate_test_message(test_type: str, message_number: int, total_messages: int) -> Dict:
+    """Gerar mensagem de teste baseada no tipo"""
+    base_message = {
+        "type": "test_message",
+        "id": f"test_msg_{message_number}",
+        "timestamp": time.time(),
+        "message_number": message_number,
+        "total_messages": total_messages,
+        "progress": (message_number / total_messages) * 100
+    }
+    
+    if test_type == "random":
+        # Mensagens aleatórias
+        messages = [
+            "Teste de conectividade WebSocket",
+            "Mensagem de teste aleatória",
+            "Validando comunicação em tempo real",
+            "Teste de performance da conexão",
+            "Verificando estabilidade do WebSocket",
+            "Mensagem de teste para validação",
+            "Teste de throughput da conexão",
+            "Validando latência da comunicação",
+            "Teste de confiabilidade do WebSocket",
+            "Mensagem de teste para monitoramento"
+        ]
+        base_message["data"] = {
+            "text": random.choice(messages),
+            "random_value": random.randint(1, 1000),
+            "random_float": random.uniform(0, 1),
+            "timestamp_iso": datetime.now().isoformat()
+        }
+        
+    elif test_type == "sequential":
+        # Mensagens sequenciais
+        base_message["data"] = {
+            "text": f"Mensagem sequencial #{message_number}",
+            "sequence": message_number,
+            "hex_value": hex(message_number),
+            "binary_value": bin(message_number),
+            "timestamp_iso": datetime.now().isoformat()
+        }
+        
+    elif test_type == "json":
+        # Mensagens JSON complexas
+        base_message["data"] = {
+            "user": {
+                "id": message_number,
+                "name": f"User_{message_number}",
+                "email": f"user{message_number}@test.com"
+            },
+            "metrics": {
+                "cpu": random.uniform(0, 100),
+                "memory": random.uniform(0, 100),
+                "network": random.uniform(0, 1000)
+            },
+            "status": "active" if message_number % 2 == 0 else "inactive",
+            "tags": [f"tag_{i}" for i in range(1, random.randint(2, 6))],
+            "timestamp_iso": datetime.now().isoformat()
+        }
+        
+    elif test_type == "error_simulation":
+        # Simular erros ocasionais
+        if message_number % 5 == 0:  # A cada 5 mensagens
+            base_message["type"] = "test_error"
+            base_message["data"] = {
+                "error": "Simulated error for testing",
+                "error_code": random.randint(100, 599),
+                "error_message": "This is a simulated error for testing purposes"
+            }
+        else:
+            base_message["data"] = {
+                "text": f"Mensagem normal #{message_number}",
+                "status": "ok",
+                "timestamp_iso": datetime.now().isoformat()
+            }
+    
+    return base_message
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
