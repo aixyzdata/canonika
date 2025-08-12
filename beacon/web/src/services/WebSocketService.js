@@ -19,6 +19,24 @@ class WebSocketService {
     this.fallbackMode = false;
     this.fallbackEndpoint = '/api/events';
     
+    // Callbacks para eventos
+    this.connectionChangeCallbacks = [];
+    this.metricsUpdateCallbacks = [];
+    this.errorCallbacks = [];
+    
+    // Métricas
+    this.metrics = {
+      messagesPerMinute: 0,
+      deliveryRate: 100,
+      avgResponse: 0,
+      latency: 0,
+      uptime: 0
+    };
+    
+    this.lastHeartbeat = null;
+    this.messageCount = 0;
+    this.startTime = null;
+    
     // Configurações
     this.config = {
       url: 'ws://localhost:3703/ws',
@@ -47,8 +65,10 @@ class WebSocketService {
         console.log('WebSocket connected');
         this.isConnected = true;
         this.reconnectAttempts = 0;
+        this.startTime = Date.now();
         this.startHeartbeat();
         this.processPendingMessages();
+        this.notifyConnectionChange('connected');
       };
       
       this.ws.onmessage = (event) => {
@@ -59,6 +79,7 @@ class WebSocketService {
         console.log('WebSocket disconnected:', event.code, event.reason);
         this.isConnected = false;
         this.stopHeartbeat();
+        this.notifyConnectionChange('disconnected');
         
         // Tentar reconectar se não foi fechamento intencional
         if (event.code !== 1000) {
@@ -69,6 +90,8 @@ class WebSocketService {
       this.ws.onerror = (error) => {
         console.error('WebSocket error:', error);
         this.fallbackMode = true;
+        this.notifyConnectionChange('error');
+        this.notifyError(error);
       };
       
     } catch (error) {
@@ -262,6 +285,20 @@ class WebSocketService {
   handleMessage(data) {
     try {
       const message = JSON.parse(data);
+      this.messageCount++;
+      
+      // Atualizar métricas
+      const now = Date.now();
+      if (this.startTime) {
+        const uptime = Math.floor((now - this.startTime) / 1000);
+        const messagesPerMinute = Math.floor((this.messageCount / uptime) * 60);
+        
+        this.updateMetrics({
+          messagesPerMinute: messagesPerMinute || 0,
+          uptime: `${Math.floor(uptime / 60)}:${(uptime % 60).toString().padStart(2, '0')}`,
+          latency: now - (message.timestamp * 1000) || 0
+        });
+      }
       
       switch (message.type) {
         case 'connection':
@@ -279,6 +316,7 @@ class WebSocketService {
           
         case 'error':
           console.error('Server error:', message.data);
+          this.notifyError(message.data);
           break;
           
         case 'response':
@@ -290,6 +328,7 @@ class WebSocketService {
       }
     } catch (error) {
       console.error('Error parsing message:', error);
+      this.notifyError(error);
     }
   }
 
@@ -474,8 +513,77 @@ class WebSocketService {
       totalTopics: this.topics.size,
       totalObservers: Array.from(this.observers.values()).reduce((sum, set) => sum + set.size, 0),
       pendingMessages: this.pendingMessages.length,
-      lastHeartbeat: this.lastHeartbeat
+      lastHeartbeat: this.lastHeartbeat,
+      ...this.metrics
     };
+  }
+
+  /**
+   * Callback para mudanças de conexão
+   */
+  onConnectionChange(callback) {
+    this.connectionChangeCallbacks.push(callback);
+  }
+
+  /**
+   * Callback para atualizações de métricas
+   */
+  onMetricsUpdate(callback) {
+    this.metricsUpdateCallbacks.push(callback);
+  }
+
+  /**
+   * Callback para erros
+   */
+  onError(callback) {
+    this.errorCallbacks.push(callback);
+  }
+
+  /**
+   * Notificar mudanças de conexão
+   */
+  notifyConnectionChange(status) {
+    this.connectionChangeCallbacks.forEach(callback => {
+      try {
+        callback(status);
+      } catch (error) {
+        console.error('Error in connection change callback:', error);
+      }
+    });
+  }
+
+  /**
+   * Notificar atualizações de métricas
+   */
+  notifyMetricsUpdate(metrics) {
+    this.metricsUpdateCallbacks.forEach(callback => {
+      try {
+        callback(metrics);
+      } catch (error) {
+        console.error('Error in metrics update callback:', error);
+      }
+    });
+  }
+
+  /**
+   * Notificar erros
+   */
+  notifyError(error) {
+    this.errorCallbacks.forEach(callback => {
+      try {
+        callback(error);
+      } catch (err) {
+        console.error('Error in error callback:', err);
+      }
+    });
+  }
+
+  /**
+   * Atualizar métricas
+   */
+  updateMetrics(newMetrics) {
+    this.metrics = { ...this.metrics, ...newMetrics };
+    this.notifyMetricsUpdate(this.metrics);
   }
 }
 
