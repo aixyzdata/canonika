@@ -285,85 +285,98 @@ export default {
         logoText: 'CANONIKA',
         logoSubtitle: 'BEACON',
         user: {
-          name: 'Administrador Canonika',
+          name: 'Administrador',
           initial: 'A'
         },
         systemStatus: 'BEACON ONLINE',
         isOnline: true
       },
       sidebarConfig: {
-        brandText: 'BEACON',
+        brandText: 'Beacon Service',
         brandIcon: 'fas fa-broadcast-tower',
         user: {
-          name: 'Administrador Canonika',
+          name: 'Administrador',
           role: 'Admin',
           initial: 'A'
         },
         navigationSections: [
           {
-            title: 'SOLUÇÕES',
+            title: 'Navegação',
             items: [
               {
-                id: 'home',
-                title: 'Home',
-                subtitle: 'Página Inicial',
-                icon: 'fas fa-home',
+                id: 'dashboard',
+                title: 'Dashboard',
+                subtitle: 'Visão Geral',
+                icon: 'fas fa-tachometer-alt',
                 href: '#',
                 active: true
-              }
-            ]
-          },
-          {
-            title: 'SERVIÇOS',
-            items: [
+              },
               {
-                id: 'websocket',
-                title: 'WebSocket',
+                id: 'monitoring',
+                title: 'Monitoramento',
                 subtitle: 'Tempo Real',
-                icon: 'fas fa-broadcast-tower',
-                href: '#websocket'
+                icon: 'fas fa-chart-line',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'websocket',
+                    title: 'WebSocket',
+                    subtitle: 'Conexão Real-time',
+                    icon: 'fas fa-broadcast-tower',
+                    href: '#websocket'
+                  },
+                  {
+                    id: 'api',
+                    title: 'REST API',
+                    subtitle: 'HTTP Endpoints',
+                    icon: 'fas fa-satellite',
+                    href: '#api'
+                  },
+                  {
+                    id: 'notifications',
+                    title: 'Push Notifications',
+                    subtitle: 'Sistema de Alertas',
+                    icon: 'fas fa-bell',
+                    href: '#notifications'
+                  }
+                ]
               },
               {
-                id: 'api',
-                title: 'REST API',
-                subtitle: 'HTTP Endpoints',
-                icon: 'fas fa-satellite',
-                href: '#api'
-              },
-              {
-                id: 'notifications',
-                title: 'Push Notifications',
-                subtitle: 'Alertas',
-                icon: 'fas fa-bell',
-                href: '#notifications'
-              },
-              {
-                id: 'email',
-                title: 'Email Service',
-                subtitle: 'Comunicação',
-                icon: 'fas fa-envelope',
-                href: '#email'
-              },
-              {
-                id: 'sms',
-                title: 'SMS Gateway',
-                subtitle: 'Mensagens',
-                icon: 'fas fa-sms',
-                href: '#sms'
-              },
-              {
-                id: 'voice',
-                title: 'Voice Service',
-                subtitle: 'Chamadas',
-                icon: 'fas fa-phone',
-                href: '#voice'
-              },
-              {
-                id: 'config',
-                title: 'Configurações',
-                subtitle: 'Parâmetros',
-                icon: 'fas fa-cog',
-                href: '#config'
+                id: 'services',
+                title: 'Serviços',
+                subtitle: 'Integração',
+                icon: 'fas fa-server',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'email',
+                    title: 'Email Service',
+                    subtitle: 'Comunicação',
+                    icon: 'fas fa-envelope',
+                    href: '#email'
+                  },
+                  {
+                    id: 'sms',
+                    title: 'SMS Gateway',
+                    subtitle: 'Mensagens',
+                    icon: 'fas fa-sms',
+                    href: '#sms'
+                  },
+                  {
+                    id: 'voice',
+                    title: 'Voice Service',
+                    subtitle: 'Chamadas',
+                    icon: 'fas fa-phone',
+                    href: '#voice'
+                  },
+                  {
+                    id: 'config',
+                    title: 'Configurações',
+                    subtitle: 'Parâmetros',
+                    icon: 'fas fa-cog',
+                    href: '#config'
+                  }
+                ]
               }
             ]
           }
