@@ -349,6 +349,7 @@
 <script>
 import CanonikaMasterPage from '../../../shared/components/MasterPage.vue'
 import AuthService from '../../../shared/services/AuthService.js'
+import { checkServiceStatus } from '../../../shared/config/status-standardization.js'
 
 export default {
   name: 'TemplateApp',
@@ -359,11 +360,14 @@ export default {
     return {
       user: null,
       headerConfig: {
-        title: 'Template Service',
-        subtitle: 'Serviço de validação da componentização',
-        icon: 'fas fa-rocket',
-        showUserInfo: true,
-        showLogout: true
+        logoText: 'CANONIKA',
+        logoSubtitle: 'TEMPLATE',
+        user: {
+          name: 'Administrador',
+          initial: 'A'
+        },
+        systemStatus: 'TEMPLATE ONLINE',
+        isOnline: true
       },
       sidebarConfig: {
         brandText: 'Template Service',
@@ -547,13 +551,16 @@ export default {
     }
   },
   async mounted() {
-    console.log('🚀 TEMPLATE APP MOUNTED')
+    console.log('🚀 Template App iniciado')
     
-    // Processar token da URL se existir (padrão Harbor)
-    this.processAuthToken()
+    // Verificar status do Template
+    this.checkTemplateStatus()
     
     // Verificar autenticação
-    await this.checkAuthentication()
+    this.checkAuthentication()
+    
+    // Processar token se presente na URL
+    this.processAuthToken()
     
     // Se ainda não há usuário após verificação, forçar redirecionamento
     if (!this.user) {
@@ -662,6 +669,29 @@ export default {
     
     handleSidebarToggle(collapsed) {
       console.log('Sidebar toggle:', collapsed)
+    },
+    
+    async checkTemplateStatus() {
+      try {
+        // Verificar status do Template usando sistema padronizado
+        const result = await checkServiceStatus('template', '', 3000)
+        
+        // Atualizar status do header
+        this.headerConfig.systemStatus = result.status
+        this.headerConfig.isOnline = result.isOnline
+        
+        if (result.success) {
+          console.log('✅ Status do Template atualizado:', this.headerConfig.systemStatus)
+        } else {
+          console.log('❌ Status do Template atualizado:', this.headerConfig.systemStatus)
+        }
+      } catch (error) {
+        console.error('❌ Erro ao verificar status do Template:', error)
+        
+        // Em caso de erro, definir como offline
+        this.headerConfig.systemStatus = 'TEMPLATE OFFLINE'
+        this.headerConfig.isOnline = false
+      }
     },
     
     redirectToQuarter() {
