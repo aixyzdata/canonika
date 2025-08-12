@@ -1,0 +1,446 @@
+// =============================================================================
+// EXPLORER COMPONENT STYLES
+// =============================================================================
+
+.explorer-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header do Explorer
+.explorer-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  
+  .explorer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    
+    i {
+      font-size: 3rem;
+      color: var(--primary-color);
+    }
+    
+    .logo-text {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+  
+  .explorer-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+// Seletor de Jornada
+.journey-selector {
+  margin-bottom: 3rem;
+  
+  .journey-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    
+    .journey-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border: 2px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      
+      &:hover {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: white;
+      }
+      
+      &.active {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: white;
+      }
+      
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+// Conteúdo da Jornada
+.journey-content {
+  animation: fadeIn 0.3s ease;
+}
+
+// Container de Pesquisa
+.search-container {
+  margin-bottom: 3rem;
+  
+  .search-input-wrapper {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--bg-primary);
+    
+    .search-icon {
+      padding: 1rem;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 1rem;
+      
+      &::placeholder {
+        color: var(--text-secondary);
+      }
+    }
+    
+    .search-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: var(--primary-dark);
+      }
+      
+      .search-text {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Seção de Resultados
+.results-section {
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h3 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .clear-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--danger-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: var(--danger-dark);
+      }
+    }
+  }
+  
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+}
+
+// Cards de Produto
+.product-card {
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      
+      i {
+        font-size: 1.5rem;
+      }
+    }
+    
+    .card-title {
+      flex: 1;
+      
+      h4 {
+        margin: 0 0 0.25rem 0;
+        color: var(--text-primary);
+      }
+      
+      .card-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  .card-content {
+    .card-description {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    
+    .card-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+  }
+}
+
+// Área de Upload de NFe
+.nfe-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 3rem;
+  text-align: center;
+  background: var(--bg-secondary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: var(--primary-color);
+    background: var(--bg-primary);
+  }
+  
+  &.drag-over {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+  }
+  
+  .upload-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+  
+  .upload-text {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  
+  .upload-hint {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  input[type="file"] {
+    display: none;
+  }
+}
+
+// Resultado da Canonização
+.canonization-result {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-top: 2rem;
+  
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h3 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .clear-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--danger-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: var(--danger-dark);
+      }
+    }
+  }
+  
+  .nfe-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+    
+    .info-group {
+      h4 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+      
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .label {
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+        
+        .value {
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+  
+  .products-list {
+    h4 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .product-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      background: var(--bg-secondary);
+      
+      .product-name {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      
+      .product-quantity,
+      .product-price,
+      .product-total {
+        color: var(--text-secondary);
+        text-align: right;
+      }
+    }
+  }
+}
+
+// Animações
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .explorer-content {
+    padding: 1rem;
+  }
+  
+  .journey-tabs {
+    flex-direction: column;
+    
+    .journey-tab {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .search-input-wrapper {
+    flex-direction: column;
+    
+    .search-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .canonization-result {
+    .nfe-info {
+      grid-template-columns: 1fr;
+    }
+    
+    .product-item {
+      grid-template-columns: 1fr;
+      text-align: center;
+      
+      .product-quantity,
+      .product-price,
+      .product-total {
+        text-align: center;
+      }
+    }
+  }
+} 
