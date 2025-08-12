@@ -451,12 +451,11 @@ export default {
     
     decodeToken(token) {
       try {
-        const parts = token.split('.')
-        if (parts.length !== 3) throw new Error('Token inválido')
-        
-        const payload = JSON.parse(atob(parts[1]))
+        // O Quarter envia um token base64 simples, não JWT
+        const payload = JSON.parse(atob(token))
         return payload
       } catch (error) {
+        console.error('❌ Erro ao decodificar token:', error)
         throw new Error('Token inválido')
       }
     },
