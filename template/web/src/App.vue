@@ -347,13 +347,9 @@
 </template>
 
 <script>
-import CanonikaMasterPage from '../../../shared/templates/MasterPage.vue'
-// Fallback mínimo para AuthService ausente neste snapshot
-const AuthService = {
-  async checkAndRefreshToken() { return true },
-  getCurrentUser() { return { name: 'Administrador' } },
-  logout() {}
-}
+import CanonikaMasterPage from '/app/shared/components/MasterPage.vue'
+import AuthService from '/app/shared/services/AuthService.js'
+import { checkServiceStatus } from '/app/shared/config/status-standardization.js'
 
 export default {
   name: 'TemplateApp',
@@ -364,57 +360,204 @@ export default {
     return {
       user: null,
       headerConfig: {
-        title: 'Template Service',
-        subtitle: 'Serviço de validação da componentização',
-        icon: 'fas fa-rocket',
-        showUserInfo: true,
-        showLogout: true
+        logoText: 'CANONIKA',
+        logoSubtitle: 'TEMPLATE',
+        user: {
+          name: 'Administrador',
+          initial: 'A'
+        },
+        systemStatus: 'TEMPLATE ONLINE',
+        isOnline: true
       },
       sidebarConfig: {
-        title: 'Template Service',
-        icon: 'fas fa-rocket',
-        menuItems: [
+        brandText: 'Template Service',
+        brandIcon: 'fas fa-rocket',
+        user: {
+          name: 'Administrador',
+          role: 'Admin',
+          initial: 'A'
+        },
+        navigationSections: [
           {
-            id: 'dashboard',
-            title: 'Dashboard',
-            subtitle: 'Visão Geral',
-            icon: 'fas fa-tachometer-alt',
-            href: '#',
-            active: true
-          },
-          {
-            id: 'components',
-            title: 'Componentes',
-            subtitle: 'Validação',
-            icon: 'fas fa-cube',
-            href: '#'
-          },
-          {
-            id: 'tests',
-            title: 'Testes',
-            subtitle: 'Funcionalidades',
-            icon: 'fas fa-vial',
-            href: '#'
-          },
-          {
-            id: 'info',
-            title: 'Informações',
-            subtitle: 'Detalhes',
-            icon: 'fas fa-info-circle',
-            href: '#'
+            title: 'Navegação',
+            items: [
+              {
+                id: 'dashboard',
+                title: 'Dashboard',
+                subtitle: 'Visão Geral',
+                icon: 'fas fa-tachometer-alt',
+                href: '#',
+                active: true
+              },
+              {
+                id: 'components',
+                title: 'Componentes',
+                subtitle: 'Validação',
+                icon: 'fas fa-cube',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'header',
+                    title: 'Header',
+                    subtitle: 'Cabeçalho',
+                    icon: 'fas fa-heading',
+                    href: '#header'
+                  },
+                  {
+                    id: 'sidebar',
+                    title: 'Sidebar',
+                    subtitle: 'Menu Lateral',
+                    icon: 'fas fa-bars',
+                    href: '#sidebar'
+                  },
+                  {
+                    id: 'masterpage',
+                    title: 'MasterPage',
+                    subtitle: 'Layout Principal',
+                    icon: 'fas fa-layer-group',
+                    href: '#masterpage'
+                  },
+                  {
+                    id: 'viewcontent',
+                    title: 'ViewContent',
+                    subtitle: 'Conteúdo',
+                    icon: 'fas fa-file-alt',
+                    href: '#viewcontent'
+                  },
+                  {
+                    id: 'viewheader',
+                    title: 'ViewHeader',
+                    subtitle: 'Cabeçalho da View',
+                    icon: 'fas fa-window-maximize',
+                    href: '#viewheader'
+                  }
+                ]
+              },
+              {
+                id: 'services',
+                title: 'Serviços',
+                subtitle: 'Integração',
+                icon: 'fas fa-server',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'auth',
+                    title: 'Autenticação',
+                    subtitle: 'Login/Logout',
+                    icon: 'fas fa-key',
+                    href: '#auth'
+                  },
+                  {
+                    id: 'quarter',
+                    title: 'Quarter',
+                    subtitle: 'Identity Provider',
+                    icon: 'fas fa-shield-alt',
+                    href: '#quarter'
+                  },
+                  {
+                    id: 'harbor',
+                    title: 'Harbor',
+                    subtitle: 'Portal Principal',
+                    icon: 'fas fa-anchor',
+                    href: '#harbor'
+                  },
+                  {
+                    id: 'beacon',
+                    title: 'Beacon',
+                    subtitle: 'Monitoramento',
+                    icon: 'fas fa-broadcast-tower',
+                    href: '#beacon'
+                  }
+                ]
+              },
+              {
+                id: 'tests',
+                title: 'Testes',
+                subtitle: 'Funcionalidades',
+                icon: 'fas fa-vial',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'unit',
+                    title: 'Unitários',
+                    subtitle: 'Testes Unitários',
+                    icon: 'fas fa-microchip',
+                    href: '#unit'
+                  },
+                  {
+                    id: 'integration',
+                    title: 'Integração',
+                    subtitle: 'Testes de Integração',
+                    icon: 'fas fa-plug',
+                    href: '#integration'
+                  },
+                  {
+                    id: 'e2e',
+                    title: 'End-to-End',
+                    subtitle: 'Testes E2E',
+                    icon: 'fas fa-route',
+                    href: '#e2e'
+                  },
+                  {
+                    id: 'performance',
+                    title: 'Performance',
+                    subtitle: 'Testes de Performance',
+                    icon: 'fas fa-tachometer-alt',
+                    href: '#performance'
+                  }
+                ]
+              },
+              {
+                id: 'info',
+                title: 'Informações',
+                subtitle: 'Detalhes',
+                icon: 'fas fa-info-circle',
+                href: '#',
+                subItems: [
+                  {
+                    id: 'docs',
+                    title: 'Documentação',
+                    subtitle: 'Guias e Tutoriais',
+                    icon: 'fas fa-book',
+                    href: '#docs'
+                  },
+                  {
+                    id: 'api',
+                    title: 'API',
+                    subtitle: 'Endpoints',
+                    icon: 'fas fa-code',
+                    href: '#api'
+                  },
+                  {
+                    id: 'config',
+                    title: 'Configuração',
+                    subtitle: 'Settings',
+                    icon: 'fas fa-cog',
+                    href: '#config'
+                  },
+                  {
+                    id: 'about',
+                    title: 'Sobre',
+                    subtitle: 'Informações do Sistema',
+                    icon: 'fas fa-info',
+                    href: '#about'
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
     }
   },
-  async mounted() {
-    console.log('🚀 TEMPLATE APP MOUNTED')
-    
-    // Processar token da URL se existir (padrão Harbor)
-    this.processAuthToken()
+  mounted() {
+    console.log('🚀 Template App iniciado')
     
     // Verificar autenticação
-    await this.checkAuthentication()
+    this.checkAuthentication()
+    
+    // Processar token se presente na URL
+    this.processAuthToken()
   },
   methods: {
     async checkAuthentication() {
@@ -487,12 +630,20 @@ export default {
     
     decodeToken(token) {
       try {
+        // Verificar se é um JWT real (3 partes) ou token simulado (base64 simples)
         const parts = token.split('.')
-        if (parts.length !== 3) throw new Error('Token inválido')
         
-        const payload = JSON.parse(atob(parts[1]))
-        return payload
+        if (parts.length === 3) {
+          // JWT real - decodificar payload (parte 1)
+          const payload = JSON.parse(atob(parts[1]))
+          return payload
+        } else {
+          // Token simulado do Quarter - decodificar diretamente
+          const payload = JSON.parse(atob(token))
+          return payload
+        }
       } catch (error) {
+        console.error('Erro ao decodificar token:', error)
         throw new Error('Token inválido')
       }
     },
@@ -513,12 +664,12 @@ export default {
     
     redirectToQuarter() {
       const quarterUrl = 'http://localhost:3700'
-      // Usar a URL completa do Template Service
-      const currentUrl = window.location.href
-      const returnUrl = encodeURIComponent(currentUrl)
+      // Usar a URL completa do Template Service com porta explícita
+      const currentUrl = `http://localhost:3790${window.location.pathname}${window.location.search}`
+      const redirectTo = encodeURIComponent(currentUrl)
       
-      // Usar o padrão return_url e service como Harbor
-      const quarterRedirectUrl = `${quarterUrl}?return_url=${returnUrl}&service=template`
+      // Usar o padrão redirect_to (padrão do Quarter)
+      const quarterRedirectUrl = `${quarterUrl}?redirect_to=${redirectTo}`
       
       console.log('🔄 Redirecionando para Quarter com URL:', currentUrl)
       console.log('🔄 URL completa do Quarter:', quarterRedirectUrl)
@@ -530,15 +681,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos do Template Service */
-.canonika-icon-bg {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-</style>
+<!-- Estilos agora são gerenciados pelo SCSS -->

@@ -1,0 +1,9 @@
+// =============================================================================
+// TEMPLATE SERVICE - SCSS MAIN FILE
+// =============================================================================
+
+// Import shared design system
+@import '../../../../../shared/styles/scss/main';
+
+// Template-specific styles
+@import 'template-specific'; 

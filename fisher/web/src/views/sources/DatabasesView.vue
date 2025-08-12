@@ -1,327 +1,349 @@
 <template>
-  <CanonikaViewTemplate
-    title="Bancos de Dados"
-    description="Bases de dados internas"
-    header-icon="fas fa-database"
-    status-text="ONLINE"
-    :primary-action="{
-      text: 'Sincronizar Dados',
-      icon: 'fas fa-sync',
-      handler: syncData
-    }"
-    @refresh="refreshData"
-  >
-    <div class="service-cards">
-      <!-- Status da Fonte -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Status da Fonte</h3>
-          <div class="card-icon">
-            <i class="fas fa-signal"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="balance-display">
-            <div class="balance-value">{{ sourceStatus.status }}</div>
-            <div class="balance-label">{{ sourceStatus.description }}</div>
-          </div>
-          <div class="balance-details">
-            <div class="detail-item">
-              <span class="detail-label">Última Sincronização:</span>
-              <span class="detail-value">{{ sourceStatus.lastSync }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Bancos Conectados:</span>
-              <span class="detail-value">{{ sourceStatus.connectedDatabases }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Taxa de Sucesso:</span>
-              <span class="detail-value">{{ sourceStatus.successRate }}</span>
-            </div>
-          </div>
+  <div class="canonika-view">
+    <!-- View Header seguindo padrão Skipper -->
+    <div class="view-header">
+      <div class="view-title">
+        <i class="fas fa-database"></i>
+        <div class="title-content">
+          <h1>Bancos de Dados</h1>
+          <p>Bases de dados internas e externas</p>
         </div>
       </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>Sistema Operacional</span>
+      </div>
+      <div class="view-actions">
+        <button @click="syncData" class="btn btn-primary btn-sm">
+          <i class="fas fa-sync me-2"></i>
+          Sincronizar Dados
+        </button>
+        <button @click="refreshData" class="btn btn-secondary btn-sm">
+          <i class="fas fa-sync-alt me-2"></i>
+          Atualizar
+        </button>
+      </div>
+    </div>
 
-      <!-- Bancos Conectados -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Bancos Conectados</h3>
-          <div class="card-icon">
-            <i class="fas fa-server"></i>
+    <!-- View Content -->
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Status da Fonte -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-signal"></i>
+            </div>
+            <div class="card-title">
+              <h4>Status da Fonte</h4>
+              <span class="card-subtitle">Informações da conexão</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Online</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">ONLINE</div>
+              <div class="balance-label">Todas as bases conectadas</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Última Sincronização:</span>
+                <span class="detail-value">2024-01-15 14:30:00</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Bases Ativas:</span>
+                <span class="detail-value">5</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Taxa de Sucesso:</span>
+                <span class="detail-value">99.2%</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div class="databases-grid">
-            <div v-for="database in databases" :key="database.id" class="database-item">
-              <div class="database-icon">
-                <i :class="database.icon"></i>
-              </div>
-              <div class="database-details">
-                <div class="database-name">{{ database.name }}</div>
-                <div class="database-status" :class="database.status">
-                  {{ database.statusText }}
+
+        <!-- Bases Conectadas -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="card-title">
+              <h4>Bases Conectadas</h4>
+              <span class="card-subtitle">Bancos de dados ativos</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">5 Bases</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="databases-grid">
+              <div v-for="db in databases" :key="db.id" class="database-item">
+                <div class="database-icon">
+                  <i :class="db.icon"></i>
                 </div>
-                <div class="database-metrics">
-                  <span>{{ database.tables }} tabelas</span>
-                  <span>{{ database.size }}</span>
+                <div class="database-details">
+                  <div class="database-name">{{ db.name }}</div>
+                  <div class="database-status" :class="db.status">
+                    {{ db.statusText }}
+                  </div>
+                  <div class="database-metrics">
+                    <span>{{ db.size }}</span>
+                    <span>{{ db.connections }} conexões</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Métricas de Dados -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Métricas de Dados</h3>
-          <div class="card-icon">
-            <i class="fas fa-chart-bar"></i>
+        <!-- Métricas de Performance -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="card-title">
+              <h4>Métricas de Performance</h4>
+              <span class="card-subtitle">Indicadores de desempenho</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">4 Métricas</span>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="metrics-grid">
-            <div v-for="metric in dataMetrics" :key="metric.id" class="metric-item">
-              <div class="metric-icon">
-                <i :class="metric.icon"></i>
-              </div>
-              <div class="metric-details">
-                <div class="metric-value">{{ metric.value }}</div>
-                <div class="metric-label">{{ metric.label }}</div>
+          <div class="card-content">
+            <div class="metrics-grid">
+              <div v-for="metric in performanceMetrics" :key="metric.id" class="metric-item">
+                <div class="metric-icon">
+                  <i :class="metric.icon"></i>
+                </div>
+                <div class="metric-details">
+                  <div class="metric-value">{{ metric.value }}</div>
+                  <div class="metric-label">{{ metric.label }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Configurações -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Configurações</h3>
-          <div class="card-icon">
-            <i class="fas fa-cog"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="config-list">
-            <div v-for="config in configurations" :key="config.id" class="config-item">
-              <div class="config-label">{{ config.name }}</div>
-              <div class="config-value">{{ config.value }}</div>
-              <div class="config-status" :class="config.status">
-                {{ config.statusText }}
-              </div>
+        <!-- Configurações -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="card-title">
+              <h4>Configurações</h4>
+              <span class="card-subtitle">Parâmetros do banco</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">4 Configs</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Logs Recentes -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Logs Recentes</h3>
-          <div class="card-icon">
-            <i class="fas fa-list-alt"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="logs-list">
-            <div v-for="log in recentLogs" :key="log.id" :class="`log-item ${log.level}`">
-              <div class="log-icon">
-                <i :class="log.icon"></i>
-              </div>
-              <div class="log-content">
-                <div class="log-title">{{ log.title }}</div>
-                <div class="log-message">{{ log.message }}</div>
-                <div class="log-time">{{ log.timestamp }}</div>
+          <div class="card-content">
+            <div class="config-list">
+              <div v-for="config in dbConfigs" :key="config.id" class="config-item">
+                <div class="config-name">{{ config.name }}</div>
+                <div class="config-value">{{ config.value }}</div>
+                <div class="config-description">{{ config.description }}</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </CanonikaViewTemplate>
+  </div>
 </template>
 
 <script>
-import CanonikaViewTemplate from 'shared/templates/CanonikaViewTemplate.vue'
-
 export default {
-  name: 'DatabasesView',
-  components: {
-    CanonikaViewTemplate
-  },
+  name: 'FisherDatabasesView',
   data() {
     return {
-      sourceStatus: {
-        status: 'ONLINE',
-        description: 'Conexão ativa com bancos de dados',
-        lastSync: '2024-01-15 14:30:00',
-        connectedDatabases: '4/4',
-        successRate: '99.9%'
-      },
       databases: [
         {
           id: 1,
           name: 'PostgreSQL',
           status: 'online',
-          statusText: 'ATIVO',
-          tables: '150',
-          size: '2.1GB',
-          icon: 'fas fa-database'
+          statusText: 'ONLINE',
+          icon: 'fas fa-database',
+          size: '2.5GB',
+          connections: '25'
         },
         {
           id: 2,
           name: 'MySQL',
           status: 'online',
-          statusText: 'ATIVO',
-          tables: '85',
+          statusText: 'ONLINE',
+          icon: 'fas fa-database',
           size: '1.8GB',
-          icon: 'fas fa-database'
+          connections: '18'
         },
         {
           id: 3,
           name: 'MongoDB',
           status: 'online',
-          statusText: 'ATIVO',
-          tables: '45',
+          statusText: 'ONLINE',
+          icon: 'fas fa-database',
           size: '3.2GB',
-          icon: 'fas fa-database'
+          connections: '12'
         },
         {
           id: 4,
           name: 'Redis',
           status: 'online',
-          statusText: 'ATIVO',
-          tables: '12',
+          statusText: 'ONLINE',
+          icon: 'fas fa-memory',
           size: '512MB',
-          icon: 'fas fa-memory'
-        }
-      ],
-      dataMetrics: [
-        {
-          id: 1,
-          value: '292',
-          label: 'Tabelas Totais',
-          icon: 'fas fa-table'
+          connections: '8'
         },
         {
-          id: 2,
-          value: '7.6GB',
-          label: 'Dados Armazenados',
+          id: 5,
+          name: 'ClickHouse',
+          status: 'online',
+          statusText: 'ONLINE',
+          icon: 'fas fa-chart-line',
+          size: '5.1GB',
+          connections: '15'
+        }
+      ],
+      performanceMetrics: [
+        {
+          id: 1,
+          name: 'Total de Dados',
+          value: '13.1GB',
+          label: 'armazenados',
           icon: 'fas fa-hdd'
         },
         {
+          id: 2,
+          name: 'Queries/min',
+          value: '1,250',
+          label: 'consultas',
+          icon: 'fas fa-search'
+        },
+        {
           id: 3,
-          value: '1.2M',
-          label: 'Registros Processados',
-          icon: 'fas fa-list'
+          name: 'Tempo Médio',
+          value: '45ms',
+          label: 'resposta',
+          icon: 'fas fa-clock'
         },
         {
           id: 4,
-          value: '99.9%',
-          label: 'Taxa de Disponibilidade',
-          icon: 'fas fa-check-circle'
+          name: 'Conexões Ativas',
+          value: '78',
+          label: 'ativas',
+          icon: 'fas fa-plug'
         }
       ],
-      configurations: [
+      dbConfigs: [
         {
           id: 1,
           name: 'Connection Pool',
-          value: '20 conexões',
-          status: 'online',
-          statusText: 'ATIVO'
+          value: '50 conexões',
+          description: 'Pool máximo de conexões'
         },
         {
           id: 2,
-          name: 'Backup Automático',
-          value: 'Diário às 02:00',
-          status: 'online',
-          statusText: 'CONFIGURADO'
+          name: 'Query Timeout',
+          value: '30s',
+          description: 'Timeout de consultas'
         },
         {
           id: 3,
-          name: 'Timeout de Query',
-          value: '30 segundos',
-          status: 'online',
-          statusText: 'OK'
+          name: 'Backup Schedule',
+          value: 'Diário 02:00',
+          description: 'Agendamento de backup'
         },
         {
           id: 4,
-          name: 'Replicação',
-          value: 'Ativa',
-          status: 'online',
-          statusText: 'ATIVO'
-        }
-      ],
-      recentLogs: [
-        {
-          id: 1,
-          title: 'Backup PostgreSQL',
-          message: 'Backup automático concluído com sucesso',
-          timestamp: '2 min atrás',
-          level: 'success',
-          icon: 'fas fa-check-circle'
-        },
-        {
-          id: 2,
-          title: 'Sincronização MySQL',
-          message: '150 registros sincronizados',
-          timestamp: '15 min atrás',
-          level: 'info',
-          icon: 'fas fa-info-circle'
-        },
-        {
-          id: 3,
-          title: 'Limpeza MongoDB',
-          message: 'Cache limpo e otimizado',
-          timestamp: '1 hora atrás',
-          level: 'info',
-          icon: 'fas fa-database'
-        },
-        {
-          id: 4,
-          title: 'Monitoramento Redis',
-          message: 'Performance dentro dos parâmetros',
-          timestamp: '2 horas atrás',
-          level: 'info',
-          icon: 'fas fa-chart-line'
+          name: 'Log Level',
+          value: 'INFO',
+          description: 'Nível de log do banco'
         }
       ]
     }
   },
   methods: {
-    refreshData() {
-      console.log('Refreshing Databases data...')
-      // Implementar refresh dos dados
-    },
     syncData() {
-      console.log('Synchronizing Databases data...')
-      // Implementar sincronização
+      console.log('Sincronizando dados dos bancos...')
+      // Implementar lógica de sincronização
+    },
+    refreshData() {
+      console.log('Atualizando dados dos bancos...')
+      // Implementar lógica de atualização
     }
   }
 }
 </script>
 
 <style scoped>
+/* Estilos específicos do DatabasesView mantidos */
+.balance-display {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.balance-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #10b981;
+}
+
+.balance-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.balance-details {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+
+.detail-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: #1f2937;
+}
+
 .databases-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .database-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
 .database-icon {
-  font-size: 1.5rem;
-  color: #3b82f6;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d1fae5;
+  color: #10b981;
+  flex-shrink: 0;
 }
 
 .database-details {
@@ -330,26 +352,26 @@ export default {
 
 .database-name {
   font-weight: 600;
-  color: #e2e8f0;
+  color: #1f2937;
   margin-bottom: 0.25rem;
 }
 
 .database-status {
   font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
-  margin-bottom: 0.25rem;
   display: inline-block;
+  margin-bottom: 0.25rem;
 }
 
 .database-status.online {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+  background-color: #d1fae5;
+  color: #10b981;
 }
 
 .database-status.offline {
-  background: rgba(239, 68, 68, 0.1);
+  background-color: #fee2e2;
   color: #ef4444;
 }
 
@@ -357,12 +379,12 @@ export default {
   display: flex;
   gap: 1rem;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
@@ -370,15 +392,22 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
 .metric-icon {
-  font-size: 1.5rem;
-  color: #3b82f6;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d1fae5;
+  color: #10b981;
+  flex-shrink: 0;
 }
 
 .metric-details {
@@ -387,14 +416,14 @@ export default {
 
 .metric-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #e2e8f0;
+  font-weight: bold;
+  color: #10b981;
+  margin-bottom: 0.25rem;
 }
 
 .metric-label {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  margin-top: 0.25rem;
+  color: #6b7280;
+  font-size: 0.75rem;
 }
 
 .config-list {
@@ -404,122 +433,27 @@ export default {
 }
 
 .config-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
-.config-label {
-  color: #e2e8f0;
+.config-name {
   font-weight: 600;
-  flex: 1;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
 .config-value {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  flex: 2;
-  text-align: center;
-}
-
-.config-status {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  flex: 1;
-  text-align: center;
-}
-
-.config-status.online {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.config-status.offline {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.logs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.log-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #475569;
-}
-
-.log-item.success {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.log-item.info {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.log-item.warning {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.log-item.error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.log-icon {
-  font-size: 1rem;
-  margin-top: 0.125rem;
-}
-
-.log-item.success .log-icon {
-  color: #22c55e;
-}
-
-.log-item.info .log-icon {
-  color: #3b82f6;
-}
-
-.log-item.warning .log-icon {
-  color: #f59e0b;
-}
-
-.log-item.error .log-icon {
-  color: #ef4444;
-}
-
-.log-content {
-  flex: 1;
-}
-
-.log-title {
-  font-weight: 600;
-  color: #e2e8f0;
+  color: #10b981;
+  font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
-.log-message {
-  color: #94a3b8;
+.config-description {
+  color: #6b7280;
   font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-}
-
-.log-time {
-  color: #64748b;
-  font-size: 0.75rem;
 }
 </style>
 

@@ -1,0 +1,85 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - THEME OVERRIDES
+// =============================================================================
+
+// Theme overrides and customizations
+// This file should be imported last to allow for theme customizations
+
+// Custom theme variables
+:root {
+  // Additional theme colors
+  --theme-accent: #{$accent-color};
+  --theme-border-light: rgba($dark-border, 0.3);
+  --theme-shadow-light: rgba($dark-bg, 0.1);
+  
+  // Custom spacing
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+  
+  // Custom border radius
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+  --border-radius-xl: #{$border-radius-xl};
+}
+
+// Dark theme enhancements
+.dark-theme {
+  --bg-primary: #{$dark-bg};
+  --bg-secondary: #{$dark-surface};
+  --text-primary: #{$dark-text};
+  --text-secondary: #{$dark-text-secondary};
+  --border-color: #{$dark-border};
+}
+
+// Light theme (if needed in the future)
+.light-theme {
+  --bg-primary: #{$white};
+  --bg-secondary: #{$gray-50};
+  --text-primary: #{$gray-900};
+  --text-secondary: #{$gray-600};
+  --border-color: #{$gray-200};
+}
+
+// Custom utility classes
+.text-gradient {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, $secondary-color 0%, darken($secondary-color, 10%) 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, $accent-color 0%, darken($accent-color, 10%) 100%);
+}
+
+// Glass morphism effect
+.glass {
+  background: rgba($dark-surface, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba($dark-border, 0.3);
+}
+
+// Custom shadows
+.shadow-glow {
+  box-shadow: 0 0 20px rgba($primary-color, 0.3);
+}
+
+.shadow-glow-success {
+  box-shadow: 0 0 20px rgba($success, 0.3);
+}
+
+.shadow-glow-error {
+  box-shadow: 0 0 20px rgba($error, 0.3);
+} 

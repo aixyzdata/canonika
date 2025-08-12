@@ -1,0 +1,198 @@
+/* Canonika Bootstrap 5 Theme */
+/* Baseado em Bootstrap 5 com customizações Canonika */
+
+:root {
+  /* Canonika Color Palette */
+  --canonika-primary: #3b82f6;
+  --canonika-primary-dark: #1d4ed8;
+  --canonika-secondary: #64748b;
+  --canonika-success: #10b981;
+  --canonika-warning: #f59e0b;
+  --canonika-danger: #ef4444;
+  --canonika-info: #06b6d4;
+  --canonika-light: #f8fafc;
+  --canonika-dark: #0f172a;
+  
+  /* Canonika Gradients */
+  --canonika-gradient-primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --canonika-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --canonika-gradient-header: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  
+  /* Canonika Spacing */
+  --canonika-spacing-xs: 0.25rem;
+  --canonika-spacing-sm: 0.5rem;
+  --canonika-spacing-md: 1rem;
+  --canonika-spacing-lg: 1.5rem;
+  --canonika-spacing-xl: 2rem;
+  --canonika-spacing-xxl: 3rem;
+  
+  /* Canonika Border Radius */
+  --canonika-border-radius-sm: 0.25rem;
+  --canonika-border-radius-md: 0.5rem;
+  --canonika-border-radius-lg: 0.75rem;
+  --canonika-border-radius-xl: 1rem;
+  
+  /* Canonika Shadows */
+  --canonika-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --canonika-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --canonika-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --canonika-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Canonika Transitions */
+  --canonika-transition-fast: 0.15s ease-in-out;
+  --canonika-transition-normal: 0.3s ease-in-out;
+  --canonika-transition-slow: 0.5s ease-in-out;
+  
+  /* Canonika Typography */
+  --canonika-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --canonika-font-size-xs: 0.75rem;
+  --canonika-font-size-sm: 0.875rem;
+  --canonika-font-size-base: 1rem;
+  --canonika-font-size-lg: 1.125rem;
+  --canonika-font-size-xl: 1.25rem;
+  --canonika-font-size-xxl: 1.5rem;
+  
+  /* Canonika Z-Index */
+  --canonika-z-dropdown: 1000;
+  --canonika-z-sticky: 1020;
+  --canonika-z-fixed: 1030;
+  --canonika-z-modal-backdrop: 1040;
+  --canonika-z-modal: 1050;
+  --canonika-z-popover: 1060;
+  --canonika-z-tooltip: 1070;
+  --canonika-z-toast: 1080;
+}
+
+/* Bootstrap 5 Overrides */
+.btn-canonika-primary {
+  background: var(--canonika-gradient-primary);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: var(--canonika-spacing-sm) var(--canonika-spacing-lg);
+  border-radius: var(--canonika-border-radius-md);
+  transition: var(--canonika-transition-normal);
+  box-shadow: var(--canonika-shadow-sm);
+}
+
+.btn-canonika-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--canonika-shadow-lg);
+  color: white;
+}
+
+.card-canonika {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--canonika-border-radius-lg);
+  box-shadow: var(--canonika-shadow-sm);
+  transition: var(--canonika-transition-normal);
+}
+
+.card-canonika:hover {
+  box-shadow: var(--canonika-shadow-md);
+  transform: translateY(-1px);
+}
+
+.badge-canonika {
+  padding: var(--canonika-spacing-xs) var(--canonika-spacing-sm);
+  border-radius: var(--canonika-border-radius-sm);
+  font-size: var(--canonika-font-size-xs);
+}
+
+.badge-canonika-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--canonika-success);
+}
+
+.badge-canonika-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--canonika-warning);
+}
+
+.badge-canonika-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--canonika-danger);
+}
+
+.badge-canonika-info {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--canonika-info);
+}
+
+/* Canonika Container Utilities */
+.canonika-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--canonika-spacing-md);
+}
+
+/* Canonika Animations */
+@keyframes canonika-pulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.05);
+  }
+}
+
+@keyframes canonika-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes canonika-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.canonika-pulse {
+  animation: canonika-pulse 2s ease-in-out infinite;
+}
+
+.canonika-rotate {
+  animation: canonika-rotate 10s linear infinite;
+}
+
+.canonika-fade-in {
+  animation: canonika-fade-in 0.3s ease-out;
+}
+
+/* Canonika Responsive Utilities */
+@media (max-width: 768px) {
+  .canonika-container {
+    padding: 0 var(--canonika-spacing-sm);
+  }
+}
+
+/* Canonika Focus States */
+.canonika-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--canonika-primary);
+}
+
+/* Canonika Loading States */
+.canonika-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.canonika-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: canonika-loading 1.5s infinite;
+}
+
+@keyframes canonika-loading {
+  0% { left: -100%; }
+  100% { left: 100%; }
+} 

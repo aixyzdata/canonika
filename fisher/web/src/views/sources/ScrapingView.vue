@@ -1,386 +1,417 @@
 <template>
-  <CanonikaViewTemplate
-    title="Web Scraping"
-    description="Coleta de dados web"
-    header-icon="fas fa-spider"
-    status-text="ONLINE"
-    :primary-action="{
-      text: 'Sincronizar Dados',
-      icon: 'fas fa-sync',
-      handler: syncData
-    }"
-    @refresh="refreshData"
-  >
-    <div class="service-cards">
-      <!-- Status da Fonte -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Status da Fonte</h3>
-          <div class="card-icon">
-            <i class="fas fa-signal"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="balance-display">
-            <div class="balance-value">{{ sourceStatus.status }}</div>
-            <div class="balance-label">{{ sourceStatus.description }}</div>
-          </div>
-          <div class="balance-details">
-            <div class="detail-item">
-              <span class="detail-label">Última Sincronização:</span>
-              <span class="detail-value">{{ sourceStatus.lastSync }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Sites Monitorados:</span>
-              <span class="detail-value">{{ sourceStatus.monitoredSites }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Taxa de Sucesso:</span>
-              <span class="detail-value">{{ sourceStatus.successRate }}</span>
-            </div>
-          </div>
+  <div class="canonika-view">
+    <!-- View Header seguindo padrão Skipper -->
+    <div class="view-header">
+      <div class="view-title">
+        <i class="fas fa-spider"></i>
+        <div class="title-content">
+          <h1>Web Scraping</h1>
+          <p>Coleta de dados web automatizada</p>
         </div>
       </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>Sistema Operacional</span>
+      </div>
+      <div class="view-actions">
+        <button @click="syncData" class="btn btn-primary btn-sm">
+          <i class="fas fa-sync me-2"></i>
+          Sincronizar Dados
+        </button>
+        <button @click="refreshData" class="btn btn-secondary btn-sm">
+          <i class="fas fa-sync-alt me-2"></i>
+          Atualizar
+        </button>
+      </div>
+    </div>
 
-      <!-- Sites Monitorados -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Sites Monitorados</h3>
-          <div class="card-icon">
-            <i class="fas fa-globe"></i>
+    <!-- View Content -->
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Status da Fonte -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-signal"></i>
+            </div>
+            <div class="card-title">
+              <h4>Status da Fonte</h4>
+              <span class="card-subtitle">Informações da conexão</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Online</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">ONLINE</div>
+              <div class="balance-label">Scrapers ativos</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Última Sincronização:</span>
+                <span class="detail-value">2024-01-15 14:30:00</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Scrapers Ativos:</span>
+                <span class="detail-value">8</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Taxa de Sucesso:</span>
+                <span class="detail-value">94.2%</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div class="sites-grid">
-            <div v-for="site in monitoredSites" :key="site.id" class="site-item">
-              <div class="site-icon">
-                <i :class="site.icon"></i>
-              </div>
-              <div class="site-details">
-                <div class="site-name">{{ site.name }}</div>
-                <div class="site-status" :class="site.status">
-                  {{ site.statusText }}
+
+        <!-- Scrapers Ativos -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-spider"></i>
+            </div>
+            <div class="card-title">
+              <h4>Scrapers Ativos</h4>
+              <span class="card-subtitle">Robôs de coleta</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">8 Scrapers</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="scrapers-grid">
+              <div v-for="scraper in scrapers" :key="scraper.id" class="scraper-item">
+                <div class="scraper-icon">
+                  <i :class="scraper.icon"></i>
                 </div>
-                <div class="site-metrics">
-                  <span>{{ site.pages }} páginas</span>
-                  <span>{{ site.lastUpdate }}</span>
+                <div class="scraper-details">
+                  <div class="scraper-name">{{ scraper.name }}</div>
+                  <div class="scraper-status" :class="scraper.status">
+                    {{ scraper.statusText }}
+                  </div>
+                  <div class="scraper-metrics">
+                    <span>{{ scraper.pages }} páginas</span>
+                    <span>{{ scraper.data }} dados</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Métricas de Performance -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Métricas de Performance</h3>
-          <div class="card-icon">
-            <i class="fas fa-tachometer-alt"></i>
+        <!-- Métricas de Performance -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="card-title">
+              <h4>Métricas de Performance</h4>
+              <span class="card-subtitle">Indicadores de desempenho</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">4 Métricas</span>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="metrics-grid">
-            <div v-for="metric in performanceMetrics" :key="metric.id" class="metric-item">
-              <div class="metric-icon">
-                <i :class="metric.icon"></i>
-              </div>
-              <div class="metric-details">
-                <div class="metric-value">{{ metric.value }}</div>
-                <div class="metric-label">{{ metric.label }}</div>
+          <div class="card-content">
+            <div class="metrics-grid">
+              <div v-for="metric in performanceMetrics" :key="metric.id" class="metric-item">
+                <div class="metric-icon">
+                  <i :class="metric.icon"></i>
+                </div>
+                <div class="metric-details">
+                  <div class="metric-value">{{ metric.value }}</div>
+                  <div class="metric-label">{{ metric.label }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Configurações -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Configurações</h3>
-          <div class="card-icon">
-            <i class="fas fa-cog"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="config-list">
-            <div v-for="config in configurations" :key="config.id" class="config-item">
-              <div class="config-label">{{ config.name }}</div>
-              <div class="config-value">{{ config.value }}</div>
-              <div class="config-status" :class="config.status">
-                {{ config.statusText }}
-              </div>
+        <!-- Configurações -->
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="card-title">
+              <h4>Configurações</h4>
+              <span class="card-subtitle">Parâmetros dos scrapers</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge info">4 Configs</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Logs Recentes -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Logs Recentes</h3>
-          <div class="card-icon">
-            <i class="fas fa-list-alt"></i>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="logs-list">
-            <div v-for="log in recentLogs" :key="log.id" :class="`log-item ${log.level}`">
-              <div class="log-icon">
-                <i :class="log.icon"></i>
-              </div>
-              <div class="log-content">
-                <div class="log-title">{{ log.title }}</div>
-                <div class="log-message">{{ log.message }}</div>
-                <div class="log-time">{{ log.timestamp }}</div>
+          <div class="card-content">
+            <div class="config-list">
+              <div v-for="config in scraperConfigs" :key="config.id" class="config-item">
+                <div class="config-name">{{ config.name }}</div>
+                <div class="config-value">{{ config.value }}</div>
+                <div class="config-description">{{ config.description }}</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </CanonikaViewTemplate>
+  </div>
 </template>
 
 <script>
-import CanonikaViewTemplate from 'shared/templates/CanonikaViewTemplate.vue'
-
 export default {
-  name: 'ScrapingView',
-  components: {
-    CanonikaViewTemplate
-  },
+  name: 'FisherScrapingView',
   data() {
     return {
-      sourceStatus: {
-        status: 'ONLINE',
-        description: 'Conexão ativa com sites monitorados',
-        lastSync: '2024-01-15 14:30:00',
-        monitoredSites: '12/15',
-        successRate: '96.8%'
-      },
-      monitoredSites: [
+      scrapers: [
         {
           id: 1,
-          name: 'E-commerce Sites',
+          name: 'E-commerce Scraper',
           status: 'online',
           statusText: 'ATIVO',
-          pages: '2.5K',
-          lastUpdate: '2 min atrás',
-          icon: 'fas fa-shopping-cart'
+          icon: 'fas fa-shopping-cart',
+          pages: '1,250',
+          data: '45.2K'
         },
         {
           id: 2,
-          name: 'News Sites',
+          name: 'News Scraper',
           status: 'online',
           statusText: 'ATIVO',
-          pages: '1.8K',
-          lastUpdate: '5 min atrás',
-          icon: 'fas fa-newspaper'
+          icon: 'fas fa-newspaper',
+          pages: '890',
+          data: '12.8K'
         },
         {
           id: 3,
-          name: 'Product Catalogs',
+          name: 'Social Media Scraper',
           status: 'online',
           statusText: 'ATIVO',
-          pages: '3.2K',
-          lastUpdate: '10 min atrás',
-          icon: 'fas fa-box'
+          icon: 'fas fa-share-alt',
+          pages: '2,100',
+          data: '78.5K'
         },
         {
           id: 4,
-          name: 'Price Comparison',
-          status: 'offline',
-          statusText: 'INATIVO',
-          pages: '0',
-          lastUpdate: '1 hora atrás',
-          icon: 'fas fa-tags'
+          name: 'Job Sites Scraper',
+          status: 'online',
+          statusText: 'ATIVO',
+          icon: 'fas fa-briefcase',
+          pages: '650',
+          data: '15.3K'
         },
         {
           id: 5,
-          name: 'Review Sites',
+          name: 'Real Estate Scraper',
           status: 'online',
           statusText: 'ATIVO',
-          pages: '950',
-          lastUpdate: '15 min atrás',
-          icon: 'fas fa-star'
+          icon: 'fas fa-home',
+          pages: '1,450',
+          data: '32.1K'
         },
         {
           id: 6,
-          name: 'Social Media',
+          name: 'Product Reviews Scraper',
           status: 'online',
           statusText: 'ATIVO',
-          pages: '1.2K',
-          lastUpdate: '20 min atrás',
-          icon: 'fas fa-share-alt'
+          icon: 'fas fa-star',
+          pages: '980',
+          data: '28.7K'
+        },
+        {
+          id: 7,
+          name: 'Price Comparison Scraper',
+          status: 'online',
+          statusText: 'ATIVO',
+          icon: 'fas fa-tags',
+          pages: '1,750',
+          data: '52.4K'
+        },
+        {
+          id: 8,
+          name: 'Directory Scraper',
+          status: 'online',
+          statusText: 'ATIVO',
+          icon: 'fas fa-address-book',
+          pages: '420',
+          data: '8.9K'
         }
       ],
       performanceMetrics: [
         {
           id: 1,
-          value: '12.2K',
-          label: 'Páginas Processadas',
-          icon: 'fas fa-file-alt'
+          name: 'Páginas Processadas',
+          value: '8,440',
+          label: 'hoje',
+          icon: 'fas fa-globe'
         },
         {
           id: 2,
-          value: '45ms',
-          label: 'Tempo Médio',
-          icon: 'fas fa-clock'
+          name: 'Dados Coletados',
+          value: '273.9K',
+          label: 'registros',
+          icon: 'fas fa-database'
         },
         {
           id: 3,
-          value: '96.8%',
-          label: 'Taxa de Sucesso',
+          name: 'Taxa de Sucesso',
+          value: '94.2%',
+          label: 'coleta',
           icon: 'fas fa-check-circle'
         },
         {
           id: 4,
-          value: '1.8GB',
-          label: 'Dados Coletados',
-          icon: 'fas fa-download'
+          name: 'Scrapers Ativos',
+          value: '8/8',
+          label: 'funcionando',
+          icon: 'fas fa-spider'
         }
       ],
-      configurations: [
+      scraperConfigs: [
         {
           id: 1,
           name: 'Rate Limiting',
-          value: '2 req/seg',
-          status: 'online',
-          statusText: 'ATIVO'
+          value: '2 req/s',
+          description: 'Limite de requisições por segundo'
         },
         {
           id: 2,
           name: 'User Agent Rotation',
-          value: 'Ativo',
-          status: 'online',
-          statusText: 'CONFIGURADO'
+          value: 'Ativado',
+          description: 'Rotação de user agents'
         },
         {
           id: 3,
-          name: 'Proxy Rotation',
-          value: '5 proxies',
-          status: 'online',
-          statusText: 'OK'
+          name: 'Proxy Pool',
+          value: '25 proxies',
+          description: 'Pool de proxies ativos'
         },
         {
           id: 4,
-          name: 'Retry Policy',
+          name: 'Auto Retry',
           value: '3 tentativas',
-          status: 'online',
-          statusText: 'ATIVO'
-        }
-      ],
-      recentLogs: [
-        {
-          id: 1,
-          title: 'E-commerce Scraping',
-          message: '2.5K páginas processadas com sucesso',
-          timestamp: '2 min atrás',
-          level: 'success',
-          icon: 'fas fa-check-circle'
-        },
-        {
-          id: 2,
-          title: 'News Sites Update',
-          message: '1.8K artigos coletados',
-          timestamp: '5 min atrás',
-          level: 'info',
-          icon: 'fas fa-info-circle'
-        },
-        {
-          id: 3,
-          title: 'Price Comparison Error',
-          message: 'Site temporariamente indisponível',
-          timestamp: '1 hora atrás',
-          level: 'error',
-          icon: 'fas fa-exclamation-circle'
-        },
-        {
-          id: 4,
-          title: 'Proxy Rotation',
-          message: 'Proxies alternados automaticamente',
-          timestamp: '2 horas atrás',
-          level: 'info',
-          icon: 'fas fa-sync'
+          description: 'Tentativas automáticas'
         }
       ]
     }
   },
   methods: {
-    refreshData() {
-      console.log('Refreshing Scraping data...')
-      // Implementar refresh dos dados
-    },
     syncData() {
-      console.log('Synchronizing Scraping data...')
-      // Implementar sincronização
+      console.log('Sincronizando dados dos scrapers...')
+      // Implementar lógica de sincronização
+    },
+    refreshData() {
+      console.log('Atualizando dados dos scrapers...')
+      // Implementar lógica de atualização
     }
   }
 }
 </script>
 
 <style scoped>
-.sites-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+/* Estilos específicos do ScrapingView mantidos */
+.balance-display {
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
-.site-item {
+.balance-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #10b981;
+}
+
+.balance-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.balance-details {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+
+.detail-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.scrapers-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scraper-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
-.site-icon {
-  font-size: 1.5rem;
-  color: #3b82f6;
+.scraper-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d1fae5;
+  color: #10b981;
+  flex-shrink: 0;
 }
 
-.site-details {
+.scraper-details {
   flex: 1;
 }
 
-.site-name {
+.scraper-name {
   font-weight: 600;
-  color: #e2e8f0;
+  color: #1f2937;
   margin-bottom: 0.25rem;
 }
 
-.site-status {
+.scraper-status {
   font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
-  margin-bottom: 0.25rem;
   display: inline-block;
+  margin-bottom: 0.25rem;
 }
 
-.site-status.online {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+.scraper-status.online {
+  background-color: #d1fae5;
+  color: #10b981;
 }
 
-.site-status.offline {
-  background: rgba(239, 68, 68, 0.1);
+.scraper-status.offline {
+  background-color: #fee2e2;
   color: #ef4444;
 }
 
-.site-metrics {
+.scraper-metrics {
   display: flex;
   gap: 1rem;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
@@ -388,15 +419,22 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
 .metric-icon {
-  font-size: 1.5rem;
-  color: #3b82f6;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d1fae5;
+  color: #10b981;
+  flex-shrink: 0;
 }
 
 .metric-details {
@@ -405,14 +443,14 @@ export default {
 
 .metric-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #e2e8f0;
+  font-weight: bold;
+  color: #10b981;
+  margin-bottom: 0.25rem;
 }
 
 .metric-label {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  margin-top: 0.25rem;
+  color: #6b7280;
+  font-size: 0.75rem;
 }
 
 .config-list {
@@ -422,122 +460,27 @@ export default {
 }
 
 .config-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  border: 1px solid #475569;
+  background-color: #f9fafb;
 }
 
-.config-label {
-  color: #e2e8f0;
+.config-name {
   font-weight: 600;
-  flex: 1;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
 .config-value {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  flex: 2;
-  text-align: center;
-}
-
-.config-status {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  flex: 1;
-  text-align: center;
-}
-
-.config-status.online {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.config-status.offline {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.logs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.log-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #475569;
-}
-
-.log-item.success {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.log-item.info {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.log-item.warning {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.log-item.error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.log-icon {
-  font-size: 1rem;
-  margin-top: 0.125rem;
-}
-
-.log-item.success .log-icon {
-  color: #22c55e;
-}
-
-.log-item.info .log-icon {
-  color: #3b82f6;
-}
-
-.log-item.warning .log-icon {
-  color: #f59e0b;
-}
-
-.log-item.error .log-icon {
-  color: #ef4444;
-}
-
-.log-content {
-  flex: 1;
-}
-
-.log-title {
-  font-weight: 600;
-  color: #e2e8f0;
+  color: #10b981;
+  font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
-.log-message {
-  color: #94a3b8;
+.config-description {
+  color: #6b7280;
   font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-}
-
-.log-time {
-  color: #64748b;
-  font-size: 0.75rem;
 }
 </style>
 

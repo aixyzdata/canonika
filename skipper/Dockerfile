@@ -32,5 +32,5 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'wait' >> /start.sh && \
     chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 3702
 CMD ["/start.sh"] 

@@ -1,0 +1,686 @@
+<template>
+  <div class="tollgate-view">
+    <!-- View Header -->
+    <div class="view-header">
+      <div class="view-title">
+        <h2>Beacon - Plataforma de Comunicação</h2>
+        <span class="view-subtitle">Sistema integrado de sinalização e comunicação</span>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator online"></div>
+        <span>Plataforma Online</span>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-primary">
+          <i class="fas fa-sync"></i>
+          Atualizar Status
+        </button>
+      </div>
+    </div>
+
+    <!-- View Content -->
+    <div class="view-content">
+      <!-- Status dos Serviços -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-broadcast-tower"></i>
+            </div>
+            <div class="card-title">
+              <h4>WebSocket</h4>
+              <span class="card-subtitle">Comunicação em tempo real</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">1.2K</span>
+                <span class="metric-label">Conexões</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">45ms</span>
+                <span class="metric-label">Latência</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">99.9%</span>
+                <span class="metric-label">Uptime</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-satellite"></i>
+            </div>
+            <div class="card-title">
+              <h4>REST API</h4>
+              <span class="card-subtitle">Endpoints HTTP</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">850</span>
+                <span class="metric-label">Req/min</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">12ms</span>
+                <span class="metric-label">Response</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">0.1%</span>
+                <span class="metric-label">Erro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div class="card-title">
+              <h4>Push Notifications</h4>
+              <span class="card-subtitle">Alertas e notificações</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">24</span>
+                <span class="metric-label">Ativos</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">156</span>
+                <span class="metric-label">Enviados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">98%</span>
+                <span class="metric-label">Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Serviços Adicionais -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="card-title">
+              <h4>Email Service</h4>
+              <span class="card-subtitle">Comunicação por email</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge warning">Manutenção</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">89</span>
+                <span class="metric-label">Enviados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">95%</span>
+                <span class="metric-label">Entrega</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">2min</span>
+                <span class="metric-label">Delay</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-sms"></i>
+            </div>
+            <div class="card-title">
+              <h4>SMS Gateway</h4>
+              <span class="card-subtitle">Mensagens SMS</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge offline">Offline</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">0</span>
+                <span class="metric-label">Ativos</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">--</span>
+                <span class="metric-label">Status</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">--</span>
+                <span class="metric-label">Conexão</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="card-title">
+              <h4>Voice Service</h4>
+              <span class="card-subtitle">Chamadas de voz</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge online">Ativo</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <span class="metric-value">3</span>
+                <span class="metric-label">Ativas</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">12</span>
+                <span class="metric-label">Chamadas</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">4.2s</span>
+                <span class="metric-label">Média</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas -->
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="card-title">
+              <h4>Ações Rápidas</h4>
+              <span class="card-subtitle">Controles principais</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="action-buttons">
+              <button class="btn btn-primary">
+                <i class="fas fa-play"></i>
+                Iniciar Todos
+              </button>
+              <button class="btn btn-secondary">
+                <i class="fas fa-pause"></i>
+                Pausar Sistema
+              </button>
+              <button class="btn btn-info">
+                <i class="fas fa-cog"></i>
+                Configurações
+              </button>
+              <button class="btn btn-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Teste de Emergência
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-history"></i>
+            </div>
+            <div class="card-title">
+              <h4>Atividade Recente</h4>
+              <span class="card-subtitle">Últimas operações</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon success">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">WebSocket: Nova conexão estabelecida</div>
+                  <div class="activity-time">Há 2 minutos</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon info">
+                  <i class="fas fa-info"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">Push Notification: 15 alertas enviados</div>
+                  <div class="activity-time">Há 5 minutos</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon warning">
+                  <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">SMS Gateway: Falha de conexão</div>
+                  <div class="activity-time">Há 15 minutos</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon success">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">Voice Service: Chamada finalizada</div>
+                  <div class="activity-time">Há 1 hora</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'HomeView',
+  data() {
+    return {
+      // Dados do componente
+    }
+  },
+  methods: {
+    // Métodos do componente
+  }
+}
+</script>
+
+<style scoped>
+/* Estilos específicos do HomeView */
+.tollgate-view {
+  padding: 2rem;
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.view-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%);
+  animation: glow-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.view-title h2 {
+  color: #e2e8f0;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.view-subtitle {
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.view-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 0.5rem;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.view-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.view-actions .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.view-actions .btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.view-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.view-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.card-title {
+  flex: 1;
+}
+
+.card-title h4 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.card-subtitle {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.online {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge.offline {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.card-content {
+  color: #e2e8f0;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  border: 1px solid #475569;
+}
+
+.btn-secondary:hover {
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.btn-info {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.btn-info:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+.btn-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+}
+
+.activity-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.activity-icon.success {
+  background: #10b981;
+}
+
+.activity-icon.info {
+  background: #3b82f6;
+}
+
+.activity-icon.warning {
+  background: #f59e0b;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  color: #e2e8f0;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.activity-time {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+@keyframes glow-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style> 

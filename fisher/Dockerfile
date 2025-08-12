@@ -18,7 +18,7 @@ COPY api/ .
 RUN mkdir -p data/cnpj cache
 
 # Expor porta
-EXPOSE 7724
+EXPOSE 3706
 
 # Comando para iniciar a aplicação
 CMD ["python", "main.py"] 

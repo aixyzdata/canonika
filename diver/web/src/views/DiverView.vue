@@ -1,115 +1,127 @@
 <template>
-  <CanonikaViewTemplate
-    title="Diver"
-    description="Tripulante de Consulta Canônica"
-    header-icon="fas fa-search"
-    status-text="ONLINE"
-    :primary-action="{
-      text: 'Consultar Produto',
-      icon: 'fas fa-search',
-      handler: openConsulta
-    }"
-    @refresh="refreshData"
-  >
-    <div class="service-cards">
-      <!-- Consultas Realizadas -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Consultas Realizadas</h3>
-          <div class="card-icon">
-            <i class="fas fa-search"></i>
-          </div>
+  <div class="canonika-view">
+    <div class="view-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="fas fa-search"></i>
         </div>
-        <div class="card-content">
-          <div class="balance-display">
-            <div class="balance-value">{{ config.metrics[0].value }}</div>
-            <div class="balance-label">{{ config.metrics[0].label }}</div>
-          </div>
-          <div class="balance-details">
-            <div class="detail-item">
-              <span class="detail-label">Produtos Encontrados:</span>
-              <span class="detail-value">{{ config.metrics[1].value }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Empresas Cadastradas:</span>
-              <span class="detail-value">{{ config.metrics[2].value }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Taxa de Sucesso:</span>
-              <span class="detail-value">{{ config.metrics[3].value }}</span>
-            </div>
-          </div>
+        <div class="header-text">
+          <h1>Diver</h1>
+          <p>Tripulante de Consulta Canônica</p>
+        </div>
+        <div class="header-status">
+          <span class="status-badge online">ONLINE</span>
         </div>
       </div>
-
-      <!-- Atividades Recentes -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Atividades Recentes</h3>
-          <div class="card-icon">
-            <i class="fas fa-history"></i>
+      <div class="header-actions">
+        <button class="btn btn-primary" @click="openConsulta">
+          <i class="fas fa-search"></i>
+          Consultar Produto
+        </button>
+      </div>
+    </div>
+    
+    <div class="view-content">
+      <div class="service-cards">
+        <!-- Consultas Realizadas -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Consultas Realizadas</h3>
+            <div class="card-icon">
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="balance-display">
+              <div class="balance-value">{{ config.metrics[0].value }}</div>
+              <div class="balance-label">{{ config.metrics[0].label }}</div>
+            </div>
+            <div class="balance-details">
+              <div class="detail-item">
+                <span class="detail-label">Produtos Encontrados:</span>
+                <span class="detail-value">{{ config.metrics[1].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Empresas Cadastradas:</span>
+                <span class="detail-value">{{ config.metrics[2].value }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Taxa de Sucesso:</span>
+                <span class="detail-value">{{ config.metrics[3].value }}</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div class="transaction-list">
-            <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
-              <div class="transaction-icon success">
-                <i :class="activity.icon"></i>
-              </div>
-              <div class="transaction-details">
-                <div class="transaction-title">{{ activity.title }}</div>
-                <div class="transaction-amount success">
-                  {{ activity.description }}
+
+        <!-- Atividades Recentes -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Atividades Recentes</h3>
+            <div class="card-icon">
+              <i class="fas fa-history"></i>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="transaction-list">
+              <div v-for="activity in config.recentActivity" :key="activity.id" class="transaction-item">
+                <div class="transaction-icon success">
+                  <i :class="activity.icon"></i>
                 </div>
-                <div class="transaction-time">{{ activity.time }}</div>
+                <div class="transaction-details">
+                  <div class="transaction-title">{{ activity.title }}</div>
+                  <div class="transaction-amount success">
+                    {{ activity.description }}
+                  </div>
+                  <div class="transaction-time">{{ activity.time }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Ferramentas Disponíveis -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Ferramentas</h3>
-          <div class="card-icon">
-            <i class="fas fa-tools"></i>
+        <!-- Ferramentas Disponíveis -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Ferramentas</h3>
+            <div class="card-icon">
+              <i class="fas fa-tools"></i>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="plans-grid">
-            <div 
-              v-for="action in config.actions" 
-              :key="action.id" 
-              class="plan-item"
-              @click="action.handler"
-            >
-              <div class="plan-name">{{ action.name }}</div>
-              <div class="plan-price">{{ action.description }}</div>
-              <div class="plan-credits">{{ action.status }}</div>
+          <div class="card-content">
+            <div class="plans-grid">
+              <div 
+                v-for="action in config.actions" 
+                :key="action.id" 
+                class="plan-item"
+                @click="action.handler"
+              >
+                <div class="plan-name">{{ action.name }}</div>
+                <div class="plan-price">{{ action.description }}</div>
+                <div class="plan-credits">{{ action.status }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Status do Sistema -->
-      <div class="service-card">
-        <div class="card-header">
-          <h3>Status do Sistema</h3>
-          <div class="card-icon">
-            <i class="fas fa-server"></i>
+        <!-- Status do Sistema -->
+        <div class="service-card">
+          <div class="card-header">
+            <h3>Status do Sistema</h3>
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="alerts-list">
-            <div v-for="status in config.systemStatus" :key="status.id" class="alert-item info">
-              <div class="alert-icon">
-                <i class="fas fa-check"></i>
-              </div>
-              <div class="alert-content">
-                <div class="alert-title">{{ status.name }}</div>
-                <div class="alert-message">{{ status.description }}</div>
-                <div class="alert-time">{{ status.port }}</div>
+          <div class="card-content">
+            <div class="alerts-list">
+              <div v-for="status in config.systemStatus" :key="status.id" class="alert-item info">
+                <div class="alert-icon">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="alert-content">
+                  <div class="alert-title">{{ status.name }}</div>
+                  <div class="alert-message">{{ status.description }}</div>
+                  <div class="alert-time">{{ status.port }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -170,18 +182,14 @@
         </div>
       </div>
     </div>
-  </CanonikaViewTemplate>
+  </div>
 </template>
 
 <script>
 import { serviceConfigs } from '../../../../shared/config/status-configs.js'
-import CanonikaViewTemplate from '../../../../shared/templates/CanonikaViewTemplate.vue'
 
 export default {
   name: 'DiverView',
-  components: {
-    CanonikaViewTemplate
-  },
   data() {
     return {
       config: serviceConfigs.diver,

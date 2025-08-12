@@ -1,0 +1,444 @@
+/* Canonika Theme - Beacon */
+
+:root {
+  /* Canonika Color Palette */
+  --canonika-primary: #3b82f6;
+  --canonika-primary-dark: #1d4ed8;
+  --canonika-secondary: #64748b;
+  --canonika-success: #10b981;
+  --canonika-warning: #f59e0b;
+  --canonika-danger: #ef4444;
+  --canonika-info: #06b6d4;
+  --canonika-light: #f8fafc;
+  --canonika-dark: #0f172a;
+  --canonika-gray: #94a3b8;
+  --canonika-green: #00bfa6;
+  
+  /* Canonika Gradients */
+  --canonika-gradient-primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --canonika-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --canonika-gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --canonika-gradient-header: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  
+  /* Canonika Spacing */
+  --canonika-spacing-xs: 0.25rem;
+  --canonika-spacing-sm: 0.5rem;
+  --canonika-spacing-md: 1rem;
+  --canonika-spacing-lg: 1.5rem;
+  --canonika-spacing-xl: 2rem;
+  --canonika-spacing-xxl: 3rem;
+  
+  /* Canonika Border Radius */
+  --canonika-border-radius-sm: 0.25rem;
+  --canonika-border-radius-md: 0.5rem;
+  --canonika-border-radius-lg: 0.75rem;
+  --canonika-border-radius-xl: 1rem;
+  
+  /* Canonika Shadows */
+  --canonika-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --canonika-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --canonika-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --canonika-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Canonika Transitions */
+  --canonika-transition-fast: 0.15s ease-in-out;
+  --canonika-transition-normal: 0.3s ease-in-out;
+  --canonika-transition-slow: 0.5s ease-in-out;
+  --canonika-transition: 0.3s ease-in-out;
+  
+  /* Canonika Typography */
+  --canonika-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --canonika-font-size-xs: 0.75rem;
+  --canonika-font-size-sm: 0.875rem;
+  --canonika-font-size-base: 1rem;
+  --canonika-font-size-lg: 1.125rem;
+  --canonika-font-size-xl: 1.25rem;
+  --canonika-font-size-xxl: 1.5rem;
+  
+  /* Canonika Z-Index */
+  --canonika-z-dropdown: 1000;
+  --canonika-z-sticky: 1020;
+  --canonika-z-fixed: 1030;
+  --canonika-z-modal-backdrop: 1040;
+  --canonika-z-modal: 1050;
+  --canonika-z-popover: 1060;
+  --canonika-z-tooltip: 1070;
+  --canonika-z-toast: 1080;
+}
+
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--canonika-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--canonika-gradient-bg);
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* Canonika Modal */
+.canonika-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--canonika-z-modal-backdrop);
+}
+
+.canonika-modal {
+  background: var(--canonika-gradient-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--canonika-border-radius-lg);
+  box-shadow: var(--canonika-shadow-xl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: canonika-fade-in 0.3s ease-out;
+}
+
+.canonika-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--canonika-spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.canonika-modal-title {
+  font-size: var(--canonika-font-size-xl);
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.canonika-modal-icon {
+  color: var(--canonika-primary);
+  font-size: var(--canonika-font-size-lg);
+}
+
+.canonika-modal-body {
+  padding: var(--canonika-spacing-lg);
+}
+
+/* Canonika Form */
+.canonika-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-sm);
+}
+
+.canonika-section-subheader {
+  margin-bottom: var(--canonika-spacing-sm);
+}
+
+.canonika-section-subheader h4 {
+  color: #e2e8f0;
+  font-size: var(--canonika-font-size-sm);
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.canonika-section-subheader p {
+  color: #94a3b8;
+  font-size: var(--canonika-font-size-xs);
+  margin: 0;
+}
+
+.canonika-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-xs);
+}
+
+.canonika-form-label {
+  color: #e2e8f0;
+  font-size: var(--canonika-font-size-sm);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-xs);
+}
+
+.canonika-form-label i {
+  color: var(--canonika-primary);
+  font-size: var(--canonika-font-size-xs);
+}
+
+.canonika-form-input,
+.canonika-form-textarea,
+.canonika-form-select {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--canonika-border-radius-md);
+  color: #e2e8f0;
+  padding: var(--canonika-spacing-sm) var(--canonika-spacing-md);
+  font-size: var(--canonika-font-size-sm);
+  transition: var(--canonika-transition);
+}
+
+.canonika-form-input:focus,
+.canonika-form-textarea:focus,
+.canonika-form-select:focus {
+  outline: none;
+  border-color: var(--canonika-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.canonika-form-input::placeholder,
+.canonika-form-textarea::placeholder {
+  color: #64748b;
+}
+
+.canonika-form-check {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-sm);
+}
+
+.canonika-form-check-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--canonika-primary);
+}
+
+.canonika-form-check-label {
+  color: #e2e8f0;
+  font-size: var(--canonika-font-size-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-xs);
+}
+
+.canonika-form-check-label i {
+  color: var(--canonika-primary);
+  font-size: var(--canonika-font-size-xs);
+}
+
+.canonika-form-actions {
+  display: flex;
+  gap: var(--canonika-spacing-sm);
+  justify-content: flex-end;
+  margin-top: var(--canonika-spacing-lg);
+}
+
+/* Canonika Utilities */
+.canonika-text-sm {
+  font-size: var(--canonika-font-size-sm);
+}
+
+.canonika-text-muted {
+  color: #94a3b8;
+}
+
+/* Canonika Responsive */
+@media (max-width: 768px) {
+  .canonika-modal {
+    width: 95%;
+    margin: var(--canonika-spacing-md);
+  }
+  
+  .canonika-form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .canonika-modal-header {
+    padding: var(--canonika-spacing-md);
+  }
+  
+  .canonika-modal-body {
+    padding: var(--canonika-spacing-md);
+  }
+}
+
+/* Canonika Cards */
+.canonika-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--canonika-border-radius-lg);
+  padding: var(--canonika-spacing-lg);
+  box-shadow: var(--canonika-shadow-sm);
+  transition: var(--canonika-transition);
+}
+
+.canonika-card:hover {
+  box-shadow: var(--canonika-shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--canonika-spacing-md);
+}
+
+.card-title {
+  color: #e2e8f0;
+  font-size: var(--canonika-font-size-lg);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Canonika Buttons */
+.canonika-btn {
+  background: var(--canonika-gradient-primary);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: var(--canonika-spacing-sm) var(--canonika-spacing-lg);
+  border-radius: var(--canonika-border-radius-md);
+  transition: var(--canonika-transition);
+  box-shadow: var(--canonika-shadow-sm);
+  cursor: pointer;
+  font-size: var(--canonika-font-size-sm);
+}
+
+.canonika-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--canonika-shadow-lg);
+}
+
+.canonika-btn-secondary {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+}
+
+.canonika-btn-secondary:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+/* Canonika Form Styles */
+.canonika-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-xs);
+}
+
+.form-label {
+  color: #e2e8f0;
+  font-size: var(--canonika-font-size-sm);
+  font-weight: 500;
+}
+
+.form-input {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--canonika-border-radius-md);
+  color: #e2e8f0;
+  padding: var(--canonika-spacing-sm) var(--canonika-spacing-md);
+  font-size: var(--canonika-font-size-sm);
+  transition: var(--canonika-transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--canonika-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: #64748b;
+}
+
+/* Canonika Status Indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--canonika-spacing-xs);
+  padding: var(--canonika-spacing-xs) var(--canonika-spacing-sm);
+  border-radius: var(--canonika-border-radius-sm);
+  font-size: var(--canonika-font-size-xs);
+  font-weight: 500;
+}
+
+.status-online {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--canonika-success);
+}
+
+.status-offline {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--canonika-danger);
+}
+
+.status-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--canonika-warning);
+}
+
+/* Canonika Responsive */
+@media (max-width: 768px) {
+  .canonika-sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    height: calc(100vh - 60px);
+    z-index: var(--canonika-z-fixed);
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-open .canonika-sidebar {
+    transform: translateX(0);
+  }
+  
+  .header-content {
+    padding: var(--canonika-spacing-sm) var(--canonika-spacing-md);
+  }
+}
+
+/* Canonika Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+}
+
+.glow {
+  animation: glow 2s ease-in-out infinite alternate;
+} 

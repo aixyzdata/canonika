@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Redirecionamento - Template</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Redirecionamento - Template Service</h1>
+    
+    <div id="results">
+        <div class="test-result info">
+            <strong>🔍 Iniciando testes...</strong>
+        </div>
+    </div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        // Teste 1: Verificar se o Template está acessível
+        addResult('🔍 Teste 1: Verificando acesso ao Template Service...');
+        
+        fetch('http://localhost:3790')
+            .then(response => {
+                if (response.ok) {
+                    addResult('✅ Template Service (3790) - ACESSÍVEL', 'success');
+                } else {
+                    addResult('❌ Template Service (3790) - ERRO: ' + response.status, 'error');
+                }
+            })
+            .catch(error => {
+                addResult('❌ Template Service (3790) - ERRO: ' + error.message, 'error');
+            });
+
+        // Teste 2: Verificar se o Quarter está acessível
+        addResult('🔍 Teste 2: Verificando acesso ao Quarter Service...');
+        
+        fetch('http://localhost:3700')
+            .then(response => {
+                if (response.ok) {
+                    addResult('✅ Quarter Service (3700) - ACESSÍVEL', 'success');
+                } else {
+                    addResult('❌ Quarter Service (3700) - ERRO: ' + response.status, 'error');
+                }
+            })
+            .catch(error => {
+                addResult('❌ Quarter Service (3700) - ERRO: ' + error.message, 'error');
+            });
+
+        // Teste 3: Simular redirecionamento
+        addResult('🔍 Teste 3: Simulando redirecionamento...');
+        
+        const quarterUrl = 'http://localhost:3700';
+        const currentUrl = `http://localhost:3790${window.location.pathname}${window.location.search}`;
+        const redirectTo = encodeURIComponent(currentUrl);
+        const quarterRedirectUrl = `${quarterUrl}?redirect_to=${redirectTo}`;
+        
+        addResult(`📍 URL atual: ${currentUrl}`, 'info');
+        addResult(`🔄 URL de redirecionamento: ${quarterRedirectUrl}`, 'info');
+        
+        // Teste 4: Verificar se o JavaScript está carregado
+        addResult('🔍 Teste 4: Verificando JavaScript do Template...');
+        
+        fetch('http://localhost:3790/assets/index-ade2d4f7.js')
+            .then(response => {
+                if (response.ok) {
+                    addResult('✅ JavaScript do Template - CARREGADO', 'success');
+                } else {
+                    addResult('❌ JavaScript do Template - ERRO: ' + response.status, 'error');
+                }
+            })
+            .catch(error => {
+                addResult('❌ JavaScript do Template - ERRO: ' + error.message, 'error');
+            });
+
+        // Teste 5: Verificar se há redirecionamento automático
+        addResult('🔍 Teste 5: Verificando redirecionamento automático...');
+        
+        setTimeout(() => {
+            const currentLocation = window.location.href;
+            if (currentLocation.includes('localhost:3700')) {
+                addResult('✅ Redirecionamento automático - FUNCIONOU', 'success');
+            } else {
+                addResult('⚠️ Redirecionamento automático - NÃO DETECTADO (pode ser normal se já estiver autenticado)', 'info');
+            }
+        }, 3000);
+
+        addResult('🎯 Testes concluídos! Verifique os resultados acima.', 'info');
+    </script>
+</body>
+</html> 

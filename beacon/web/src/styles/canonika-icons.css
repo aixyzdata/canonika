@@ -1,0 +1,141 @@
+/* Canonika Icons - Ícones específicos para cada módulo */
+
+/* Ícones dos módulos */
+.module-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+  border-radius: 50%;
+  background: rgba(0, 191, 166, 0.1);
+  border: 1px solid rgba(0, 191, 166, 0.3);
+  transition: all 0.3s ease;
+}
+
+.module-icon:hover {
+  background: rgba(0, 191, 166, 0.2);
+  border-color: rgba(0, 191, 166, 0.5);
+  transform: scale(1.1);
+}
+
+/* Ícones específicos por módulo */
+.icon-harbor::before {
+  content: "🏠";
+}
+
+.icon-skipper::before {
+  content: "🚢";
+}
+
+.icon-wayfinder::before {
+  content: "🧭";
+}
+
+.icon-mapmaker::before {
+  content: "🗺️";
+}
+
+.icon-quartermaster::before {
+  content: "⚓";
+}
+
+.icon-quarter::before {
+  content: "⚓";
+}
+
+.icon-ledger::before {
+  content: "📊";
+}
+
+.icon-seagull::before {
+  content: "🕊️";
+}
+
+.icon-beacon::before {
+  content: "🔦";
+}
+
+.icon-dock::before {
+  content: "⚓";
+}
+
+.icon-guardian::before {
+  content: "🛡️";
+}
+
+.icon-echo::before {
+  content: "📢";
+}
+
+.icon-tollgate::before {
+  content: "🚪";
+}
+
+/* Título com ícone */
+.module-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--canonika-white);
+  margin: 0;
+}
+
+.module-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Variações de tamanho */
+.module-icon.small {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.module-icon.large {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+/* Animações especiais */
+.module-icon.pulse {
+  animation: icon-pulse 2s infinite;
+}
+
+@keyframes icon-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.module-icon.glow {
+  animation: icon-glow 2s infinite;
+}
+
+@keyframes icon-glow {
+  0% { box-shadow: 0 0 5px rgba(0, 191, 166, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(0, 191, 166, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(0, 191, 166, 0.3); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .module-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.125rem;
+    margin-right: 0.5rem;
+  }
+  
+  .module-title {
+    font-size: 1.25rem;
+  }
+} 

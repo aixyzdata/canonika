@@ -10,10 +10,12 @@ networks:
 services:
   # Quarter - Ponto de Entrada
   quarter:
-    build: ./quarter
+    build:
+      context: .
+      dockerfile: ./quarter/Dockerfile
     container_name: canonika_quarter
     ports:
-      - "80:80"
+      - "3700:80"
       - "8000:8000"
       - "5174:5174"
     networks:
@@ -48,7 +50,7 @@ services:
     networks:
       - canonika-network
     environment:
-      - DEV_MODE=false
+      - DEV_MODE=true
       - QUARTER_URL=http://quarter:80
       - HARBOR_URL=http://harbor:3701
       - GUARDIAN_URL=http://guardian:3705
@@ -126,7 +128,9 @@ services:
 
   # Beacon - Monitoramento
   beacon:
-    build: ./beacon
+    build:
+      context: .
+      dockerfile: ./beacon/Dockerfile
     container_name: canonika_beacon
     ports:
       - "3703:3703"
@@ -135,12 +139,44 @@ services:
     networks:
       - canonika-network
     environment:
-      - DEV_MODE=false
+      - DEV_MODE=true
       - QUARTER_URL=http://quarter:80
       - HARBOR_URL=http://harbor:3701
       - GUARDIAN_URL=http://guardian:3705
       - SKIPPER_URL=http://skipper:3702
       - BEACON_URL=http://beacon:3703
+      - FISHER_URL=http://fisher:3706
+      - TOLLGATE_URL=http://tollgate:3707
+      - LEDGER_URL=http://ledger:3708
+      - KEYCLOAK_URL=http://keycloak:8080
+      - POSTGRES_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+      - OPA_URL=http://opa:8181
+      - CLICKHOUSE_URL=http://clickhouse:8123
+    depends_on:
+      - quarter
+      - clickhouse
+
+  # Beacon Old - Versão de Referência
+  beacon_old:
+    build:
+      context: .
+      dockerfile: ./beacon_old/Dockerfile
+    container_name: canonika_beacon_old
+    ports:
+      - "3799:3799"
+      - "8004:8004"
+      - "5179:5179"
+    networks:
+      - canonika-network
+    environment:
+      - DEV_MODE=true
+      - QUARTER_URL=http://quarter:80
+      - HARBOR_URL=http://harbor:3701
+      - GUARDIAN_URL=http://guardian:3705
+      - SKIPPER_URL=http://skipper:3702
+      - BEACON_URL=http://beacon:3703
+      - BEACON_OLD_URL=http://beacon_old:3799
       - FISHER_URL=http://fisher:3706
       - TOLLGATE_URL=http://tollgate:3707
       - LEDGER_URL=http://ledger:3708
@@ -313,6 +349,35 @@ services:
       - CLICKHOUSE_PASSWORD=canonika123
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+
+  # Template - Layout Oficial
+  template:
+    build:
+      context: ./template/api
+      dockerfile: Dockerfile
+    container_name: canonika_template
+    ports:
+      - "8015:8015"
+    networks:
+      - canonika-network
+    environment:
+      - DATABASE_URL=postgresql://canonika:canonika123@postgres:5432/canonika
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  template-web:
+    build:
+      context: .
+      dockerfile: ./template/web/Dockerfile
+    container_name: canonika_template_web
+    ports:
+      - "3790:80"
+    depends_on:
+      - template
+    networks:
+      - canonika-network
 
 volumes:
   postgres_data:

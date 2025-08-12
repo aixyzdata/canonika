@@ -4,8 +4,13 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    host: true,
-    port: 3790,
-    strictPort: true
+    port: 3790
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "../../shared/styles/scss/main";`
+      }
+    }
   }
 })

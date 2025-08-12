@@ -1,0 +1,552 @@
+/* ========================================
+   SISTEMA UNIFICADO PARA VIEWS DE STATUS
+   ======================================== */
+
+/* ========================================
+   HEADER PADRÃO PARA VIEWS DE STATUS
+   ======================================== */
+
+.canonika-status-header {
+  background: var(--canonika-gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius-lg);
+  padding: var(--canonika-spacing-xl);
+  margin-bottom: var(--canonika-spacing-xl);
+  box-shadow: var(--canonika-shadow);
+}
+
+.canonika-status-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--canonika-spacing-lg);
+}
+
+.canonika-status-header-info {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-lg);
+  flex: 1;
+}
+
+.canonika-service-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, var(--canonika-green), #00a085);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-white);
+  font-size: var(--canonika-font-size-lg);
+  box-shadow: var(--canonika-shadow);
+}
+
+.canonika-service-info {
+  flex: 1;
+}
+
+.canonika-service-title {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-sm);
+  margin-bottom: var(--canonika-spacing-xs);
+}
+
+.canonika-service-name {
+  font-size: var(--canonika-font-size-2xl);
+  font-weight: var(--canonika-font-weight-bold);
+  color: var(--canonika-white);
+  margin: 0;
+}
+
+.canonika-service-description {
+  color: var(--canonika-gray);
+  font-size: var(--canonika-font-size-base);
+  margin: 0;
+}
+
+.canonika-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-sm);
+  padding: var(--canonika-spacing-sm) var(--canonika-spacing-md);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--canonika-border-radius);
+  color: var(--canonika-success);
+  font-weight: var(--canonika-font-weight-semibold);
+  font-size: var(--canonika-font-size-sm);
+}
+
+.canonika-status-indicator.offline {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: var(--canonika-error);
+}
+
+.canonika-status-indicator.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.2);
+  color: var(--canonika-warning);
+}
+
+.canonika-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  animation: canonika-pulse 2s infinite;
+}
+
+.canonika-status-actions {
+  display: flex;
+  gap: var(--canonika-spacing-sm);
+  align-items: center;
+}
+
+/* ========================================
+   CARDS DE MÉTRICAS PADRÃO
+   ======================================== */
+
+.canonika-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--canonika-spacing-lg);
+  margin-bottom: var(--canonika-spacing-xl);
+}
+
+.canonika-metric-card {
+  background: var(--canonika-gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius-lg);
+  padding: var(--canonika-spacing-xl);
+  transition: var(--canonika-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.canonika-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--canonika-shadow-lg);
+  border-color: var(--canonika-green);
+}
+
+.canonika-metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--canonika-green), var(--canonika-blue));
+}
+
+.canonika-metric-header {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-md);
+  margin-bottom: var(--canonika-spacing-lg);
+}
+
+.canonika-metric-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, var(--canonika-green), #00a085);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-white);
+  font-size: var(--canonika-font-size-lg);
+}
+
+.canonika-metric-title {
+  font-size: var(--canonika-font-size-base);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0;
+}
+
+.canonika-metric-value {
+  font-size: var(--canonika-font-size-3xl);
+  font-weight: var(--canonika-font-weight-bold);
+  color: var(--canonika-white);
+  margin: 0 0 var(--canonika-spacing-xs) 0;
+  line-height: 1;
+}
+
+.canonika-metric-label {
+  font-size: var(--canonika-font-size-sm);
+  color: var(--canonika-gray);
+  margin: 0;
+}
+
+/* ========================================
+   CARDS DE SISTEMA PADRÃO
+   ======================================== */
+
+.canonika-system-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--canonika-spacing-lg);
+  margin-bottom: var(--canonika-spacing-xl);
+}
+
+.canonika-system-card {
+  background: var(--canonika-gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius-lg);
+  padding: var(--canonika-spacing-xl);
+  transition: var(--canonika-transition);
+}
+
+.canonika-system-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--canonika-shadow-lg);
+}
+
+.canonika-system-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-sm);
+  margin-bottom: var(--canonika-spacing-lg);
+  padding-bottom: var(--canonika-spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.canonika-system-card-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-green);
+  font-size: var(--canonika-font-size-lg);
+}
+
+.canonika-system-card-title {
+  font-size: var(--canonika-font-size-lg);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0;
+}
+
+.canonika-system-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-system-item {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-md);
+  padding: var(--canonika-spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--canonika-border-radius);
+  border-left: 3px solid var(--canonika-success);
+  transition: var(--canonika-transition);
+}
+
+.canonika-system-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.canonika-system-item.offline {
+  border-left-color: var(--canonika-error);
+}
+
+.canonika-system-item.warning {
+  border-left-color: var(--canonika-warning);
+}
+
+.canonika-system-status-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--canonika-success);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  animation: canonika-pulse 2s infinite;
+}
+
+.canonika-system-status-dot.offline {
+  background: var(--canonika-error);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.canonika-system-status-dot.warning {
+  background: var(--canonika-warning);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.canonika-system-info {
+  flex: 1;
+}
+
+.canonika-system-name {
+  font-size: var(--canonika-font-size-base);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0 0 var(--canonika-spacing-xs) 0;
+}
+
+.canonika-system-description {
+  font-size: var(--canonika-font-size-sm);
+  color: var(--canonika-gray);
+  margin: 0;
+}
+
+.canonika-system-port {
+  font-size: var(--canonika-font-size-xs);
+  color: var(--canonika-gray);
+  font-family: 'Courier New', monospace;
+}
+
+/* ========================================
+   CARDS DE ATIVIDADE PADRÃO
+   ======================================== */
+
+.canonika-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--canonika-spacing-md);
+  padding: var(--canonika-spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--canonika-border-radius);
+  transition: var(--canonika-transition);
+}
+
+.canonika-activity-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.canonika-activity-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-info);
+  font-size: var(--canonika-font-size-base);
+  flex-shrink: 0;
+}
+
+.canonika-activity-content {
+  flex: 1;
+}
+
+.canonika-activity-title {
+  font-size: var(--canonika-font-size-sm);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0 0 var(--canonika-spacing-xs) 0;
+}
+
+.canonika-activity-description {
+  font-size: var(--canonika-font-size-sm);
+  color: var(--canonika-gray);
+  margin: 0 0 var(--canonika-spacing-xs) 0;
+}
+
+.canonika-activity-time {
+  font-size: var(--canonika-font-size-xs);
+  color: var(--canonika-gray);
+  margin: 0;
+}
+
+/* ========================================
+   CARDS DE AÇÕES PADRÃO
+   ======================================== */
+
+.canonika-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--canonika-spacing-lg);
+  margin-bottom: var(--canonika-spacing-xl);
+}
+
+.canonika-action-card {
+  background: var(--canonika-gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--canonika-border-radius-lg);
+  padding: var(--canonika-spacing-xl);
+  text-align: center;
+  transition: var(--canonika-transition);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.canonika-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--canonika-shadow-lg);
+  border-color: var(--canonika-green);
+  color: inherit;
+  text-decoration: none;
+}
+
+.canonika-action-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, var(--canonika-green), #00a085);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-white);
+  font-size: var(--canonika-font-size-lg);
+  margin: 0 auto var(--canonika-spacing-md);
+}
+
+.canonika-action-title {
+  font-size: var(--canonika-font-size-base);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0 0 var(--canonika-spacing-sm) 0;
+}
+
+.canonika-action-description {
+  font-size: var(--canonika-font-size-sm);
+  color: var(--canonika-gray);
+  margin: 0;
+}
+
+/* ========================================
+   COMPONENTES ESPECÍFICOS PARA FONTES
+   ======================================== */
+
+.canonika-sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-source-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--canonika-border-radius);
+  padding: var(--canonika-spacing-md);
+  transition: var(--canonika-transition);
+}
+
+.canonika-source-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--canonika-green);
+}
+
+.canonika-source-header {
+  display: flex;
+  align-items: center;
+  gap: var(--canonika-spacing-md);
+}
+
+.canonika-source-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, var(--canonika-green), #00a085);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--canonika-white);
+  font-size: var(--canonika-font-size-base);
+  flex-shrink: 0;
+}
+
+.canonika-source-info {
+  flex: 1;
+}
+
+.canonika-source-name {
+  font-size: var(--canonika-font-size-base);
+  font-weight: var(--canonika-font-weight-semibold);
+  color: var(--canonika-white);
+  margin: 0 0 var(--canonika-spacing-xs) 0;
+}
+
+.canonika-source-type {
+  margin-bottom: var(--canonika-spacing-xs);
+}
+
+.canonika-source-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--canonika-font-size-xs);
+  color: var(--canonika-gray);
+}
+
+.canonika-source-usage {
+  color: var(--canonika-info);
+}
+
+.canonika-source-rate {
+  color: var(--canonika-success);
+  font-weight: var(--canonika-font-weight-semibold);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .canonika-status-header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--canonika-spacing-md);
+  }
+  
+  .canonika-status-header-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .canonika-status-actions {
+    justify-content: center;
+  }
+  
+  .canonika-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .canonika-system-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .canonika-actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .canonika-status-header {
+    padding: var(--canonika-spacing-lg);
+  }
+  
+  .canonika-metric-card {
+    padding: var(--canonika-spacing-lg);
+  }
+  
+  .canonika-system-card {
+    padding: var(--canonika-spacing-lg);
+  }
+  
+  .canonika-action-card {
+    padding: var(--canonika-spacing-lg);
+  }
+} 

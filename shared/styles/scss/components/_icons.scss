@@ -1,0 +1,82 @@
+// =============================================================================
+// CANONIKA DESIGN SYSTEM - ICONS
+// =============================================================================
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+}
+
+.icon-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.icon-lg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.icon-xl {
+  width: 2rem;
+  height: 2rem;
+}
+
+// Icon colors
+.icon-primary {
+  color: $primary-color;
+}
+
+.icon-secondary {
+  color: $secondary-color;
+}
+
+.icon-success {
+  color: $success;
+}
+
+.icon-warning {
+  color: $warning;
+}
+
+.icon-error {
+  color: $error;
+}
+
+.icon-info {
+  color: $info;
+}
+
+// Icon backgrounds
+.icon-bg-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  color: $white;
+  border-radius: $border-radius-sm;
+}
+
+.icon-bg-secondary {
+  background: linear-gradient(135deg, $secondary-color 0%, darken($secondary-color, 10%) 100%);
+  color: $white;
+  border-radius: $border-radius-sm;
+}
+
+.icon-bg-success {
+  background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+  color: $white;
+  border-radius: $border-radius-sm;
+}
+
+.icon-bg-warning {
+  background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+  color: $white;
+  border-radius: $border-radius-sm;
+}
+
+.icon-bg-error {
+  background: linear-gradient(135deg, $error 0%, darken($error, 10%) 100%);
+  color: $white;
+  border-radius: $border-radius-sm;
+} 

@@ -1,0 +1,418 @@
+<template>
+  <div class="tollgate-view">
+    <!-- View Header -->
+    <div class="view-header">
+      <div class="view-title">
+        <h2>SMS Gateway</h2>
+        <span class="view-subtitle">Sistema de mensagens SMS</span>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator offline"></div>
+        <span>Serviço Offline</span>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Nova Mensagem
+        </button>
+      </div>
+    </div>
+
+    <!-- View Content -->
+    <div class="view-content">
+      <div class="service-cards">
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-sms"></i>
+            </div>
+            <div class="card-title">
+              <h4>Mensagens SMS</h4>
+              <span class="card-subtitle">Histórico de envios</span>
+            </div>
+            <div class="card-actions">
+              <span class="status-badge offline">0</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="sms-list">
+              <div class="sms-item">
+                <div class="sms-icon">
+                  <i class="fas fa-sms"></i>
+                </div>
+                <div class="sms-info">
+                  <div class="sms-text">Alerta de Segurança - Sistema</div>
+                  <div class="sms-details">Para: +55 11 99999-9999 | Status: Falha | 2h atrás</div>
+                </div>
+                <div class="sms-status">
+                  <span class="status-badge offline">Falha</span>
+                </div>
+              </div>
+              <div class="sms-item">
+                <div class="sms-icon">
+                  <i class="fas fa-sms"></i>
+                </div>
+                <div class="sms-info">
+                  <div class="sms-text">Código de Verificação</div>
+                  <div class="sms-details">Para: +55 11 88888-8888 | Status: Falha | 4h atrás</div>
+                </div>
+                <div class="sms-status">
+                  <span class="status-badge offline">Falha</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-title">
+              <h4>Métricas de Entrega</h4>
+              <span class="card-subtitle">Performance do SMS</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-value">0%</span>
+                <span class="metric-label">Taxa de Entrega</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">--</span>
+                <span class="metric-label">Tempo Médio</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">0</span>
+                <span class="metric-label">Total Enviados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">100%</span>
+                <span class="metric-label">Taxa de Falha</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="card-title">
+              <h4>Configurações SMS</h4>
+              <span class="card-subtitle">Parâmetros do serviço</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="settings-form">
+              <div class="form-group">
+                <label>Provedor SMS</label>
+                <select class="form-control">
+                  <option>Twilio</option>
+                  <option>Vonage</option>
+                  <option>Zenvia</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Account SID</label>
+                <input type="text" value="" class="form-control" placeholder="Digite o SID">
+              </div>
+              <div class="form-group">
+                <label>Auth Token</label>
+                <input type="password" value="" class="form-control" placeholder="Digite o token">
+              </div>
+              <div class="form-group">
+                <label>Número Remetente</label>
+                <input type="text" value="" class="form-control" placeholder="+55 11 99999-9999">
+              </div>
+              <button class="btn btn-primary">Salvar Configurações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'SmsView'
+}
+</script>
+
+<style scoped>
+.tollgate-view {
+  padding: 2rem;
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #475569;
+}
+
+.view-title h2 {
+  color: #e2e8f0;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.view-subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.view-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-indicator.offline {
+  background: #ef4444;
+}
+
+.view-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.view-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.card-title {
+  flex: 1;
+}
+
+.card-title h4 {
+  color: #e2e8f0;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.card-subtitle {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.offline {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.card-content {
+  color: #e2e8f0;
+}
+
+.sms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sms-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+}
+
+.sms-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+}
+
+.sms-info {
+  flex: 1;
+}
+
+.sms-text {
+  color: #e2e8f0;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.sms-details {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.sms-status {
+  display: flex;
+  align-items: center;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 8px;
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-control {
+  padding: 0.75rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+  .service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style> 
