@@ -73,5 +73,3 @@ export default {
 </script>
 
 <!-- Estilos agora são gerenciados pelo SCSS compartilhado -->
-<style>
-</style> 

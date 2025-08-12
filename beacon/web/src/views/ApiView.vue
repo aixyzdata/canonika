@@ -54,10 +54,4 @@ export default {
     console.log('🔌 ApiView carregada')
   }
 }
-</script>
-
-<style scoped>
-.api-view {
-  height: 100%;
-}
-</style> 
+</script> 

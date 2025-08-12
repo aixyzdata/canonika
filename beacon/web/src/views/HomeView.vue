@@ -54,10 +54,4 @@ export default {
     console.log('🏠 HomeView carregada')
   }
 }
-</script>
-
-<style scoped>
-.home-view {
-  height: 100%;
-}
-</style> 
+</script> 

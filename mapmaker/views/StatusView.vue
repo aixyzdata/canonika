@@ -235,6 +235,3 @@ export default {
 }
 </script>
 
-<style>
-@import '../../shared/styles/canonika-view.css';
-</style> 

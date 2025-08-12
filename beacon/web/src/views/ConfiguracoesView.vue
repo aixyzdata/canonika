@@ -55,9 +55,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.configuracoes-view {
-  height: 100%;
-}
-</style>

@@ -150,10 +150,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos do Skipper, se necessário */
-</style>
 
-<style>
-@import '../../shared/styles/canonika-view.css';
-</style>

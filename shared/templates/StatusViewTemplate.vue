@@ -194,15 +194,3 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Importa o sistema de design unificado */
-@import url('../styles/design-system.css');
-@import url('../styles/status-views.css');
-
-.canonika-status-view {
-  height: 100%;
-  padding: var(--canonika-spacing-lg);
-  background: var(--canonika-gradient-primary);
-  min-height: 100vh;
-}
-</style> 

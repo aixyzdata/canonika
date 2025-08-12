@@ -33,9 +33,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.websocket-view {
-  height: 100%;
-}
-</style>
