@@ -3,7 +3,7 @@
 // =============================================================================
 
 // Import shared design system
-@import "/app/shared/styles/scss/main";
+@import "../../../shared/styles/scss/main";
 
 // Beacon-specific styles
-@import "./scss/beacon-specific"; 
+@import "./scss/_beacon-specific"; 
