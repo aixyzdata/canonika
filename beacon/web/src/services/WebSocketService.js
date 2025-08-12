@@ -587,7 +587,8 @@ class WebSocketService {
   }
 }
 
-// Instância singleton
-const webSocketService = new WebSocketService();
+// Exportar a classe para permitir múltiplas instâncias
+export default WebSocketService;
 
-export default webSocketService; 
+// Também exportar uma instância singleton para uso global
+export const webSocketService = new WebSocketService(); 
