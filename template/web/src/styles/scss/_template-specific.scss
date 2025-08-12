@@ -173,12 +173,17 @@
 }
 
 .section-title {
-  font-size: 1.25rem;
+  color: #64748b;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  transform: translateX(0);
   display: flex;
   align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .section-description {
