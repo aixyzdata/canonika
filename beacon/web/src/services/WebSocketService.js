@@ -471,6 +471,16 @@ class WebSocketService {
    */
   decodeToken(token) {
     try {
+      // Verificar se token existe
+      if (!token) {
+        console.error('Token não fornecido');
+        return {
+          id: 'unknown',
+          name: 'Unknown User',
+          email: 'unknown@example.com'
+        };
+      }
+
       // Primeiro, tentar como JWT
       if (token.includes('.')) {
         const base64Url = token.split('.')[1];
@@ -500,7 +510,9 @@ class WebSocketService {
    * Obter token armazenado
    */
   getStoredToken() {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    return localStorage.getItem('canonika_access_token') || 
+           localStorage.getItem('auth_token') || 
+           sessionStorage.getItem('auth_token');
   }
 
   /**
