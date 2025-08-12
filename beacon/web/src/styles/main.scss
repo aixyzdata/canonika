@@ -1,0 +1,9 @@
+// =============================================================================
+// BEACON SERVICE - MAIN SCSS FILE
+// =============================================================================
+
+// Import shared design system
+@import "../../../shared/styles/scss/main";
+
+// Beacon-specific styles
+@import "./scss/beacon-specific"; 
