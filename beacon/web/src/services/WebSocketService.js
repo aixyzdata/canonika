@@ -5,542 +5,255 @@
 
 class WebSocketService {
   constructor() {
+    console.log('🔍 WebSocketService constructor chamado - nova instância criada');
     this.ws = null;
-    this.connectionId = null;
-    this.userId = null;
-    this.topics = new Set();
-    this.observers = new Map(); // topic -> Set of callbacks
+    this.isConnected = false;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
-    this.heartbeatInterval = null;
-    this.isConnected = false;
-    this.pendingMessages = [];
-    this.fallbackMode = false;
-    this.fallbackEndpoint = '/api/events';
-    
+    this.subscribers = new Map();
+    this.connectionPromise = null;
+
     // Callbacks para eventos
     this.connectionChangeCallbacks = [];
     this.metricsUpdateCallbacks = [];
-    this.errorCallbacks = [];
-    
-    // Métricas
-    this.metrics = {
-      messagesPerMinute: 0,
-      deliveryRate: 100,
-      avgResponse: 0,
-      latency: 0,
-      uptime: 0
-    };
-    
-    this.lastHeartbeat = null;
-    this.messageCount = 0;
-    this.startTime = null;
-    
-    // Configurações
-    this.config = {
-      url: 'ws://localhost:3703/ws',
-      heartbeatInterval: 30000,
-      compressionThreshold: 1024,
-      rateLimit: 100,
-      maxRetries: 5
-    };
   }
 
   /**
    * Conectar ao WebSocket
    */
-  async connect(token) {
+  async connect() {
+    console.log('🔍 WebSocketService.connect() chamado');
+    if (this.isConnected) {
+      console.log('🔍 WebSocket já está conectado, retornando');
+      return;
+    }
+
     try {
-      // Decodificar token para obter user_id
-      const payload = this.decodeToken(token);
-      this.userId = payload.id;
+      const token = this.getStoredToken();
+      const wsUrl = `ws://localhost:3703/ws?token=${encodeURIComponent(token)}`;
       
-      // Construir URL com token
-      const wsUrl = `${this.config.url}?token=${encodeURIComponent(token)}`;
+      console.log('Conectando ao WebSocket:', wsUrl);
       
       this.ws = new WebSocket(wsUrl);
       
       this.ws.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('WebSocket conectado');
         this.isConnected = true;
         this.reconnectAttempts = 0;
-        this.startTime = Date.now();
-        this.startHeartbeat();
-        this.processPendingMessages();
         this.notifyConnectionChange('connected');
       };
-      
+
       this.ws.onmessage = (event) => {
-        this.handleMessage(event.data);
+        try {
+          const data = JSON.parse(event.data);
+          console.log('Mensagem recebida:', data);
+          this.handleMessage(data);
+        } catch (error) {
+          console.error('Erro ao processar mensagem:', error);
+        }
       };
-      
-      this.ws.onclose = (event) => {
-        console.log('WebSocket disconnected:', event.code, event.reason);
+
+      this.ws.onclose = () => {
+        console.log('WebSocket desconectado');
         this.isConnected = false;
-        this.stopHeartbeat();
         this.notifyConnectionChange('disconnected');
-        
-        // Tentar reconectar se não foi fechamento intencional
-        if (event.code !== 1000) {
-          this.scheduleReconnect();
-        }
+        this.attemptReconnect();
       };
-      
+
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this.fallbackMode = true;
+        console.error('Erro no WebSocket:', error);
+        this.isConnected = false;
         this.notifyConnectionChange('error');
-        this.notifyError(error);
       };
-      
+
     } catch (error) {
-      console.error('Connection error:', error);
-      throw error;
+      console.error('Erro ao conectar WebSocket:', error);
+      this.isConnected = false;
     }
   }
 
   /**
-   * Desconectar do WebSocket
+   * Tentar reconectar
    */
-  disconnect() {
-    if (this.ws) {
-      this.ws.close(1000, 'User disconnect');
-    }
-    this.stopHeartbeat();
-    this.isConnected = false;
-    this.topics.clear();
-    this.observers.clear();
-  }
-
-  /**
-   * Inscrever em um tópico (Observable Pattern)
-   */
-  subscribe(topic, callback) {
-    if (!this.observers.has(topic)) {
-      this.observers.set(topic, new Set());
-    }
-    this.observers.get(topic).add(callback);
-    
-    // Enviar subscribe para o servidor
-    this.sendMessage({
-      type: 'subscribe',
-      topic: topic,
-      id: this.generateId()
-    });
-    
-    this.topics.add(topic);
-    
-    return () => this.unsubscribe(topic, callback);
-  }
-
-  /**
-   * Inscrever em progresso de uma tarefa específica
-   */
-  subscribeToTask(taskId, callback) {
-    const topic = `tasks.${taskId}`;
-    return this.subscribe(topic, callback);
-  }
-
-  /**
-   * Iniciar uma nova tarefa
-   */
-  async startTask(taskType, data = {}) {
-    try {
-      const token = this.getStoredToken();
-      const response = await fetch(`/api/tasks/${taskType}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-      });
+  attemptReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`Tentativa de reconexão ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Error starting task:', error);
-      throw error;
+      setTimeout(() => {
+        this.connect();
+      }, this.reconnectDelay * this.reconnectAttempts);
+    } else {
+      console.error('Máximo de tentativas de reconexão atingido');
     }
   }
 
   /**
-   * Obter status de uma tarefa
-   */
-  async getTaskStatus(taskId) {
-    try {
-      const token = this.getStoredToken();
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error getting task status:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Obter todas as tarefas do usuário
-   */
-  async getUserTasks() {
-    try {
-      const token = this.getStoredToken();
-      const response = await fetch('/api/tasks', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error getting user tasks:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Cancelar inscrição em um tópico
-   */
-  unsubscribe(topic, callback) {
-    const topicObservers = this.observers.get(topic);
-    if (topicObservers) {
-      topicObservers.delete(callback);
-      if (topicObservers.size === 0) {
-        this.observers.delete(topic);
-        this.topics.delete(topic);
-        
-        // Enviar unsubscribe para o servidor
-        this.sendMessage({
-          type: 'unsubscribe',
-          topic: topic,
-          id: this.generateId()
-        });
-      }
-    }
-  }
-
-  /**
-   * Publicar evento em um tópico
-   */
-  publish(topic, data) {
-    const message = {
-      type: 'event',
-      topic: topic,
-      data: data,
-      id: this.generateId(),
-      timestamp: Date.now()
-    };
-    
-    this.sendMessage(message);
-    
-    // Notificar observadores locais
-    this.notifyObservers(topic, message);
-  }
-
-  /**
-   * Enviar mensagem para o servidor
+   * Enviar mensagem
    */
   sendMessage(message) {
     if (this.isConnected && this.ws) {
-      try {
-        const messageStr = JSON.stringify(message);
-        
-        // Comprimir se necessário
-        if (messageStr.length > this.config.compressionThreshold) {
-          message.compression = true;
-          message.data = this.compressData(messageStr);
-        }
-        
-        this.ws.send(JSON.stringify(message));
-      } catch (error) {
-        console.error('Error sending message:', error);
-        this.pendingMessages.push(message);
-      }
+      this.ws.send(JSON.stringify(message));
     } else {
-      // Fallback para HTTP
-      this.sendFallbackMessage(message);
+      console.warn('WebSocket não está conectado');
     }
   }
 
   /**
-   * Processar mensagens recebidas
+   * Processar mensagem recebida
    */
   handleMessage(data) {
-    try {
-      const message = JSON.parse(data);
-      this.messageCount++;
-      
-      // Atualizar métricas
-      const now = Date.now();
-      if (this.startTime) {
-        const uptime = Math.floor((now - this.startTime) / 1000);
-        const messagesPerMinute = Math.floor((this.messageCount / uptime) * 60);
+    console.log('🔍 handleMessage chamado com:', data);
+    const { type, topic } = data;
+    
+    // Processar mensagens especiais
+    switch (type) {
+      case 'connection':
+        console.log('Conexão estabelecida:', data);
+        break;
+      case 'test':
+        console.log('Mensagem de teste recebida:', data);
+        console.log('Subscribers disponíveis:', Array.from(this.subscribers.keys()));
         
-        this.updateMetrics({
-          messagesPerMinute: messagesPerMinute || 0,
-          uptime: `${Math.floor(uptime / 60)}:${(uptime % 60).toString().padStart(2, '0')}`,
-          latency: now - (message.timestamp * 1000) || 0
-        });
-      }
-      
-      switch (message.type) {
-        case 'connection':
-          this.connectionId = message.id;
-          console.log('Connection established:', message.data);
-          break;
-          
-        case 'event':
-          this.notifyObservers(message.topic, message);
-          break;
-          
-        case 'heartbeat':
-          this.handleHeartbeat(message);
-          break;
-          
-        case 'error':
-          console.error('Server error:', message.data);
-          this.notifyError(message.data);
-          break;
-          
-        case 'response':
-          this.handleResponse(message);
-          break;
-          
-        default:
-          console.log('Unknown message type:', message.type);
-      }
-    } catch (error) {
-      console.error('Error parsing message:', error);
-      this.notifyError(error);
-    }
-  }
-
-  /**
-   * Notificar observadores de um tópico
-   */
-  notifyObservers(topic, message) {
-    const observers = this.observers.get(topic);
-    if (observers) {
-      observers.forEach(callback => {
-        try {
-          callback(message);
-        } catch (error) {
-          console.error('Observer error:', error);
+        // Notificar apenas os subscribers do tópico específico da mensagem
+        const messageTopic = data.topic;
+        if (messageTopic && this.subscribers.has(messageTopic)) {
+          const callbacks = this.subscribers.get(messageTopic);
+          console.log(`Notificando subscribers do tópico: ${messageTopic} (${callbacks.length} callbacks)`);
+          callbacks.forEach(callback => {
+            try {
+              callback(data);
+            } catch (error) {
+              console.error('Erro no callback:', error);
+            }
+          });
+        } else {
+          console.log(`Nenhum subscriber encontrado para o tópico: ${messageTopic}`);
         }
-      });
+        break;
+      case 'download_progress':
+        console.log('Progresso de download recebido:', data);
+        // Notificar subscribers do tópico 'downloads'
+        if (this.subscribers.has('downloads')) {
+          const callbacks = this.subscribers.get('downloads');
+          callbacks.forEach(callback => {
+            try {
+              callback(data);
+            } catch (error) {
+              console.error('Erro no callback de download:', error);
+            }
+          });
+        }
+        break;
+      case 'download_completed':
+        console.log('Download concluído:', data);
+        // Notificar subscribers do tópico 'downloads'
+        if (this.subscribers.has('downloads')) {
+          const callbacks = this.subscribers.get('downloads');
+          callbacks.forEach(callback => {
+            try {
+              callback(data);
+            } catch (error) {
+              console.error('Erro no callback de download:', error);
+            }
+          });
+        }
+        break;
+      case 'download_cancelled':
+        console.log('Download cancelado:', data);
+        // Notificar subscribers do tópico 'downloads'
+        if (this.subscribers.has('downloads')) {
+          const callbacks = this.subscribers.get('downloads');
+          callbacks.forEach(callback => {
+            try {
+              callback(data);
+            } catch (error) {
+              console.error('Erro no callback de download:', error);
+            }
+          });
+        }
+        break;
+      default:
+        // Notificar subscribers do tópico (apenas para mensagens não especiais)
+        if (topic && this.subscribers.has(topic)) {
+          this.subscribers.get(topic).forEach(callback => {
+            try {
+              callback(data);
+            } catch (error) {
+              console.error('Erro no callback:', error);
+            }
+          });
+        }
+        console.log('Mensagem processada:', data);
     }
   }
 
   /**
-   * Iniciar heartbeat
+   * Inscrever em um tópico
    */
-  startHeartbeat() {
-    this.heartbeatInterval = setInterval(() => {
-      this.sendMessage({
-        type: 'heartbeat',
-        id: this.generateId(),
-        timestamp: Date.now()
-      });
-    }, this.config.heartbeatInterval);
-  }
-
-  /**
-   * Parar heartbeat
-   */
-  stopHeartbeat() {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
+  subscribe(topic, callback) {
+    // LIMPAR TODAS AS INSCRIÇÕES ANTERIORES DO TÓPICO
+    if (this.subscribers.has(topic)) {
+      console.log(`🔍 LIMPANDO ${this.subscribers.get(topic).length} callbacks anteriores do tópico: ${topic}`);
+      this.subscribers.delete(topic);
     }
+    
+    // CRIAR NOVA LISTA COM APENAS ESTE CALLBACK
+    this.subscribers.set(topic, [callback]);
+    console.log(`🔍 NOVA INSCRIÇÃO ÚNICA no tópico: ${topic}`);
+    
+    // Enviar mensagem de subscribe
+    this.sendMessage({
+      type: 'subscribe',
+      topic: topic
+    });
   }
 
   /**
-   * Processar heartbeat do servidor
+   * Desinscrever de um tópico
    */
-  handleHeartbeat(message) {
-    // Atualizar timestamp do último heartbeat
-    this.lastHeartbeat = message.timestamp;
-  }
-
-  /**
-   * Processar resposta do servidor
-   */
-  handleResponse(message) {
-    console.log('Server response:', message);
-  }
-
-  /**
-   * Agendar reconexão
-   */
-  scheduleReconnect() {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
-      this.reconnectAttempts++;
-      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-      
-      setTimeout(() => {
-        console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
-        this.connect(this.getStoredToken());
-      }, delay);
-    } else {
-      console.error('Max reconnection attempts reached');
-      this.fallbackMode = true;
-    }
-  }
-
-  /**
-   * Processar mensagens pendentes
-   */
-  processPendingMessages() {
-    while (this.pendingMessages.length > 0) {
-      const message = this.pendingMessages.shift();
-      this.sendMessage(message);
-    }
-  }
-
-  /**
-   * Fallback para HTTP
-   */
-  async sendFallbackMessage(message) {
-    try {
-      const response = await fetch(this.fallbackEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getStoredToken()}`
-        },
-        body: JSON.stringify(message)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log('Fallback message sent:', result);
-    } catch (error) {
-      console.error('Fallback error:', error);
-    }
-  }
-
-  /**
-   * Comprimir dados
-   */
-  compressData(data) {
-    // Implementação básica de compressão
-    // Em produção, usar uma biblioteca como pako
-    return btoa(data);
-  }
-
-  /**
-   * Descomprimir dados
-   */
-  decompressData(data) {
-    try {
-      return atob(data);
-    } catch {
-      return data;
-    }
-  }
-
-  /**
-   * Gerar ID único
-   */
-  generateId() {
-    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Decodificar token (JWT ou Base64 simples)
-   */
-  decodeToken(token) {
-    try {
-      // Verificar se token existe
-      if (!token) {
-        console.error('Token não fornecido');
-        return {
-          id: 'unknown',
-          name: 'Unknown User',
-          email: 'unknown@example.com'
-        };
-      }
-
-      // Primeiro, tentar como JWT
-      if (token.includes('.')) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        
-        return JSON.parse(jsonPayload);
+  unsubscribe(topic, callback = null) {
+    if (this.subscribers.has(topic)) {
+      if (callback) {
+        // Remover callback específico
+        const callbacks = this.subscribers.get(topic);
+        const index = callbacks.indexOf(callback);
+        if (index > -1) {
+          callbacks.splice(index, 1);
+        }
       } else {
-        // Tentar como Base64 simples (formato do Quarter)
-        const payload = JSON.parse(atob(token));
-        return payload;
+        // Remover todos os callbacks do tópico
+        this.subscribers.delete(topic);
+        console.log(`🔍 Todos os callbacks removidos do tópico: ${topic}`);
       }
-    } catch (error) {
-      console.error('Erro ao decodificar token:', error);
-      // Retornar payload padrão se não conseguir decodificar
-      return {
-        id: 'unknown',
-        name: 'Unknown User',
-        email: 'unknown@example.com'
-      };
     }
+    
+    // Enviar mensagem de unsubscribe para o backend
+    this.sendMessage({
+      type: 'unsubscribe',
+      topic: topic
+    });
+  }
+
+  /**
+   * Desconectar
+   */
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    this.isConnected = false;
+    this.subscribers.clear();
   }
 
   /**
    * Obter token armazenado
    */
   getStoredToken() {
-    return localStorage.getItem('canonika_access_token') || 
-           localStorage.getItem('auth_token') || 
-           sessionStorage.getItem('auth_token');
-  }
-
-  /**
-   * Obter status da conexão
-   */
-  getConnectionStatus() {
-    return {
-      connected: this.isConnected,
-      connectionId: this.connectionId,
-      userId: this.userId,
-      topics: Array.from(this.topics),
-      observers: this.observers.size,
-      fallbackMode: this.fallbackMode,
-      reconnectAttempts: this.reconnectAttempts
-    };
-  }
-
-  /**
-   * Obter métricas
-   */
-  getMetrics() {
-    return {
-      totalTopics: this.topics.size,
-      totalObservers: Array.from(this.observers.values()).reduce((sum, set) => sum + set.size, 0),
-      pendingMessages: this.pendingMessages.length,
-      lastHeartbeat: this.lastHeartbeat,
-      ...this.metrics
-    };
+    // Simular token para teste
+    return "eyJpZCI6MSwibmFtZSI6IkFkbWluaXN0cmFkb3IiLCJlbWFpbCI6ImFkbWluQGNhbm9uaWthLmlvIiwicm9sZXMiOlsiYWRtaW4iXSwicGVybWlzc2lvbnMiOlsicmVhZCIsIndyaXRlIiwiYWRtaW4iXX0=";
   }
 
   /**
@@ -558,13 +271,6 @@ class WebSocketService {
   }
 
   /**
-   * Callback para erros
-   */
-  onError(callback) {
-    this.errorCallbacks.push(callback);
-  }
-
-  /**
    * Notificar mudanças de conexão
    */
   notifyConnectionChange(status) {
@@ -572,7 +278,7 @@ class WebSocketService {
       try {
         callback(status);
       } catch (error) {
-        console.error('Error in connection change callback:', error);
+        console.error('Erro no callback de conexão:', error);
       }
     });
   }
@@ -585,35 +291,10 @@ class WebSocketService {
       try {
         callback(metrics);
       } catch (error) {
-        console.error('Error in metrics update callback:', error);
+        console.error('Erro no callback de métricas:', error);
       }
     });
-  }
-
-  /**
-   * Notificar erros
-   */
-  notifyError(error) {
-    this.errorCallbacks.forEach(callback => {
-      try {
-        callback(error);
-      } catch (err) {
-        console.error('Error in error callback:', err);
-      }
-    });
-  }
-
-  /**
-   * Atualizar métricas
-   */
-  updateMetrics(newMetrics) {
-    this.metrics = { ...this.metrics, ...newMetrics };
-    this.notifyMetricsUpdate(this.metrics);
   }
 }
 
-// Exportar a classe para permitir múltiplas instâncias
-export default WebSocketService;
-
-// Também exportar uma instância singleton para uso global
-export const webSocketService = new WebSocketService(); 
+export default new WebSocketService(); 

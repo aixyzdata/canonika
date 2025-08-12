@@ -8,11 +8,21 @@ echo "🚀 Iniciando Beacon WebSocket Broker..."
 # Iniciar uvicorn em background
 echo "📡 Iniciando backend uvicorn..."
 cd /app/api
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+
+# Verificar se o arquivo main.py existe
+if [ ! -f "main.py" ]; then
+    echo "❌ Erro: main.py não encontrado em /app/api"
+    exit 1
+fi
+
+echo "✅ Arquivo main.py encontrado"
+
+# Iniciar uvicorn com configuração específica
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level info &
 UVICORN_PID=$!
 
 # Aguardar um pouco para o uvicorn inicializar
-sleep 3
+sleep 5
 
 # Verificar se o uvicorn está rodando
 if ! kill -0 $UVICORN_PID 2>/dev/null; then
@@ -72,21 +82,23 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # Endpoints diretos do backend
-        location ~ ^/(health|metrics|topics|clients|events|help)$ {
-            proxy_pass http://backend;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-        # WebSocket endpoint
-        location /ws/ {
+        # WebSocket endpoint - configuração simplificada
+        location /ws {
             proxy_pass http://backend;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 86400;
+            proxy_send_timeout 86400;
+        }
+
+        # Endpoints diretos do backend
+        location ~ ^/(health|metrics|topics|clients|help|test)$ {
+            proxy_pass http://backend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

@@ -165,36 +165,7 @@
         </div>
       </div>
 
-      <!-- Seção: Log de Eventos -->
-      <div class="canonika-section" v-if="events.length > 0">
-        <div class="section-header">
-          <h3 class="section-title">
-            <i class="fas fa-list text-info me-2"></i>
-            Log de Eventos
-          </h3>
-          <p class="section-description">
-            Histórico dos últimos eventos recebidos.
-          </p>
-        </div>
-        
-        <div class="section-content">
-          <div class="event-log">
-            <div 
-              v-for="(event, index) in events.slice(0, 10)" 
-              :key="index"
-              class="event-item"
-            >
-              <div class="event-header">
-                <span class="event-type">{{ event.type }}</span>
-                <span class="event-time">{{ new Date(event.timestamp).toLocaleTimeString() }}</span>
-              </div>
-              <div class="event-data">
-                {{ JSON.stringify(event.data, null, 2) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <!-- Seção: Testes WebSocket -->
       <div class="canonika-section">
@@ -297,7 +268,7 @@
           </div>
 
           <!-- Status do Teste -->
-          <div v-if="currentTest" class="test-status">
+          <div v-if="currentTest || isTestRunning" class="test-status">
             <div class="status-info">
               <div class="status-item">
                 <span class="status-label">Status:</span>
@@ -305,19 +276,19 @@
               </div>
               <div class="status-item">
                 <span class="status-label">Progresso:</span>
-                <span class="status-value">{{ Math.round(currentTest.progress || 0) }}%</span>
+                <span class="status-value">{{ Math.round((currentTest && currentTest.progress) || 0) }}%</span>
               </div>
               <div class="status-item">
                 <span class="status-label">Enviadas:</span>
-                <span class="status-value">{{ currentTest.sent_count || 0 }} / {{ currentTest.total_count || 0 }}</span>
+                <span class="status-value">{{ (currentTest && currentTest.sent_count) || 0 }} / {{ (currentTest && currentTest.total_count) || 0 }}</span>
               </div>
             </div>
             
             <div class="progress-bar">
               <div 
                 class="progress-fill" 
-                :style="{ width: (currentTest.progress || 0) + '%' }"
-                :class="currentTest.status"
+                :style="{ width: ((currentTest && currentTest.progress) || 0) + '%' }"
+                :class="currentTest ? currentTest.status : 'running'"
               ></div>
             </div>
           </div>
@@ -359,6 +330,204 @@
             </div>
           </div>
 
+          <!-- Seção: Download com Progresso -->
+          <div class="canonika-section">
+            <div class="section-header">
+              <h3 class="section-title">
+                <i class="fas fa-download text-success me-2"></i>
+                Download com Progresso
+              </h3>
+              <p class="section-description">
+                Simula downloads reais com progresso em tempo real via WebSocket.
+              </p>
+            </div>
+            
+            <div class="section-content">
+              <!-- Configuração do Download -->
+              <div class="download-config">
+                <div class="config-grid">
+                  <div class="config-item">
+                    <label for="filename">Nome do Arquivo:</label>
+                    <input 
+                      id="filename"
+                      v-model="downloadConfig.filename" 
+                      type="text" 
+                      class="form-control"
+                      placeholder="arquivo.zip"
+                      :disabled="isDownloadRunning"
+                    >
+                  </div>
+                  
+                  <div class="config-item">
+                    <label for="fileSize">Tamanho (MB):</label>
+                    <input 
+                      id="fileSize"
+                      v-model.number="downloadConfig.fileSize" 
+                      type="number" 
+                      min="1" 
+                      max="1000"
+                      class="form-control"
+                      :disabled="isDownloadRunning"
+                    >
+                  </div>
+                  
+                  <div class="config-item">
+                    <label for="downloadSpeed">Velocidade (MB/s):</label>
+                    <input 
+                      id="downloadSpeed"
+                      v-model.number="downloadConfig.downloadSpeed" 
+                      type="number" 
+                      min="1" 
+                      max="100"
+                      class="form-control"
+                      :disabled="isDownloadRunning"
+                    >
+                  </div>
+                </div>
+                
+                <div class="download-actions">
+                  <button 
+                    @click="startDownload"
+                    :disabled="!canStartDownload || isDownloadRunning"
+                    class="btn btn-success"
+                  >
+                    <i class="fas fa-download me-2"></i>
+                    {{ isDownloadRunning ? 'Download em Execução...' : 'Iniciar Download' }}
+                  </button>
+                  
+                  <button 
+                    @click="cancelDownload"
+                    :disabled="!canCancelDownload"
+                    class="btn btn-danger"
+                  >
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar Download
+                  </button>
+                  
+                  <button 
+                    @click="clearDownloadLog"
+                    :disabled="downloadLog.length === 0"
+                    class="btn btn-secondary"
+                  >
+                    <i class="fas fa-trash me-2"></i>
+                    Limpar Log
+                  </button>
+                </div>
+              </div>
+
+              <!-- Status do Download -->
+              <div v-if="currentDownload" class="download-status">
+                <div class="status-info">
+                  <div class="status-item">
+                    <span class="status-label">Status:</span>
+                    <span class="status-value" :class="currentDownload.status">{{ getStatusText(currentDownload.status) }}</span>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Progresso:</span>
+                    <span class="status-value">{{ Math.round(currentDownload.progress || 0) }}%</span>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">Baixado:</span>
+                    <span class="status-value">{{ formatBytes(currentDownload.bytes_downloaded || 0) }} / {{ formatBytes(currentDownload.file_size_bytes || 0) }}</span>
+                  </div>
+                  <div class="status-item" v-if="currentDownload.eta > 0">
+                    <span class="status-label">ETA:</span>
+                    <span class="status-value">{{ formatTime(currentDownload.eta) }}</span>
+                  </div>
+                </div>
+                
+                <div class="progress-bar">
+                  <div 
+                    class="progress-fill" 
+                    :style="{ width: (currentDownload.progress || 0) + '%' }"
+                    :class="currentDownload.status"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Terminal de Download -->
+              <div class="download-terminal">
+                <div class="terminal-header">
+                  <span class="terminal-title">
+                    <i class="fas fa-terminal me-2"></i>
+                    Terminal de Download
+                  </span>
+                  <span class="terminal-status">
+                    {{ downloadLog.length }} mensagens
+                  </span>
+                </div>
+                
+                <div class="terminal-content" ref="downloadTerminalContent">
+                  <div 
+                    v-for="log in downloadLog" 
+                    :key="log.timestamp"
+                    class="log-entry"
+                    :class="getLogEntryClass(log)"
+                  >
+                    <div class="log-header">
+                      <span class="log-timestamp">{{ new Date(log.timestamp).toLocaleTimeString() }}</span>
+                      <span class="log-type">{{ log.type.toUpperCase() }}</span>
+                    </div>
+                    <div class="log-message">
+                      {{ formatLogMessage(log) }}
+                    </div>
+                  </div>
+                  
+                  <div v-if="downloadLog.length === 0" class="no-logs">
+                    <i class="fas fa-info-circle"></i>
+                    Nenhum download iniciado ainda.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção: Log de Eventos -->
+          <div class="canonika-section" v-if="events.length > 0">
+            <div class="section-header">
+              <h3 class="section-title">
+                <i class="fas fa-list text-info me-2"></i>
+                Log de Eventos
+              </h3>
+              <p class="section-description">
+                Detalhes das chamadas e eventos recebidos.
+              </p>
+            </div>
+            
+            <div class="section-content">
+              <div class="event-summary">
+                <div class="summary-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Total de Eventos:</span>
+                    <span class="stat-value">{{ events.length }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Último Evento:</span>
+                    <span class="stat-value">{{ events.length > 0 ? new Date(events[0].timestamp).toLocaleTimeString() : 'N/A' }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Tipos de Evento:</span>
+                    <span class="stat-value">{{ getUniqueEventTypes().join(', ') }}</span>
+                  </div>
+                </div>
+                
+                <div class="event-details" v-if="events.length > 0">
+                  <h4>Último Evento Recebido:</h4>
+                  <div class="event-detail-item">
+                    <strong>Tipo:</strong> {{ events[0].type }}
+                  </div>
+                  <div class="event-detail-item">
+                    <strong>Timestamp:</strong> {{ new Date(events[0].timestamp).toLocaleString() }}
+                  </div>
+                  <div class="event-detail-item" v-if="events[0].data">
+                    <strong>Dados:</strong>
+                    <pre class="event-data-preview">{{ JSON.stringify(events[0].data, null, 2) }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Estatísticas do Teste -->
           <div v-if="testStats.totalMessages > 0" class="test-stats">
             <div class="stats-grid">
@@ -394,7 +563,7 @@ export default {
   name: 'WebSocketView',
   data() {
     return {
-      wsService: new WebSocketService(),
+      wsService: WebSocketService,
       connectionStatus: 'disconnected',
       connectionId: null,
       metrics: {
@@ -416,14 +585,27 @@ export default {
         topic: 'test',
         delayMs: 1000
       },
+      downloadConfig: {
+        filename: 'arquivo.zip',
+        fileSize: 100,
+        downloadSpeed: 10
+      },
       currentTest: null,
+      currentDownload: null,
       isTestRunning: false,
+      isDownloadRunning: false,
       testLog: [],
+      downloadLog: [],
       testStats: {
         totalMessages: 0,
         successRate: 0,
         avgLatency: 0,
         errors: 0
+      },
+      downloadStats: {
+        totalDownloads: 0,
+        completedDownloads: 0,
+        cancelledDownloads: 0
       },
       statusPollingInterval: null
     }
@@ -481,6 +663,11 @@ export default {
         if (!this.topics.includes(topic)) {
           this.topics.push(topic)
         }
+      })
+
+      // Listener para downloads
+      this.wsService.subscribe('downloads', (downloadData) => {
+        this.handleDownloadMessage(downloadData)
       })
     },
 
@@ -572,6 +759,12 @@ export default {
 
     cleanup() {
       if (this.wsService) {
+        // Cancelar todas as inscrições antes de desconectar
+        if (this.testConfig.topic && this.testCallback) {
+          this.wsService.unsubscribe(this.testConfig.topic, this.testCallback)
+        } else if (this.testConfig.topic) {
+          this.wsService.unsubscribe(this.testConfig.topic)
+        }
         this.wsService.disconnect()
       }
       this.stopStatusPolling()
@@ -587,6 +780,27 @@ export default {
       try {
         this.isTestRunning = true
         this.clearTestLog()
+        
+                        // O WebSocketService agora limpa automaticamente inscrições anteriores
+                console.log('🔍 Iniciando teste com tópico:', this.testConfig.topic)
+        
+        // Inscrever no tópico de teste ANTES de iniciar o teste
+        if (this.testConfig.topic) {
+          console.log('🔍 Tópico configurado:', this.testConfig.topic)
+          console.log('🔍 Inscrevendo no tópico:', this.testConfig.topic)
+          
+          // Criar callback e armazenar referência
+          this.testCallback = (message) => {
+            console.log('🔍 CALLBACK chamado para:', message.message, 'Timestamp:', new Date().toISOString())
+            this.handleTestMessage(message)
+          }
+          
+          await this.wsService.subscribe(this.testConfig.topic, this.testCallback)
+          this.addTestLog('info', `Inscrito no tópico: ${this.testConfig.topic}`)
+          
+          // Pequeno delay para garantir que a inscrição seja processada
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
         
         // Iniciar teste no backend
         const response = await fetch('/api/test/websocket', {
@@ -610,20 +824,19 @@ export default {
           sent_count: 0,
           total_count: this.testConfig.messageCount
         }
+        
+        // Garantir que o progresso seja visível desde o início
+        this.$nextTick(() => {
+          if (this.currentTest) {
+            this.currentTest.progress = 0
+          }
+        })
 
         this.addTestLog('info', `Teste iniciado: ${result.test_id}`)
         this.addTestLog('info', `Configuração: ${this.testConfig.messageCount} mensagens, tipo: ${this.testConfig.testType}, tópico: ${this.testConfig.topic}`)
         
         // Iniciar polling de status
         this.startStatusPolling()
-        
-        // Inscrever no tópico de teste se especificado
-        if (this.testConfig.topic) {
-          await this.wsService.subscribe(this.testConfig.topic, (message) => {
-            this.handleTestMessage(message)
-          })
-          this.addTestLog('info', `Inscrito no tópico: ${this.testConfig.topic}`)
-        }
 
       } catch (error) {
         console.error('Erro ao iniciar teste:', error)
@@ -669,13 +882,25 @@ export default {
 
           if (response.ok) {
             const status = await response.json()
-            this.currentTest = { ...this.currentTest, ...status }
+            
+            // Atualizar apenas se o status não for 'completed', 'error' ou 'stopped'
+            // para preservar o status final
+            if (status.status && !['completed', 'error', 'stopped'].includes(status.status)) {
+              this.currentTest = { ...this.currentTest, ...status }
+            } else {
+              // Para status finais, atualizar apenas outros campos, não o status
+              const { status: backendStatus, ...otherFields } = status
+              this.currentTest = { ...this.currentTest, ...otherFields }
+            }
 
             // Verificar se teste foi concluído
             if (status.status === 'completed' || status.status === 'error' || status.status === 'stopped') {
               this.isTestRunning = false
               this.stopStatusPolling()
               this.updateTestStats()
+              
+              // Definir o status final
+              this.currentTest.status = status.status
               
               if (status.status === 'completed') {
                 this.addTestLog('success', 'Teste concluído com sucesso!')
@@ -698,11 +923,29 @@ export default {
     },
 
     handleTestMessage(message) {
+      console.log('🔍 handleTestMessage chamado para:', message.message, 'Timestamp:', new Date().toISOString())
       const now = Date.now()
       const latency = now - (message.timestamp * 1000)
       
       this.addTestLog('message', message, latency)
       this.updateTestStats()
+      
+      // Atualizar contador de mensagens enviadas e progresso
+      if (this.currentTest && message.type === 'test') {
+        this.currentTest.sent_count = (this.currentTest.sent_count || 0) + 1
+        this.currentTest.progress = Math.round((this.currentTest.sent_count / this.currentTest.total_count) * 100)
+        
+        // Se chegou a 100%, marcar como concluído
+        if (this.currentTest.progress >= 100) {
+          this.currentTest.status = 'completed'
+          this.isTestRunning = false
+          this.stopStatusPolling()
+          this.addTestLog('success', 'Teste concluído com sucesso!')
+        }
+        
+        // Log do progresso para debug
+        console.log(`📊 Progresso atualizado: ${this.currentTest.sent_count}/${this.currentTest.total_count} = ${this.currentTest.progress}%`)
+      }
     },
 
     addTestLog(type, message, latency = 0) {
@@ -782,6 +1025,172 @@ export default {
         'stopped': 'Parado'
       }
       return statusMap[status] || status
+    },
+
+    getUniqueEventTypes() {
+      const types = [...new Set(this.events.map(event => event.type))]
+      return types.slice(0, 5) // Limitar a 5 tipos para não ficar muito longo
+    },
+
+    // Métodos de Download
+    async startDownload() {
+      if (!this.wsService.isConnected) {
+        this.addDownloadLog('error', 'WebSocket não está conectado. Conecte primeiro.')
+        return
+      }
+
+      try {
+        this.isDownloadRunning = true
+        this.clearDownloadLog()
+        
+        // Iniciar download no backend
+        const response = await fetch('/api/download/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('canonika_access_token')}`
+          },
+          body: JSON.stringify(this.downloadConfig)
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+
+        const result = await response.json()
+        this.currentDownload = {
+          id: result.download_id,
+          filename: this.downloadConfig.filename,
+          status: 'running',
+          progress: 0,
+          bytes_downloaded: 0,
+          file_size_bytes: this.downloadConfig.fileSize * 1024 * 1024,
+          eta: result.estimated_time
+        }
+
+        this.downloadStats.totalDownloads++
+        this.addDownloadLog('info', `Download iniciado: ${result.download_id}`)
+        this.addDownloadLog('info', `Arquivo: ${this.downloadConfig.filename} (${this.downloadConfig.fileSize}MB)`)
+
+      } catch (error) {
+        console.error('Erro ao iniciar download:', error)
+        this.addDownloadLog('error', `Erro ao iniciar download: ${error.message}`)
+        this.isDownloadRunning = false
+      }
+    },
+
+    async cancelDownload() {
+      if (!this.currentDownload) return
+
+      try {
+        const response = await fetch(`/api/download/cancel/${this.currentDownload.id}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('canonika_access_token')}`
+          }
+        })
+
+        if (response.ok) {
+          this.addDownloadLog('warning', 'Download cancelado pelo usuário')
+          this.currentDownload.status = 'cancelled'
+          this.isDownloadRunning = false
+        }
+      } catch (error) {
+        console.error('Erro ao cancelar download:', error)
+        this.addDownloadLog('error', `Erro ao cancelar download: ${error.message}`)
+      }
+    },
+
+    handleDownloadMessage(downloadData) {
+      console.log('Download message received:', downloadData)
+      
+      switch (downloadData.type) {
+        case 'download_progress':
+          this.updateDownloadProgress(downloadData)
+          break
+        case 'download_completed':
+          this.handleDownloadCompleted(downloadData)
+          break
+        case 'download_cancelled':
+          this.handleDownloadCancelled(downloadData)
+          break
+      }
+    },
+
+    updateDownloadProgress(downloadData) {
+      if (this.currentDownload && this.currentDownload.id === downloadData.download_id) {
+        this.currentDownload = {
+          ...this.currentDownload,
+          progress: downloadData.progress,
+          bytes_downloaded: downloadData.bytes_downloaded,
+          eta: downloadData.eta
+        }
+      }
+
+      this.addDownloadLog('progress', downloadData)
+    },
+
+    handleDownloadCompleted(downloadData) {
+      if (this.currentDownload && this.currentDownload.id === downloadData.download_id) {
+        this.currentDownload.status = 'completed'
+        this.currentDownload.progress = 100
+        this.isDownloadRunning = false
+        this.downloadStats.completedDownloads++
+      }
+
+      this.addDownloadLog('success', `Download concluído: ${downloadData.filename} em ${downloadData.total_time}s`)
+    },
+
+    handleDownloadCancelled(downloadData) {
+      if (this.currentDownload && this.currentDownload.id === downloadData.download_id) {
+        this.currentDownload.status = 'cancelled'
+        this.isDownloadRunning = false
+        this.downloadStats.cancelledDownloads++
+      }
+
+      this.addDownloadLog('warning', `Download cancelado: ${downloadData.filename}`)
+    },
+
+    addDownloadLog(type, message, latency = 0) {
+      const logEntry = {
+        type,
+        message: typeof message === 'string' ? message : JSON.stringify(message, null, 2),
+        timestamp: Date.now(),
+        latency,
+        raw: message
+      }
+
+      this.downloadLog.unshift(logEntry)
+      
+      // Limitar log a 1000 entradas
+      if (this.downloadLog.length > 1000) {
+        this.downloadLog = this.downloadLog.slice(0, 1000)
+      }
+
+      // Auto-scroll para o topo
+      this.$nextTick(() => {
+        if (this.$refs.downloadTerminalContent) {
+          this.$refs.downloadTerminalContent.scrollTop = 0
+        }
+      })
+    },
+
+    clearDownloadLog() {
+      this.downloadLog = []
+    },
+
+    formatBytes(bytes) {
+      if (bytes === 0) return '0 B'
+      const k = 1024
+      const sizes = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+
+    formatTime(seconds) {
+      if (seconds < 60) return `${Math.round(seconds)}s`
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`
+      return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`
     }
   },
 
@@ -814,6 +1223,14 @@ export default {
 
     canStartTest() {
       return this.connectionStatus === 'connected' && !this.isTestRunning
+    },
+
+    canStartDownload() {
+      return this.connectionStatus === 'connected' && !this.isDownloadRunning
+    },
+
+    canCancelDownload() {
+      return this.isDownloadRunning && this.currentDownload && this.currentDownload.status === 'running'
     }
   }
 }
@@ -1122,5 +1539,119 @@ export default {
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Estilos para o Log de Eventos */
+.event-summary {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: 0.375rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.event-details {
+  border-top: 1px solid #475569;
+  padding-top: 1.5rem;
+}
+
+.event-details h4 {
+  color: #e2e8f0;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.event-detail-item {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.event-detail-item strong {
+  color: #94a3b8;
+  min-width: 80px;
+  font-size: 0.875rem;
+}
+
+.event-data-preview {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  flex: 1;
+}
+
+/* Estilos para Download */
+.download-config {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.download-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.download-status {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.download-terminal {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.log-entry.log-progress .log-type {
+  color: #10b981;
+}
+
+.log-entry.log-progress .log-message {
+  color: #10b981;
+  font-weight: 500;
 }
 </style>
