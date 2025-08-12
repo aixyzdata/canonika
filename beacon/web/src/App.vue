@@ -6,265 +6,7 @@
     @nav-click="handleNavClick"
     @sidebar-toggle="handleSidebarToggle"
   >
-    <div class="canonika-view">
-      <!-- View Header seguindo padrão das outras views -->
-      <div class="view-header">
-        <div class="view-title">
-          <i class="fas fa-broadcast-tower"></i>
-          <div class="title-content">
-            <h1>Beacon</h1>
-            <p>Sistema de Monitoramento</p>
-          </div>
-        </div>
-        <div class="view-status">
-          <div class="status-indicator online"></div>
-          <span>Sistema Operacional</span>
-        </div>
-        <div class="view-actions">
-          <button class="btn btn-primary btn-sm">
-            <i class="fas fa-sync-alt me-2"></i>
-            Atualizar
-          </button>
-          <button class="btn btn-secondary btn-sm">
-            <i class="fas fa-cog me-2"></i>
-            Configurar
-          </button>
-        </div>
-      </div>
-
-      <!-- View Content -->
-      <div class="view-content">
-        <!-- Seção: Status do Sistema -->
-        <div class="canonika-section">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="fas fa-chart-line text-success me-2"></i>
-              Status do Sistema
-            </h3>
-            <p class="section-description">
-              Monitoramento em tempo real dos serviços do Beacon.
-            </p>
-          </div>
-          
-          <div class="section-content">
-            <div class="service-cards">
-              <div class="service-card">
-                <div class="card-header">
-                  <div class="card-icon">
-                    <i class="fas fa-broadcast-tower"></i>
-                  </div>
-                  <div class="card-title">
-                    <h4>WebSocket</h4>
-                    <span class="card-subtitle">Conexão em tempo real</span>
-                  </div>
-                  <div class="card-actions">
-                    <span class="status-badge online">Ativo</span>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="metric-grid">
-                    <div class="metric-item">
-                      <span class="metric-value">100%</span>
-                      <span class="metric-label">Disponibilidade</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">0ms</span>
-                      <span class="metric-label">Latência</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">24/7</span>
-                      <span class="metric-label">Uptime</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="service-card">
-                <div class="card-header">
-                  <div class="card-icon">
-                    <i class="fas fa-satellite"></i>
-                  </div>
-                  <div class="card-title">
-                    <h4>REST API</h4>
-                    <span class="card-subtitle">HTTP Endpoints</span>
-                  </div>
-                  <div class="card-actions">
-                    <span class="status-badge online">Funcionando</span>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="metric-grid">
-                    <div class="metric-item">
-                      <span class="metric-value">200</span>
-                      <span class="metric-label">Status OK</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">Fast</span>
-                      <span class="metric-label">Performance</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">Secure</span>
-                      <span class="metric-label">Autenticação</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="service-card">
-                <div class="card-header">
-                  <div class="card-icon">
-                    <i class="fas fa-bell"></i>
-                  </div>
-                  <div class="card-title">
-                    <h4>Push Notifications</h4>
-                    <span class="card-subtitle">Sistema de alertas</span>
-                  </div>
-                  <div class="card-actions">
-                    <span class="status-badge online">Ativo</span>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="metric-grid">
-                    <div class="metric-item">
-                      <span class="metric-value">Real-time</span>
-                      <span class="metric-label">Entrega</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">Multi</span>
-                      <span class="metric-label">Plataformas</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-value">Smart</span>
-                      <span class="metric-label">Filtros</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Seção: Serviços de Comunicação -->
-        <div class="canonika-section">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="fas fa-comments text-info me-2"></i>
-              Serviços de Comunicação
-            </h3>
-            <p class="section-description">
-              Canais de comunicação disponíveis para envio de notificações.
-            </p>
-          </div>
-          
-          <div class="section-content">
-            <div class="feature-cards">
-              <div class="feature-card">
-                <div class="feature-icon">
-                  <i class="fas fa-envelope"></i>
-                </div>
-                <div class="feature-title">Email Service</div>
-                <div class="feature-description">Envio de emails transacionais</div>
-              </div>
-              
-              <div class="feature-card">
-                <div class="feature-icon">
-                  <i class="fas fa-sms"></i>
-                </div>
-                <div class="feature-title">SMS Gateway</div>
-                <div class="feature-description">Mensagens de texto</div>
-              </div>
-              
-              <div class="feature-card">
-                <div class="feature-icon">
-                  <i class="fas fa-phone"></i>
-                </div>
-                <div class="feature-title">Voice Service</div>
-                <div class="feature-description">Chamadas de voz</div>
-              </div>
-              
-              <div class="feature-card">
-                <div class="feature-icon">
-                  <i class="fas fa-cog"></i>
-                </div>
-                <div class="feature-title">Configurações</div>
-                <div class="feature-description">Parâmetros do sistema</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Seção: Informações do Serviço -->
-        <div class="canonika-section">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="fas fa-info-circle text-info me-2"></i>
-              Informações do Serviço
-            </h3>
-            <p class="section-description">
-              Detalhes sobre o Beacon e sua configuração atual.
-            </p>
-          </div>
-          
-          <div class="section-content">
-            <div class="info-cards">
-              <div class="info-card">
-                <div class="info-label">Nome</div>
-                <div class="info-value">Beacon</div>
-                <div class="info-description">Sistema de Monitoramento</div>
-              </div>
-              
-              <div class="info-card">
-                <div class="info-label">Porta</div>
-                <div class="info-value">3703</div>
-                <div class="info-description">Porta de desenvolvimento</div>
-              </div>
-              
-              <div class="info-card">
-                <div class="info-label">Status</div>
-                <div class="info-value">Online</div>
-                <div class="info-description">Serviço ativo</div>
-              </div>
-              
-              <div class="info-card">
-                <div class="info-label">Versão</div>
-                <div class="info-value">1.0.0</div>
-                <div class="info-description">Versão atual</div>
-              </div>
-              
-              <div class="info-card">
-                <div class="info-label">Framework</div>
-                <div class="info-value">Vue.js 3</div>
-                <div class="info-description">Frontend framework</div>
-              </div>
-              
-              <div class="info-card">
-                <div class="info-label">Build Tool</div>
-                <div class="info-value">Vite</div>
-                <div class="info-description">Development server</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="canonika-footer">
-          <div class="footer-info">
-            <div class="footer-item">
-              <i class="fas fa-code"></i>
-              <span>Beacon v1.0.0</span>
-            </div>
-            <div class="footer-item">
-              <i class="fas fa-clock"></i>
-              <span>Última atualização: {{ new Date().toLocaleDateString('pt-BR') }}</span>
-            </div>
-            <div class="footer-item">
-              <i class="fas fa-shield-alt"></i>
-              <span>Status: Online</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <router-view />
   </CanonikaMasterPage>
 </template>
 
@@ -304,79 +46,36 @@ export default {
             title: 'Navegação',
             items: [
               {
-                id: 'dashboard',
+                id: 'home',
                 title: 'Dashboard',
                 subtitle: 'Visão Geral',
                 icon: 'fas fa-tachometer-alt',
-                href: '#',
-                active: true
+                href: '/',
+                active: this.$route.name === 'home'
               },
               {
-                id: 'monitoring',
-                title: 'Monitoramento',
-                subtitle: 'Tempo Real',
-                icon: 'fas fa-chart-line',
-                href: '#',
-                subItems: [
-                  {
-                    id: 'websocket',
-                    title: 'WebSocket',
-                    subtitle: 'Conexão Real-time',
-                    icon: 'fas fa-broadcast-tower',
-                    href: '#websocket'
-                  },
-                  {
-                    id: 'api',
-                    title: 'REST API',
-                    subtitle: 'HTTP Endpoints',
-                    icon: 'fas fa-satellite',
-                    href: '#api'
-                  },
-                  {
-                    id: 'notifications',
-                    title: 'Push Notifications',
-                    subtitle: 'Sistema de Alertas',
-                    icon: 'fas fa-bell',
-                    href: '#notifications'
-                  }
-                ]
+                id: 'websocket',
+                title: 'WebSocket',
+                subtitle: 'Conexão Real-time',
+                icon: 'fas fa-broadcast-tower',
+                href: '/websocket',
+                active: this.$route.name === 'websocket'
               },
               {
-                id: 'services',
-                title: 'Serviços',
-                subtitle: 'Integração',
-                icon: 'fas fa-server',
-                href: '#',
-                subItems: [
-                  {
-                    id: 'email',
-                    title: 'Email Service',
-                    subtitle: 'Comunicação',
-                    icon: 'fas fa-envelope',
-                    href: '#email'
-                  },
-                  {
-                    id: 'sms',
-                    title: 'SMS Gateway',
-                    subtitle: 'Mensagens',
-                    icon: 'fas fa-sms',
-                    href: '#sms'
-                  },
-                  {
-                    id: 'voice',
-                    title: 'Voice Service',
-                    subtitle: 'Chamadas',
-                    icon: 'fas fa-phone',
-                    href: '#voice'
-                  },
-                  {
-                    id: 'config',
-                    title: 'Configurações',
-                    subtitle: 'Parâmetros',
-                    icon: 'fas fa-cog',
-                    href: '#config'
-                  }
-                ]
+                id: 'api',
+                title: 'REST API',
+                subtitle: 'HTTP Endpoints',
+                icon: 'fas fa-satellite',
+                href: '/api',
+                active: this.$route.name === 'api'
+              },
+              {
+                id: 'configuracoes',
+                title: 'Configurações',
+                subtitle: 'Parâmetros',
+                icon: 'fas fa-cog',
+                href: '/configuracoes',
+                active: this.$route.name === 'configuracoes'
               }
             ]
           }
@@ -481,6 +180,9 @@ export default {
     
     handleNavClick(item) {
       console.log('Navegação clicada:', item)
+      if (item.href && item.href !== '#') {
+        this.$router.push(item.href)
+      }
     },
     
     handleSidebarToggle(collapsed) {
