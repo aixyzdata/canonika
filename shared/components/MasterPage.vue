@@ -35,6 +35,7 @@
 <script>
 import CanonikaHeader from './Header.vue'
 import CanonikaSidebar from './Sidebar.vue'
+import { getDefaultStatus } from '../config/status-standardization.js'
 
 export default {
   name: 'CanonikaMasterPage',
@@ -52,7 +53,7 @@ export default {
           name: 'Administrador',
           initial: 'A'
         },
-        systemStatus: 'ONLINE',
+        systemStatus: 'SERVICE ONLINE', // Padronizado: [SERVIÇO] [STATUS]
         isOnline: true
       })
     },
