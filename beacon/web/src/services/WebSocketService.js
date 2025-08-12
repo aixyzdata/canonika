@@ -467,19 +467,32 @@ class WebSocketService {
   }
 
   /**
-   * Decodificar token JWT
+   * Decodificar token (JWT ou Base64 simples)
    */
   decodeToken(token) {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      
-      return JSON.parse(jsonPayload);
+      // Primeiro, tentar como JWT
+      if (token.includes('.')) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        
+        return JSON.parse(jsonPayload);
+      } else {
+        // Tentar como Base64 simples (formato do Quarter)
+        const payload = JSON.parse(atob(token));
+        return payload;
+      }
     } catch (error) {
-      throw new Error('Invalid token');
+      console.error('Erro ao decodificar token:', error);
+      // Retornar payload padrão se não conseguir decodificar
+      return {
+        id: 'unknown',
+        name: 'Unknown User',
+        email: 'unknown@example.com'
+      };
     }
   }
 
