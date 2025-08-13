@@ -6,14 +6,14 @@
 const config = {
   // Configurações da API
   api: {
-    baseUrl: process.env.VITE_API_BASE_URL || 'http://localhost:3705',
+    baseUrl: process.env.VITE_API_BASE_URL || 'http://localhost:3706',
     timeout: 30000,
     retries: 3
   },
   
   // Configurações do WebSocket
   websocket: {
-    url: process.env.VITE_WS_URL || 'ws://localhost:3705/ws',
+    url: process.env.VITE_WS_URL || 'ws://localhost:3706/ws',
     reconnectInterval: 5000,
     maxReconnectAttempts: 10
   },
@@ -41,7 +41,7 @@ const config = {
     skipper: 'http://localhost:3702',
     beacon: 'http://localhost:3703',
     quarter: 'http://localhost:3700',
-    guardian: 'http://localhost:3706'
+    guardian: 'http://localhost:3705'
   }
 }
 
