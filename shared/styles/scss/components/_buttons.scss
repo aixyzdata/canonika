@@ -56,6 +56,18 @@
   }
 }
 
+// Outline button
+.btn-outline {
+  background: transparent;
+  border: 2px solid $primary-color;
+  color: $primary-color;
+
+  &:hover {
+    background: $primary-color;
+    color: $white;
+  }
+}
+
 // Success button
 .btn-success {
   background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
