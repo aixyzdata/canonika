@@ -4,6 +4,14 @@ import App from './src/App.vue'
 import FisherView from './src/views/FisherView.vue'
 import StatusView from './src/views/StatusView.vue'
 
+// Importar views de fontes de dados
+import SefazView from './src/views/sources/SefazView.vue'
+import MarketplacesView from './src/views/sources/MarketplacesView.vue'
+import ApisView from './src/views/sources/ApisView.vue'
+import DatabasesView from './src/views/sources/DatabasesView.vue'
+import ScrapingView from './src/views/sources/ScrapingView.vue'
+import FilesView from './src/views/sources/FilesView.vue'
+
 // Importar estilos compartilhados
 import '../shared/styles/scss/main.scss'
 
@@ -18,6 +26,37 @@ const routes = [
     path: '/status',
     name: 'StatusView',
     component: StatusView
+  },
+  // Rotas para fontes de dados
+  {
+    path: '/sources/sefaz',
+    name: 'SefazView',
+    component: SefazView
+  },
+  {
+    path: '/sources/marketplaces',
+    name: 'MarketplacesView',
+    component: MarketplacesView
+  },
+  {
+    path: '/sources/apis',
+    name: 'ApisView',
+    component: ApisView
+  },
+  {
+    path: '/sources/databases',
+    name: 'DatabasesView',
+    component: DatabasesView
+  },
+  {
+    path: '/sources/scraping',
+    name: 'ScrapingView',
+    component: ScrapingView
+  },
+  {
+    path: '/sources/files',
+    name: 'FilesView',
+    component: FilesView
   }
 ]
 

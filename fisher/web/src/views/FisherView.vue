@@ -259,7 +259,23 @@ export default {
     },
     openDataSource(source) {
       console.log('Abrindo fonte de dados:', source)
-      // Implementar navegação para a fonte específica
+      
+      // Mapear tipos para rotas
+      const routeMap = {
+        'sefaz': '/sources/sefaz',
+        'marketplaces': '/sources/marketplaces',
+        'apis': '/sources/apis',
+        'databases': '/sources/databases',
+        'scraping': '/sources/scraping',
+        'files': '/sources/files'
+      }
+      
+      const route = routeMap[source.type]
+      if (route) {
+        this.$router.push(route)
+      } else {
+        console.error('Rota não encontrada para:', source.type)
+      }
     }
   }
 }
