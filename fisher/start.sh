@@ -38,5 +38,5 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 # Manter o container rodando
-echo "🎣 Fisher Service rodando..."
+echo "🎣 Fisher Service rodando com Frontend + Backend..."
 wait 
