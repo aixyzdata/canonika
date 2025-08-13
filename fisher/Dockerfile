@@ -27,8 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Criar diretórios necessários
 RUN mkdir -p data/cnpj cache
 
-# Expor porta
-EXPOSE 3706
+# Expor portas
+EXPOSE 3706 80
 
 # Script de inicialização
 COPY fisher/start.sh /start.sh
