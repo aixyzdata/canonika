@@ -12,10 +12,10 @@ export default defineConfig({
   base: '/',
   server: {
     host: '0.0.0.0',
-    port: 5175,
+    port: 5176,
     hmr: {
       host: 'localhost',
-      port: 5175
+      port: 5176
     },
     watch: {
       usePolling: true

@@ -138,7 +138,7 @@ export default {
         'skipper': 'http://localhost:3702',
         'beacon': 'http://localhost:3703',
         'quarter': 'http://localhost:3700',
-        'guardian': 'http://localhost:3706'
+        'guardian': 'http://localhost:3705'
       }
       
       const url = serviceUrls[serviceId]

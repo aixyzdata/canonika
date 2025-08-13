@@ -23,7 +23,7 @@ const config = {
     name: 'Fisher',
     version: '1.0.0',
     description: 'Tripulante de Pesca de Dados',
-    port: process.env.VITE_PORT || 3705
+    port: process.env.VITE_PORT || 3706
   },
   
   // Configurações de autenticação
