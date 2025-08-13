@@ -4,7 +4,7 @@
 const config = {
   // URLs dos microserviços
   services: {
-    quarter: process.env.VUE_APP_QUARTER_URL || 'http://localhost',
+    quarter: process.env.VUE_APP_QUARTER_URL || 'http://localhost:3700',
     harbor: process.env.VUE_APP_HARBOR_URL || 'http://localhost:3701',
     guardian: process.env.VUE_APP_GUARDIAN_URL || 'http://localhost:3705',
     skipper: process.env.VUE_APP_SKIPPER_URL || 'http://localhost:3702',
