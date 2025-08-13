@@ -199,6 +199,7 @@ services:
     container_name: canonika_fisher
     ports:
       - "3706:3706"
+      - "3706:80"
       - "8006:8006"
       - "5176:5176"
     networks:
