@@ -18,7 +18,7 @@ COPY fisher/web/ /app/web/
 # Instalar dependências Python
 WORKDIR /app/api
 COPY fisher/api/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Criar diretórios necessários
 RUN mkdir -p data/cnpj cache
