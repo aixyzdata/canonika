@@ -68,6 +68,47 @@ export default {
             ]
           },
           {
+            title: 'Fontes de Dados',
+            items: [
+              {
+                id: 'sefaz',
+                title: 'SEFAZ',
+                subtitle: 'Receita Federal',
+                icon: 'fas fa-building'
+              },
+              {
+                id: 'marketplaces',
+                title: 'Marketplaces',
+                subtitle: 'E-commerce',
+                icon: 'fas fa-shopping-cart'
+              },
+              {
+                id: 'apis',
+                title: 'APIs Externas',
+                subtitle: 'Terceiros',
+                icon: 'fas fa-plug'
+              },
+              {
+                id: 'databases',
+                title: 'Bancos de Dados',
+                subtitle: 'Internos',
+                icon: 'fas fa-database'
+              },
+              {
+                id: 'scraping',
+                title: 'Web Scraping',
+                subtitle: 'Coleta Web',
+                icon: 'fas fa-spider'
+              },
+              {
+                id: 'files',
+                title: 'Arquivos Locais',
+                subtitle: 'CSV, Excel, XML',
+                icon: 'fas fa-file-alt'
+              }
+            ]
+          },
+          {
             title: 'Serviços',
             items: [
               {
@@ -121,11 +162,24 @@ export default {
       this.currentView = viewId
       console.log('View changed to:', viewId)
       
+      // Mapear fontes de dados para rotas
+      const dataSourceRoutes = {
+        'sefaz': '/sources/sefaz',
+        'marketplaces': '/sources/marketplaces',
+        'apis': '/sources/apis',
+        'databases': '/sources/databases',
+        'scraping': '/sources/scraping',
+        'files': '/sources/files'
+      }
+      
       // Navegar usando o router
       if (viewId === 'dashboard') {
         this.$router.push('/')
       } else if (viewId === 'status') {
         this.$router.push('/status')
+      } else if (dataSourceRoutes[viewId]) {
+        // Para fontes de dados, navegar internamente
+        this.$router.push(dataSourceRoutes[viewId])
       } else {
         // Para serviços externos, abrir em nova aba
         this.openExternalService(viewId)
