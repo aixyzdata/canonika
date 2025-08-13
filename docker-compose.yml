@@ -193,7 +193,9 @@ services:
 
   # Fisher - Coleta de Dados
   fisher:
-    build: ./fisher
+    build:
+      context: .
+      dockerfile: ./fisher/Dockerfile
     container_name: canonika_fisher
     ports:
       - "3706:3706"
