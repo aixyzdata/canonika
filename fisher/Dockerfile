@@ -8,8 +8,12 @@ COPY shared/ ./shared/
 RUN cd web && npm run build
 
 # Etapa 2: Backend + Nginx
-FROM nginx:1.25-alpine
-RUN apk add --no-cache python3 py3-pip gcc musl-dev libffi-dev openssl-dev nodejs npm
+FROM python:3.11-slim
+RUN apt-get update && apt-get install -y \
+    nginx \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 COPY fisher/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=frontend-build /app/web/dist/ /usr/share/nginx/html/
 COPY fisher/api/ /app/api/
@@ -18,7 +22,7 @@ COPY fisher/web/ /app/web/
 # Instalar dependências Python
 WORKDIR /app/api
 COPY fisher/api/requirements.txt .
-RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Criar diretórios necessários
 RUN mkdir -p data/cnpj cache
