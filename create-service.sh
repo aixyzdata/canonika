@@ -544,7 +544,7 @@ export default {
   flex-direction: column;
 }
 
-.view-header {
+.canonika-view .view-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -553,7 +553,7 @@ export default {
   border-bottom: 1px solid #334155;
 }
 
-.view-title {
+.canonika-view .view-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -562,7 +562,7 @@ export default {
   color: #e2e8f0;
 }
 
-.view-status {
+.canonika-view .view-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -570,27 +570,27 @@ export default {
   color: #94a3b8;
 }
 
-.status-indicator {
+.canonika-view .status-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
 
-.status-indicator.online {
+.canonika-view .status-indicator.online {
   background: #10b981;
   animation: pulse 2s infinite;
 }
 
-.status-indicator.offline {
+.canonika-view .status-indicator.offline {
   background: #ef4444;
 }
 
-.view-actions {
+.canonika-view .view-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.action-btn {
+.canonika-view .action-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -604,12 +604,12 @@ export default {
   transition: all 0.2s;
 }
 
-.action-btn:hover {
+.canonika-view .action-btn:hover {
   background: #3b82f6;
   color: white;
 }
 
-.view-content {
+.canonika-view .view-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;

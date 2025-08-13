@@ -1,5 +1,5 @@
 <template>
-  <div class="tollgate-view">
+  <div class="canonika-view">
     <div class="view-header">
       <div class="view-title">
         <i class="fas fa-toll"></i>

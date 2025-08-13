@@ -1,5 +1,5 @@
 <template>
-  <div class="tollgate-view">
+  <div class="canonika-view">
     <!-- Header Padronizado -->
     <div class="view-header">
       <div class="view-title">

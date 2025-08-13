@@ -1,0 +1,9 @@
+// =============================================================================
+// FISHER SERVICE - MAIN SCSS FILE
+// =============================================================================
+
+// Import shared design system
+@import "../../../shared/styles/scss/main";
+
+// Fisher-specific styles (consistente com Beacon)
+@import "./scss/_fisher-specific"; 

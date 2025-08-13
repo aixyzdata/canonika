@@ -1,153 +1,148 @@
 <template>
   <div class="canonika-view">
-    <!-- View Header seguindo padrão Skipper -->
+    <!-- View Header seguindo padrão do Beacon -->
     <div class="view-header">
       <div class="view-title">
         <i class="fas fa-plug"></i>
         <div class="title-content">
           <h1>APIs Externas</h1>
-          <p>APIs de terceiros e serviços externos</p>
+          <p>Integração com serviços terceiros</p>
         </div>
       </div>
       <div class="view-status">
         <div class="status-indicator online"></div>
-        <span>Sistema Operacional</span>
+        <span>Conectado</span>
       </div>
       <div class="view-actions">
-        <button @click="syncData" class="btn btn-primary btn-sm">
-          <i class="fas fa-sync me-2"></i>
-          Sincronizar Dados
+        <button @click="testConnections" class="btn btn-primary btn-sm">
+          <i class="fas fa-play me-2"></i>
+          Testar Conexões
         </button>
-        <button @click="refreshData" class="btn btn-secondary btn-sm">
-          <i class="fas fa-sync-alt me-2"></i>
-          Atualizar
+        <button @click="configureApis" class="btn btn-secondary btn-sm">
+          <i class="fas fa-cog me-2"></i>
+          Configurar
         </button>
       </div>
     </div>
 
     <!-- View Content -->
     <div class="view-content">
-      <div class="service-cards">
-        <!-- Status da Fonte -->
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-signal"></i>
-            </div>
-            <div class="card-title">
-              <h4>Status da Fonte</h4>
-              <span class="card-subtitle">Informações da conexão</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge online">{{ sourceStatus.status }}</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="balance-display">
-              <div class="balance-value">{{ sourceStatus.status }}</div>
-              <div class="balance-label">{{ sourceStatus.description }}</div>
-            </div>
-            <div class="balance-details">
-              <div class="detail-item">
-                <span class="detail-label">Última Sincronização:</span>
-                <span class="detail-value">{{ sourceStatus.lastSync }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">APIs Ativas:</span>
-                <span class="detail-value">{{ sourceStatus.activeApis }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Taxa de Sucesso:</span>
-                <span class="detail-value">{{ sourceStatus.successRate }}</span>
-              </div>
-            </div>
-          </div>
+      <!-- Seção: Status da Conexão -->
+      <div class="canonika-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="fas fa-plug text-success me-2"></i>
+            Status da Conexão
+          </h3>
+          <p class="section-description">
+            Monitoramento das APIs externas conectadas.
+          </p>
         </div>
-
-        <!-- APIs Conectadas -->
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-network-wired"></i>
-            </div>
-            <div class="card-title">
-              <h4>APIs Conectadas</h4>
-              <span class="card-subtitle">Serviços externos ativos</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge info">{{ apis.length }} APIs</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="apis-grid">
-              <div v-for="api in apis" :key="api.id" class="api-item">
-                <div class="api-icon">
-                  <i :class="api.icon"></i>
+        
+        <div class="section-content">
+          <div class="service-cards">
+            <div class="service-card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-plug"></i>
                 </div>
-                <div class="api-details">
-                  <div class="api-name">{{ api.name }}</div>
-                  <div class="api-status" :class="api.status">
-                    {{ api.statusText }}
+                <div class="card-title">
+                  <h4>Conexão APIs</h4>
+                  <span class="card-subtitle">8 APIs conectadas</span>
+                </div>
+                <div class="card-actions">
+                  <span class="status-badge online">Conectado</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="metric-grid">
+                  <div class="metric-item">
+                    <span class="metric-value">{{ connectionStatus.activeApis }}</span>
+                    <span class="metric-label">APIs Ativas</span>
                   </div>
-                  <div class="api-metrics">
-                    <span>{{ api.requests }} req/min</span>
-                    <span>{{ api.responseTime }}ms</span>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ connectionStatus.successRate }}%</span>
+                    <span class="metric-label">Taxa Sucesso</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ connectionStatus.avgResponse }}ms</span>
+                    <span class="metric-label">Tempo Médio</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ connectionStatus.lastTest }}</span>
+                    <span class="metric-label">Último Teste</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Métricas de Performance -->
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-tachometer-alt"></i>
-            </div>
-            <div class="card-title">
-              <h4>Métricas de Performance</h4>
-              <span class="card-subtitle">Indicadores de desempenho</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge info">{{ performanceMetrics.length }} Métricas</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="metrics-grid">
-              <div v-for="metric in performanceMetrics" :key="metric.id" class="metric-item">
-                <div class="metric-icon">
-                  <i :class="metric.icon"></i>
+            <div class="service-card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-chart-bar"></i>
                 </div>
-                <div class="metric-details">
-                  <div class="metric-value">{{ metric.value }}</div>
-                  <div class="metric-label">{{ metric.label }}</div>
+                <div class="card-title">
+                  <h4>Estatísticas</h4>
+                  <span class="card-subtitle">Dados coletados</span>
+                </div>
+                <div class="card-actions">
+                  <span class="status-badge online">Ativo</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="metric-grid">
+                  <div class="metric-item">
+                    <span class="metric-value">{{ dataStats.totalRequests }}</span>
+                    <span class="metric-label">Total Requisições</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ dataStats.successfulRequests }}</span>
+                    <span class="metric-label">Requisições OK</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ dataStats.failedRequests }}</span>
+                    <span class="metric-label">Falhas</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-value">{{ dataStats.dataVolume }}</span>
+                    <span class="metric-label">Volume de Dados</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Configurações -->
-        <div class="service-card">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="fas fa-cog"></i>
-            </div>
-            <div class="card-title">
-              <h4>Configurações</h4>
-              <span class="card-subtitle">Parâmetros da API</span>
-            </div>
-            <div class="card-actions">
-              <span class="status-badge info">{{ apiConfigs.length }} Configs</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <div class="config-list">
-              <div v-for="config in apiConfigs" :key="config.id" class="config-item">
-                <div class="config-name">{{ config.name }}</div>
-                <div class="config-value">{{ config.value }}</div>
-                <div class="config-description">{{ config.description }}</div>
+            <div class="service-card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-code"></i>
+                </div>
+                <div class="card-title">
+                  <h4>APIs Conectadas</h4>
+                  <span class="card-subtitle">Serviços ativos</span>
+                </div>
+                <div class="card-actions">
+                  <span class="status-badge online">{{ apis.length }} Ativas</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="apis-list">
+                  <div 
+                    v-for="api in apis" 
+                    :key="api.id" 
+                    class="api-item"
+                  >
+                    <div class="api-icon">
+                      <i :class="api.icon"></i>
+                    </div>
+                    <div class="api-content">
+                      <div class="api-name">{{ api.name }}</div>
+                      <div class="api-status">{{ api.status }}</div>
+                    </div>
+                    <div class="api-metrics">
+                      <span>{{ api.responseTime }}ms</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -159,158 +154,149 @@
 
 <script>
 export default {
-  name: 'FisherApisView',
+  name: 'ApisView',
   data() {
     return {
-      sourceStatus: {
-        status: 'ONLINE',
-        description: 'Todas as APIs funcionando normalmente',
-        lastSync: '2024-01-15 14:30:00',
-        activeApis: '8',
-        successRate: '98.5%'
+      connectionStatus: {
+        activeApis: 8,
+        successRate: 94.2,
+        avgResponse: 245,
+        lastTest: '2 min atrás'
+      },
+      dataStats: {
+        totalRequests: '125.8K',
+        successfulRequests: '118.5K',
+        failedRequests: '7.3K',
+        dataVolume: '2.8GB'
       },
       apis: [
         {
           id: 1,
-          name: 'Receita Federal',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-building',
-          requests: '150',
-          responseTime: '250'
+          name: 'Google Maps API',
+          status: 'Online',
+          icon: 'fas fa-map-marker-alt',
+          responseTime: 180
         },
         {
           id: 2,
-          name: 'Serasa',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-shield-alt',
-          requests: '200',
-          responseTime: '180'
+          name: 'Stripe Payment',
+          status: 'Online',
+          icon: 'fas fa-credit-card',
+          responseTime: 95
         },
         {
           id: 3,
-          name: 'SPC Brasil',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-credit-card',
-          requests: '120',
-          responseTime: '300'
+          name: 'SendGrid Email',
+          status: 'Online',
+          icon: 'fas fa-envelope',
+          responseTime: 320
         },
         {
           id: 4,
-          name: 'Banco Central',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-university',
-          requests: '80',
-          responseTime: '400'
+          name: 'AWS S3',
+          status: 'Online',
+          icon: 'fas fa-cloud',
+          responseTime: 150
         },
         {
           id: 5,
-          name: 'IBGE',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-chart-bar',
-          requests: '50',
-          responseTime: '500'
+          name: 'Twilio SMS',
+          status: 'Online',
+          icon: 'fas fa-sms',
+          responseTime: 280
         },
         {
           id: 6,
-          name: 'Anvisa',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-pills',
-          requests: '90',
-          responseTime: '350'
+          name: 'Slack Webhook',
+          status: 'Online',
+          icon: 'fab fa-slack',
+          responseTime: 200
         },
         {
           id: 7,
-          name: 'Inmetro',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-certificate',
-          requests: '70',
-          responseTime: '280'
+          name: 'GitHub API',
+          status: 'Online',
+          icon: 'fab fa-github',
+          responseTime: 165
         },
         {
           id: 8,
-          name: 'Procon',
-          status: 'online',
-          statusText: 'ONLINE',
-          icon: 'fas fa-balance-scale',
-          requests: '60',
-          responseTime: '320'
-        }
-      ],
-      performanceMetrics: [
-        {
-          id: 1,
-          name: 'Total de Requisições',
-          value: '820',
-          label: 'req/min',
-          icon: 'fas fa-chart-line'
-        },
-        {
-          id: 2,
-          name: 'Tempo Médio de Resposta',
-          value: '310',
-          label: 'ms',
-          icon: 'fas fa-clock'
-        },
-        {
-          id: 3,
-          name: 'Taxa de Sucesso',
-          value: '98.5%',
-          label: 'sucesso',
-          icon: 'fas fa-check-circle'
-        },
-        {
-          id: 4,
-          name: 'APIs Ativas',
-          value: '8/8',
-          label: 'ativas',
-          icon: 'fas fa-plug'
-        }
-      ],
-      apiConfigs: [
-        {
-          id: 1,
-          name: 'Rate Limit',
-          value: '1000 req/min',
-          description: 'Limite de requisições por minuto'
-        },
-        {
-          id: 2,
-          name: 'Timeout',
-          value: '30s',
-          description: 'Tempo limite de resposta'
-        },
-        {
-          id: 3,
-          name: 'Retry Policy',
-          value: '3 tentativas',
-          description: 'Política de retry'
-        },
-        {
-          id: 4,
-          name: 'Cache TTL',
-          value: '3600s',
-          description: 'Tempo de vida do cache'
+          name: 'Weather API',
+          status: 'Online',
+          icon: 'fas fa-cloud-sun',
+          responseTime: 420
         }
       ]
     }
   },
   methods: {
-    syncData() {
-      console.log('Sincronizando dados das APIs...')
-      // Implementar lógica de sincronização
+    testConnections() {
+      console.log('Testando conexões das APIs...')
+      // Lógica para testar conexões
     },
-    refreshData() {
-      console.log('Atualizando dados das APIs...')
-      // Implementar lógica de atualização
+    configureApis() {
+      console.log('Configurando APIs...')
+      // Lógica para configurar APIs
     }
   }
 }
 </script>
+
+<style scoped>
+/* Estilos específicos das APIs seguindo padrão Beacon */
+.apis-list {
+  margin-top: 1rem;
+}
+
+.api-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.api-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+}
+
+.api-icon {
+  width: 2rem;
+  height: 2rem;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.api-content {
+  flex: 1;
+}
+
+.api-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.25rem;
+}
+
+.api-status {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.api-metrics {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+</style>
 

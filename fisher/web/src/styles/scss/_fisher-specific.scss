@@ -1,29 +1,29 @@
 // =============================================================================
-// BEACON SERVICE - SPECIFIC STYLES (SEM DUPLICAÇÕES)
+// FISHER SERVICE - SPECIFIC STYLES (SEM DUPLICAÇÕES)
 // =============================================================================
 
-// Beacon-specific customizations only
+// Fisher-specific customizations only
 // No duplicated classes - using shared design system
 
-.beacon-service {
-  // Beacon-specific customizations can go here
+.fisher-service {
+  // Fisher-specific customizations can go here
 }
 
-// Beacon-specific animations (if not in shared system)
-@keyframes beacon-pulse {
+// Fisher-specific animations (if not in shared system)
+@keyframes fisher-glow {
   0%, 100% {
-    opacity: 1;
+    opacity: 0.5;
   }
   50% {
-    opacity: 0.7;
+    opacity: 1;
   }
 }
 
-// Beacon-specific utility classes (if needed)
-.beacon-gradient {
+// Fisher-specific utility classes (if needed)
+.fisher-gradient {
   background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
 }
 
-.beacon-border {
+.fisher-border {
   border: 2px solid #3b82f6;
 } 
