@@ -41,7 +41,9 @@ services:
 
   # Harbor - Dashboard Principal
   harbor:
-    build: ./harbor
+    build:
+      context: .
+      dockerfile: ./harbor/Dockerfile
     container_name: canonika_harbor
     ports:
       - "3701:3701"

@@ -1,5 +1,5 @@
 <template>
-  <div class="canonika-view">
+  <div class="tollgate-view">
     <!-- View Header seguindo padrão Skipper -->
     <div class="view-header">
       <div class="view-title">
