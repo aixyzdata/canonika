@@ -43,7 +43,7 @@ export default {
         },
         navigationSections: [
           {
-            title: 'Navegação',
+            title: 'Navegação Principal',
             items: [
               {
                 id: 'dashboard',
@@ -52,15 +52,25 @@ export default {
                 icon: 'fas fa-tachometer-alt',
                 href: '/',
                 active: true
-              },
+              }
+            ]
+          },
+          {
+            title: 'AG-Grid Template',
+            items: [
               {
                 id: 'aggrid-reference',
                 title: 'AG-Grid Reference',
-                subtitle: 'Template Oficial',
+                subtitle: 'Implementação Oficial Vue',
                 icon: 'fas fa-table',
                 href: '/aggrid-reference',
                 active: false
-              },
+              }
+            ]
+          },
+          {
+            title: 'Componentes',
+            items: [
               {
                 id: 'components',
                 title: 'Componentes',
@@ -230,6 +240,16 @@ export default {
     
     // Processar token se presente na URL
     this.processAuthToken()
+    
+    // Atualizar item ativo baseado na rota atual
+    this.updateActiveNavBasedOnRoute()
+  },
+  
+  watch: {
+    '$route'(to, from) {
+      // Atualizar item ativo quando a rota mudar
+      this.updateActiveNavBasedOnRoute()
+    }
   },
   methods: {
     async checkAuthentication() {
@@ -328,6 +348,51 @@ export default {
     
     handleNavClick(item) {
       console.log('Navegação clicada:', item)
+      
+      // Navegação via Vue Router
+      if (item.href && item.href.startsWith('/')) {
+        this.$router.push(item.href)
+        
+        // Atualizar item ativo no sidebar
+        this.updateActiveNavItem(item.id)
+      } else if (item.href && item.href.startsWith('#')) {
+        // Navegação por âncora (scroll)
+        const element = document.querySelector(item.href)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    },
+    
+    updateActiveNavItem(activeId) {
+      // Atualizar item ativo na navegação
+      this.sidebarConfig.navigationSections.forEach(section => {
+        section.items.forEach(item => {
+          item.active = item.id === activeId
+          
+          // Também atualizar subitems se existir
+          if (item.subItems) {
+            item.subItems.forEach(subItem => {
+              subItem.active = subItem.id === activeId
+            })
+          }
+        })
+      })
+    },
+    
+    updateActiveNavBasedOnRoute() {
+      const currentPath = this.$route.path
+      
+      // Mapear rotas para IDs dos items do sidebar
+      const routeToItemMap = {
+        '/': 'dashboard',
+        '/aggrid-reference': 'aggrid-reference'
+      }
+      
+      const activeItemId = routeToItemMap[currentPath] || 'dashboard'
+      this.updateActiveNavItem(activeItemId)
+      
+      console.log('🔄 Rota atual:', currentPath, '- Item ativo:', activeItemId)
     },
     
     handleSidebarToggle(collapsed) {
