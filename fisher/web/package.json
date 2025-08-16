@@ -12,6 +12,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "ag-grid-vue3": "^34.1.1",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"
   },

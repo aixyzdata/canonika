@@ -3,4 +3,7 @@
 // =============================================================================
 
 // Import shared design system
-@import "../../../shared/styles/scss/main"; 
+@import "../../../shared/styles/scss/main";
+
+// Import AG-Grid Canonika theme
+@import "./ag-grid-canonika"; 
