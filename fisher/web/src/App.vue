@@ -64,7 +64,8 @@ export default {
                 title: 'Status',
                 subtitle: 'Monitoramento',
                 icon: 'fas fa-chart-line'
-              }
+              },
+
             ]
           },
           {
@@ -177,6 +178,7 @@ export default {
         this.$router.push('/')
       } else if (viewId === 'status') {
         this.$router.push('/status')
+      // AG-Grid removido - usando apenas Bootstrap
       } else if (dataSourceRoutes[viewId]) {
         // Para fontes de dados, navegar internamente
         this.$router.push(dataSourceRoutes[viewId])

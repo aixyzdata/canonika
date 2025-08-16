@@ -7,6 +7,7 @@ import csv
 import zipfile
 import logging
 import asyncio
+import os
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import pandas as pd
@@ -20,7 +21,15 @@ logger = logging.getLogger(__name__)
 class CNPJProcessor:
     """Processador de arquivos CNPJ da Receita Federal"""
     
-    def __init__(self, db_url: str = "postgresql+asyncpg://canonika:canonika@postgres:5432/canonika"):
+    def __init__(self, db_url: str = None):
+        # Usar variável de ambiente ou fallback para configuração padrão
+        if db_url is None:
+            db_url = os.getenv('POSTGRES_URL', 'postgresql://canonika:canonika123@postgres:5432/canonika')
+        
+        # Converter para formato asyncpg se necessário
+        if db_url.startswith('postgresql://'):
+            db_url = db_url.replace('postgresql://', 'postgresql+asyncpg://')
+        
         self.db_url = db_url
         self.engine = None
         self.session_factory = None

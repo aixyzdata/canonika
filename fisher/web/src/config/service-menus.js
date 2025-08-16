@@ -24,6 +24,13 @@ export function getServiceMenu(serviceName) {
           subtitle: 'Monitoramento',
           icon: 'fas fa-chart-line',
           route: '/status'
+        },
+        {
+          id: 'test',
+          title: 'Teste AG Grid',
+          subtitle: 'Teste do Grid',
+          icon: 'fas fa-flask',
+          route: '/test'
         }
       ]
     }

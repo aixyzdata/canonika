@@ -27,6 +27,7 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
 from cnpj_processor import CNPJProcessor
+from cnpj_scraper import CNPJScraper
 from sqlalchemy import text
 
 # Modelo para request de download
@@ -1110,10 +1111,425 @@ async def get_available_months():
             "error": str(e)
         }
 
+@app.get("/cnpj/search")
+async def search_cnpj(q: str, limit: int = 10):
+    """Busca CNPJs na base local"""
+    try:
+        # Inicializar processador se necessário
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+                    # Buscar na base de dados
+            async with cnpj_processor.session_factory() as session:
+                # Busca por CNPJ, razão social ou nome fantasia
+                query = text("""
+                    SELECT 
+                        cnpj_base,
+                        company_name,
+                        trade_name,
+                        state,
+                        city,
+                        activity_start_date,
+                        main_fiscal_cnae
+                    FROM cnpj_companies 
+                    WHERE 
+                        cnpj_base LIKE :search OR
+                        company_name ILIKE :search OR
+                        trade_name ILIKE :search
+                    LIMIT :limit
+                """)
+            
+            result = await session.execute(query, {
+                "search": f"%{q}%",
+                "limit": limit
+            })
+            
+            rows = result.fetchall()
+            
+            # Format results
+            results = []
+            for row in rows:
+                results.append({
+                    "cnpj": row[0],
+                    "company_name": row[1],
+                    "trade_name": row[2],
+                    "state": row[3],
+                    "city": row[4],
+                    "activity_start_date": row[5],
+                    "main_fiscal_cnae": row[6]
+                })
+            
+            return {
+                "status": "success",
+                "query": q,
+                "total_results": len(results),
+                "results": results
+            }
+            
+    except Exception as e:
+        logger.error(f"Erro na busca CNPJ: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.get("/cnpj/stats")
+async def get_cnpj_stats():
+    """Obtém estatísticas da base local CNPJ"""
+    try:
+        # Inicializar processador se necessário
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        async with cnpj_processor.session_factory() as session:
+            # Count total companies
+            total_companies = await session.execute(text("SELECT COUNT(*) FROM cnpj_companies"))
+            total_companies = total_companies.scalar()
+            
+            # Count total establishments
+            total_establishments = await session.execute(text("SELECT COUNT(*) FROM cnpj_establishments"))
+            total_establishments = total_establishments.scalar()
+            
+            # Count total partners
+            total_partners = await session.execute(text("SELECT COUNT(*) FROM cnpj_partners"))
+            total_partners = total_partners.scalar()
+            
+            # Last update
+            last_update = await session.execute(text("SELECT MAX(activity_start_date) FROM cnpj_establishments"))
+            last_update = last_update.scalar()
+            
+            # Tamanho da base (estimativa)
+            base_size = await session.execute(text("""
+                SELECT pg_size_pretty(pg_database_size(current_database()))
+            """))
+            base_size = base_size.scalar()
+            
+            return {
+                "status": "success",
+                "stats": {
+                    "total_companies": total_companies,
+                    "total_establishments": total_establishments,
+                    "total_partners": total_partners,
+                    "last_update": str(last_update) if last_update else None,
+                    "base_size": base_size
+                }
+            }
+            
+    except Exception as e:
+        logger.error(f"Erro ao obter estatísticas CNPJ: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.get("/cnpj/sync/status")
+async def get_sync_status():
+    """Obtém status da sincronização CNPJ (dinâmico + local)"""
+    try:
+        # Buscar dados dinâmicos do site da Receita Federal
+        async with CNPJScraper() as scraper:
+            remote_hierarchy = await scraper.get_complete_hierarchy()
+        
+        # Buscar dados locais da tabela de controle
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        async with cnpj_processor.session_factory() as session:
+            result = await session.execute(text("""
+                SELECT status, download_date
+                FROM cnpj_file_control 
+                WHERE status IN ('DOWNLOADED', 'IMPORTED')
+                ORDER BY download_date DESC
+                LIMIT 1
+            """))
+            
+            last_download_row = result.fetchone()
+            last_download = last_download_row[1].isoformat() if last_download_row and last_download_row[1] else None
+        
+        # Calcular estatísticas
+        total_available = remote_hierarchy['total_files']
+        total_downloaded = remote_hierarchy['total_files']  # Por enquanto, todos estão pendentes
+        
+        # Contar arquivos baixados localmente
+        async with cnpj_processor.session_factory() as session:
+            result = await session.execute(text("""
+                SELECT COUNT(*) as downloaded_count
+                FROM cnpj_file_control 
+                WHERE status IN ('DOWNLOADED', 'IMPORTED')
+            """))
+            
+            downloaded_count = result.fetchone()[0]
+            total_pending = total_available - downloaded_count
+        
+        return {
+            "status": "success",
+            "sync_status": {
+                "total_available": total_available,
+                "total_downloaded": downloaded_count,
+                "total_pending": total_pending,
+                "sync_percentage": (downloaded_count / total_available * 100) if total_available > 0 else 0,
+                "last_download": last_download,
+                "last_check": remote_hierarchy['last_check']
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao obter status de sincronização: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.get("/cnpj/files/hierarchy")
+async def get_cnpj_files_hierarchy():
+    """Retorna a hierarquia de arquivos CNPJ disponíveis (dinâmico + local)"""
+    try:
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        # Buscar dados dinâmicos do site da Receita Federal
+        async with CNPJScraper() as scraper:
+            remote_hierarchy = await scraper.get_complete_hierarchy()
+        
+        # Buscar dados locais da tabela de controle
+        async with cnpj_processor.session_factory() as session:
+            result = await session.execute(text("""
+                SELECT folder, filename, file_url, file_size_bytes, 
+                       last_modified, status, download_date, import_date,
+                       download_attempts, import_attempts, last_error
+                FROM cnpj_file_control 
+                ORDER BY folder DESC, filename
+            """))
+            
+            local_files = result.fetchall()
+            
+            # Criar dicionário de arquivos locais para cruzamento
+            local_files_dict = {}
+            for file in local_files:
+                key = f"{file[0]}/{file[1]}"
+                local_files_dict[key] = {
+                    'status': file[5],
+                    'download_date': file[6].isoformat() if file[6] else None,
+                    'import_date': file[7].isoformat() if file[7] else None,
+                    'local_size': file[3],
+                    'download_attempts': file[8],
+                    'import_attempts': file[9],
+                    'last_error': file[10]
+                }
+        
+        # Cruzar dados remotos com locais
+        merged_folders = {}
+        
+        for file in remote_hierarchy['files']:
+            folder = file['folder']
+            filename = file['filename']
+            key = f"{folder}/{filename}"
+            
+            if folder not in merged_folders:
+                merged_folders[folder] = {
+                    'folder': folder,
+                    'files': [],
+                    'total_files': 0,
+                    'downloaded_files': 0,
+                    'pending_files': 0,
+                    'imported_files': 0,
+                    'failed_files': 0
+                }
+            
+            # Verificar se arquivo existe localmente
+            local_info = local_files_dict.get(key, {})
+            
+            file_info = {
+                'filename': filename,
+                'file_url': file['file_url'],
+                'file_size': file['file_size'],
+                'last_modified': file['last_modified'],
+                'status': local_info.get('status', 'PENDING'),
+                'download_date': local_info.get('download_date'),
+                'import_date': local_info.get('import_date'),
+                'local_size': local_info.get('local_size'),
+                'download_attempts': local_info.get('download_attempts', 0),
+                'import_attempts': local_info.get('import_attempts', 0),
+                'last_error': local_info.get('last_error')
+            }
+            
+            merged_folders[folder]['files'].append(file_info)
+            merged_folders[folder]['total_files'] += 1
+            
+            status = file_info['status']
+            if status == 'DOWNLOADED':
+                merged_folders[folder]['downloaded_files'] += 1
+            elif status == 'PENDING':
+                merged_folders[folder]['pending_files'] += 1
+            elif status == 'IMPORTED':
+                merged_folders[folder]['imported_files'] += 1
+            elif status == 'FAILED':
+                merged_folders[folder]['failed_files'] += 1
+        
+        # Converter para lista ordenada
+        folders_list = list(merged_folders.values())
+        folders_list.sort(key=lambda x: x["folder"], reverse=True)
+        
+        return {
+            "status": "success",
+            "folders": folders_list,
+            "total_folders": len(folders_list),
+            "total_files": sum(len(f['files']) for f in folders_list),
+            "last_check": remote_hierarchy['last_check']
+        }
+            
+    except Exception as e:
+        logger.error(f"Erro ao buscar hierarquia de arquivos: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.post("/init-db")
+async def initialize_database():
+    """Inicializa o banco de dados com as tabelas necessárias"""
+    try:
+        # Inicializar processador se necessário
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        # Executar schema SQL
+        async with cnpj_processor.session_factory() as session:
+            # Ler arquivo schema.sql
+            schema_path = Path(__file__).parent / "schema.sql"
+            logger.info(f"Lendo schema de: {schema_path}")
+            
+            with open(schema_path, 'r', encoding='utf-8') as f:
+                schema_sql = f.read()
+            
+            logger.info(f"Schema SQL lido, tamanho: {len(schema_sql)} caracteres")
+            
+            # Executar comandos SQL
+            commands_executed = 0
+            
+            # Processar linha por linha para separar comentários de comandos
+            lines = schema_sql.split('\n')
+            current_command = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith('--'):
+                    continue
+                
+                current_command.append(line)
+                
+                if line.endswith(';'):
+                    # Comando completo encontrado
+                    full_command = ' '.join(current_command)
+                    if full_command and not full_command.startswith('--'):
+                        logger.info(f"Executando comando: {full_command[:100]}...")
+                        await session.execute(text(full_command))
+                        commands_executed += 1
+                    current_command = []
+            
+            logger.info(f"Total de comandos executados: {commands_executed}")
+            await session.commit()
+        
+        return {
+            "status": "success",
+            "message": f"Banco de dados inicializado com sucesso. {commands_executed} comandos executados.",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao inicializar banco de dados: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@app.post("/load-test-data")
+async def load_test_data():
+    """Carrega dados de teste na tabela cnpj_file_control"""
+    try:
+        if not cnpj_processor.engine:
+            await cnpj_processor.initialize_db()
+        
+        # Dados de teste hardcoded
+        test_data = [
+            # Arquivos PENDENTES
+            ("2025-08", "CNPJ_2025_08.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-08/CNPJ_2025_08.zip", 1280000000, "2025-08-01 10:00:00", "PENDING", None, None, None, 0, 0, None),
+            ("2025-07", "CNPJ_2025_07.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-07/CNPJ_2025_07.zip", 1250000000, "2025-07-01 10:00:00", "PENDING", None, None, None, 0, 0, None),
+            ("2025-06", "CNPJ_2025_06.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-06/CNPJ_2025_06.zip", 1220000000, "2025-06-01 10:00:00", "PENDING", None, None, None, 0, 0, None),
+            
+            # Arquivos BAIXADOS
+            ("2025-05", "CNPJ_2025_05.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-05/CNPJ_2025_05.zip", 1200000000, "2025-05-01 10:00:00", "DOWNLOADED", "2025-08-14 15:30:00", None, "/app/api/data/cnpj/2025-05/CNPJ_2025_05.zip", 1, 0, None),
+            ("2025-04", "CNPJ_2025_04.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-04/CNPJ_2025_04.zip", 1180000000, "2025-04-01 10:00:00", "DOWNLOADED", "2025-08-14 14:45:00", None, "/app/api/data/cnpj/2025-04/CNPJ_2025_04.zip", 1, 0, None),
+            ("2025-03", "CNPJ_2025_03.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-03/CNPJ_2025_03.zip", 1150000000, "2025-03-01 10:00:00", "DOWNLOADED", "2025-08-14 13:20:00", None, "/app/api/data/cnpj/2025-03/CNPJ_2025_03.zip", 1, 0, None),
+            
+            # Arquivos IMPORTADOS
+            ("2025-02", "CNPJ_2025_02.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-02/CNPJ_2025_02.zip", 1120000000, "2025-02-01 10:00:00", "IMPORTED", "2025-08-14 12:15:00", "2025-08-14 12:45:00", "/app/api/data/cnpj/2025-02/CNPJ_2025_02.zip", 1, 1, None),
+            ("2025-01", "CNPJ_2025_01.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2025-01/CNPJ_2025_01.zip", 1100000000, "2025-01-01 10:00:00", "IMPORTED", "2025-08-14 11:30:00", "2025-08-14 12:00:00", "/app/api/data/cnpj/2025-01/CNPJ_2025_01.zip", 1, 1, None),
+            ("2024-12", "CNPJ_2024_12.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-12/CNPJ_2024_12.zip", 1080000000, "2024-12-01 10:00:00", "IMPORTED", "2025-08-14 10:45:00", "2025-08-14 11:15:00", "/app/api/data/cnpj/2024-12/CNPJ_2024_12.zip", 1, 1, None),
+            
+            # Arquivos com FALHA
+            ("2024-11", "CNPJ_2024_11.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-11/CNPJ_2024_11.zip", 1050000000, "2024-11-01 10:00:00", "FAILED", None, None, None, 3, 0, "Connection timeout after 30 seconds"),
+            ("2024-10", "CNPJ_2024_10.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-10/CNPJ_2024_10.zip", 1020000000, "2024-10-01 10:00:00", "FAILED", None, None, None, 2, 0, "HTTP 404 - File not found"),
+            ("2024-09", "CNPJ_2024_09.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-09/CNPJ_2024_09.zip", 1000000000, "2024-09-01 10:00:00", "FAILED", "2025-08-14 09:30:00", None, "/app/api/data/cnpj/2024-09/CNPJ_2024_09.zip", 1, 2, "Invalid ZIP file format"),
+            
+            # Mais arquivos PENDENTES
+            ("2024-08", "CNPJ_2024_08.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-08/CNPJ_2024_08.zip", 980000000, "2024-08-01 10:00:00", "PENDING", None, None, None, 0, 0, None),
+            ("2024-07", "CNPJ_2024_07.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-07/CNPJ_2024_07.zip", 950000000, "2024-07-01 10:00:00", "PENDING", None, None, None, 0, 0, None),
+            ("2024-06", "CNPJ_2024_06.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-06/CNPJ_2024_06.zip", 920000000, "2024-06-01 10:00:00", "PENDING", None, None, None, 0, 0, 0),
+            
+            # Arquivos mais antigos IMPORTADOS
+            ("2024-05", "CNPJ_2024_05.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-05/CNPJ_2024_05.zip", 900000000, "2024-05-01 10:00:00", "IMPORTED", "2025-08-14 07:30:00", "2025-08-14 08:00:00", "/app/api/data/cnpj/2024-05/CNPJ_2024_05.zip", 1, 1, None),
+            ("2024-04", "CNPJ_2024_04.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-04/CNPJ_2024_04.zip", 880000000, "2024-04-01 10:00:00", "IMPORTED", "2025-08-14 06:45:00", "2025-08-14 07:15:00", "/app/api/data/cnpj/2024-04/CNPJ_2024_04.zip", 1, 1, None),
+            ("2024-03", "CNPJ_2024_03.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-03/CNPJ_2024_03.zip", 850000000, "2024-03-01 10:00:00", "IMPORTED", "2025-08-14 06:00:00", "2025-08-14 06:30:00", "/app/api/data/cnpj/2024-03/CNPJ_2024_03.zip", 1, 1, None),
+            ("2024-02", "CNPJ_2024_02.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-02/CNPJ_2024_02.zip", 820000000, "2024-02-01 10:00:00", "IMPORTED", "2025-08-14 05:15:00", "2025-08-14 05:45:00", "/app/api/data/cnpj/2024-02/CNPJ_2024_02.zip", 1, 1, None),
+            ("2024-01", "CNPJ_2024_01.zip", "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2024-01/CNPJ_2024_01.zip", 800000000, "2024-01-01 10:00:00", "IMPORTED", "2025-08-14 04:30:00", "2025-08-14 05:00:00", "/app/api/data/cnpj/2024-01/CNPJ_2024_01.zip", 1, 1, None),
+        ]
+        
+        # Executar inserções
+        async with cnpj_processor.session_factory() as session:
+            for data in test_data:
+                try:
+                    await session.execute(text("""
+                        INSERT INTO cnpj_file_control 
+                        (folder, filename, file_url, file_size_bytes, last_modified, status, download_date, import_date, local_path, download_attempts, import_attempts, last_error)
+                        VALUES (:folder, :filename, :file_url, :file_size_bytes, :last_modified, :status, :download_date, :import_date, :local_path, :download_attempts, :import_attempts, :last_error)
+                    """), {
+                        "folder": data[0],
+                        "filename": data[1],
+                        "file_url": data[2],
+                        "file_size_bytes": data[3],
+                        "last_modified": data[4],
+                        "status": data[5],
+                        "download_date": data[6],
+                        "import_date": data[7],
+                        "local_path": data[8],
+                        "download_attempts": data[9],
+                        "import_attempts": data[10],
+                        "last_error": data[11]
+                    })
+                    logger.info(f"Dado inserido: {data[1]}")
+                except Exception as e:
+                    logger.warning(f"Erro ao inserir {data[1]}: {e}")
+                    # Continuar com outros dados
+            
+            await session.commit()
+        
+        return {
+            "status": "success",
+            "message": f"Dados de teste carregados com sucesso! {len(test_data)} registros inseridos."
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao carregar dados de teste: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
 @app.get("/health")
 async def health_check():
     """Health check da API"""
     return {"status": "healthy", "service": "fisher"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=3706) 
+    uvicorn.run(app, host="0.0.0.0", port=8000) 

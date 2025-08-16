@@ -1,149 +1,160 @@
 <template>
   <div class="canonika-view">
-    <!-- View Header seguindo padrão do Beacon -->
-    <div class="view-header">
-      <div class="view-title">
-        <i class="fas fa-database"></i>
-        <div class="title-content">
-          <h1>Bancos de Dados</h1>
-          <p>Fontes de dados internas</p>
+    <!-- View Header (padrão template) -->
+    <div class="view-header-card">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="service-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <div class="service-info">
+            <h2>BANCOS DE DADOS - Sistema de Dados</h2>
+            <p>Gerenciamento e monitoramento de fontes de dados internas</p>
+          </div>
         </div>
-      </div>
-      <div class="view-status">
-        <div class="status-indicator online"></div>
-        <span>Conectado</span>
-      </div>
-      <div class="view-actions">
-        <button @click="backupDatabases" class="btn btn-primary btn-sm">
-          <i class="fas fa-download me-2"></i>
-          Backup
-        </button>
-        <button @click="optimizeDatabases" class="btn btn-secondary btn-sm">
-          <i class="fas fa-cog me-2"></i>
-          Otimizar
-        </button>
+        <div class="header-center">
+          <div class="status-indicator-large">
+            <div class="status-dot online"></div>
+            <span>Sistema Operacional</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button @click="backupDatabases" class="btn btn-primary">
+            <i class="fas fa-download me-2"></i>
+            Backup
+          </button>
+          <button @click="optimizeDatabases" class="btn btn-secondary">
+            <i class="fas fa-cog me-2"></i>
+            Otimizar
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- View Content -->
     <div class="view-content">
-      <!-- Seção: Status da Conexão -->
+      <!-- Seção: Monitoramento de Bancos -->
       <div class="canonika-section">
         <div class="section-header">
           <h3 class="section-title">
-            <i class="fas fa-plug text-success me-2"></i>
-            Status da Conexão
+            <i class="fas fa-server section-icon text-success"></i>
+            MONITORAMENTO DE BANCOS
           </h3>
           <p class="section-description">
-            Monitoramento dos bancos de dados internos.
+            Status em tempo real das conexões e performance dos bancos de dados.
           </p>
         </div>
-        
         <div class="section-content">
-          <div class="service-cards">
-            <div class="service-card">
+          <div class="service-cards-grid">
+            <div class="service-card-large">
               <div class="card-header">
                 <div class="card-icon">
                   <i class="fas fa-database"></i>
                 </div>
-                <div class="card-title">
-                  <h4>Conexão Databases</h4>
-                  <span class="card-subtitle">5 bancos conectados</span>
+                <div class="card-info">
+                  <h4>STATUS DAS CONEXÕES</h4>
+                  <p class="card-subtitle">Monitoramento em tempo real</p>
                 </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Conectado</span>
+                <div class="card-status">
+                  <span class="status-badge functioning">Funcionando</span>
                 </div>
               </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.activeDatabases }}</span>
-                    <span class="metric-label">DBs Ativos</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.successRate }}%</span>
-                    <span class="metric-label">Taxa Sucesso</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.avgResponse }}ms</span>
-                    <span class="metric-label">Tempo Médio</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.lastBackup }}</span>
-                    <span class="metric-label">Último Backup</span>
-                  </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.activeDatabases }}</span>
+                  <span class="metric-label">DBs Ativos</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.successRate }}%</span>
+                  <span class="metric-label">Taxa Sucesso</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.avgResponse }}ms</span>
+                  <span class="metric-label">Tempo Médio</span>
                 </div>
               </div>
             </div>
 
-            <div class="service-card">
+            <div class="service-card-large">
               <div class="card-header">
                 <div class="card-icon">
                   <i class="fas fa-chart-bar"></i>
                 </div>
-                <div class="card-title">
-                  <h4>Estatísticas</h4>
-                  <span class="card-subtitle">Dados armazenados</span>
+                <div class="card-info">
+                  <h4>ESTATÍSTICAS DE DADOS</h4>
+                  <p class="card-subtitle">Volume e performance</p>
                 </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Ativo</span>
+                <div class="card-status">
+                  <span class="status-badge functioning">Ativo</span>
                 </div>
               </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.totalSize }}</span>
-                    <span class="metric-label">Tamanho Total</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.totalRecords }}</span>
-                    <span class="metric-label">Total Registros</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.performance }}%</span>
-                    <span class="metric-label">Performance</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.connections }}</span>
-                    <span class="metric-label">Conexões Ativas</span>
-                  </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.totalSize }}</span>
+                  <span class="metric-label">Tamanho Total</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.totalRecords }}</span>
+                  <span class="metric-label">Registros</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.connections }}</span>
+                  <span class="metric-label">Conexões</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="service-card">
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-server"></i>
-                </div>
-                <div class="card-title">
-                  <h4>Bancos Conectados</h4>
-                  <span class="card-subtitle">Instâncias ativas</span>
-                </div>
-                <div class="card-actions">
-                  <span class="status-badge online">{{ databases.length }} Ativos</span>
-                </div>
+          <h3 class="section-title mt-4">
+            <i class="fas fa-list-alt section-icon text-primary"></i>
+            LISTA DE BANCOS CONECTADOS
+          </h3>
+          <p class="section-description">
+            Detalhes e status de cada instância de banco de dados.
+          </p>
+          <div class="feature-cards-grid">
+            <div 
+              v-for="database in databases" 
+              :key="database.id" 
+              class="feature-card"
+            >
+              <div class="feature-icon">
+                <i :class="database.icon"></i>
               </div>
-              <div class="card-content">
-                <div class="databases-list">
-                  <div 
-                    v-for="database in databases" 
-                    :key="database.id" 
-                    class="database-item"
-                  >
-                    <div class="database-icon">
-                      <i :class="database.icon"></i>
-                    </div>
-                    <div class="database-content">
-                      <div class="database-name">{{ database.name }}</div>
-                      <div class="database-status">{{ database.status }}</div>
-                    </div>
-                    <div class="database-metrics">
-                      <span>{{ database.size }}</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="feature-title">{{ database.name }}</div>
+              <div class="feature-description">{{ database.status }} - {{ database.size }}</div>
+              <div class="feature-actions">
+                <button class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-download"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-cog"></i>
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="canonika-footer">
+        <div class="footer-content">
+          <div class="footer-info">
+            <h3>Bancos de Dados - Fisher Service</h3>
+            <p>Sistema de gerenciamento e monitoramento de fontes de dados</p>
+          </div>
+          <div class="footer-stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ databases.length }}</span>
+              <span class="stat-label">Bancos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ dataStats.totalSize }}</span>
+              <span class="stat-label">Tamanho</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ dataStats.totalRecords }}</span>
+              <span class="stat-label">Registros</span>
             </div>
           </div>
         </div>
@@ -221,62 +232,5 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos dos Databases seguindo padrão Beacon */
-.databases-list {
-  margin-top: 1rem;
-}
-
-.database-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.database-item:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
-}
-
-.database-icon {
-  width: 2rem;
-  height: 2rem;
-  background: #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-}
-
-.database-content {
-  flex: 1;
-}
-
-.database-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.25rem;
-}
-
-.database-status {
-  font-size: 0.7rem;
-  color: #10b981;
-  font-weight: 500;
-}
-
-.database-metrics {
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-</style>
 
 

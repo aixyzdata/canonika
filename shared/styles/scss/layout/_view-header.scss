@@ -182,4 +182,24 @@
   50% {
     opacity: 0.5;
   }
+}
+
+// =============================================================================
+// SECTION TITLES (Template-style section headers) - SHARED COMPONENT
+// =============================================================================
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+
+  .section-icon {
+    font-size: 1.25rem;
+  }
 } 

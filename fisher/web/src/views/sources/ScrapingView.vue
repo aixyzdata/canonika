@@ -1,149 +1,160 @@
 <template>
   <div class="canonika-view">
-    <!-- View Header seguindo padrão do Beacon -->
-    <div class="view-header">
-      <div class="view-title">
-        <i class="fas fa-spider"></i>
-        <div class="title-content">
-          <h1>Web Scraping</h1>
-          <p>Coleta automatizada de dados web</p>
+    <!-- View Header (padrão template) -->
+    <div class="view-header-card">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="service-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="service-info">
+            <h2>WEB SCRAPING - Sistema de Bots</h2>
+            <p>Gerenciamento e monitoramento de coleta automatizada de dados</p>
+          </div>
         </div>
-      </div>
-      <div class="view-status">
-        <div class="status-indicator online"></div>
-        <span>Ativo</span>
-      </div>
-      <div class="view-actions">
-        <button @click="startScraping" class="btn btn-primary btn-sm">
-          <i class="fas fa-play me-2"></i>
-          Iniciar
-        </button>
-        <button @click="configureScraping" class="btn btn-secondary btn-sm">
-          <i class="fas fa-cog me-2"></i>
-          Configurar
-        </button>
+        <div class="header-center">
+          <div class="status-indicator-large">
+            <div class="status-dot online"></div>
+            <span>Sistema Operacional</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button @click="startScraping" class="btn btn-primary">
+            <i class="fas fa-play me-2"></i>
+            Iniciar Bots
+          </button>
+          <button @click="configureScraping" class="btn btn-secondary">
+            <i class="fas fa-cog me-2"></i>
+            Configurar
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- View Content -->
     <div class="view-content">
-      <!-- Seção: Status da Coleta -->
+      <!-- Seção: Monitoramento de Bots -->
       <div class="canonika-section">
         <div class="section-header">
           <h3 class="section-title">
-            <i class="fas fa-spider text-success me-2"></i>
-            Status da Coleta
+            <i class="fas fa-chart-line section-icon text-success"></i>
+            MONITORAMENTO DE BOTS
           </h3>
           <p class="section-description">
-            Monitoramento das atividades de web scraping.
+            Status em tempo real dos bots de web scraping e performance de coleta.
           </p>
         </div>
-        
         <div class="section-content">
-          <div class="service-cards">
-            <div class="service-card">
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-spider"></i>
-                </div>
-                <div class="card-title">
-                  <h4>Status Scraping</h4>
-                  <span class="card-subtitle">4 bots ativos</span>
-                </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Ativo</span>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ scrapingStatus.activeBots }}</span>
-                    <span class="metric-label">Bots Ativos</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ scrapingStatus.successRate }}%</span>
-                    <span class="metric-label">Taxa Sucesso</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ scrapingStatus.pagesScraped }}</span>
-                    <span class="metric-label">Páginas Coletadas</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ scrapingStatus.lastRun }}</span>
-                    <span class="metric-label">Última Execução</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="service-card">
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-chart-bar"></i>
-                </div>
-                <div class="card-title">
-                  <h4>Estatísticas</h4>
-                  <span class="card-subtitle">Dados coletados</span>
-                </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Ativo</span>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.totalData }}</span>
-                    <span class="metric-label">Total de Dados</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.sitesMonitored }}</span>
-                    <span class="metric-label">Sites Monitorados</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.dataQuality }}%</span>
-                    <span class="metric-label">Qualidade dos Dados</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.storageUsed }}</span>
-                    <span class="metric-label">Armazenamento</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="service-card">
+          <div class="service-cards-grid">
+            <div class="service-card-large">
               <div class="card-header">
                 <div class="card-icon">
                   <i class="fas fa-robot"></i>
                 </div>
-                <div class="card-title">
-                  <h4>Bots Ativos</h4>
-                  <span class="card-subtitle">Agentes de coleta</span>
+                <div class="card-info">
+                  <h4>STATUS DOS BOTS</h4>
+                  <p class="card-subtitle">Monitoramento em tempo real</p>
                 </div>
-                <div class="card-actions">
-                  <span class="status-badge online">{{ bots.length }} Ativos</span>
-                </div>
-              </div>
-              <div class="card-content">
-                <div class="bots-list">
-                  <div 
-                    v-for="bot in bots" 
-                    :key="bot.id" 
-                    class="bot-item"
-                  >
-                    <div class="bot-icon">
-                      <i :class="bot.icon"></i>
-                    </div>
-                    <div class="bot-content">
-                      <div class="bot-name">{{ bot.name }}</div>
-                      <div class="bot-status">{{ bot.status }}</div>
-                    </div>
-                    <div class="bot-metrics">
-                      <span>{{ bot.pagesScraped }} páginas</span>
-                    </div>
-                  </div>
+                <div class="card-status">
+                  <span class="status-badge functioning">Funcionando</span>
                 </div>
               </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ scrapingStatus.activeBots }}</span>
+                  <span class="metric-label">Bots Ativos</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ scrapingStatus.successRate }}%</span>
+                  <span class="metric-label">Taxa Sucesso</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ scrapingStatus.pagesScraped }}</span>
+                  <span class="metric-label">Páginas</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="service-card-large">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="card-info">
+                  <h4>ESTATÍSTICAS DE COLETA</h4>
+                  <p class="card-subtitle">Volume e qualidade dos dados</p>
+                </div>
+                <div class="card-status">
+                  <span class="status-badge functioning">Ativo</span>
+                </div>
+              </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.totalData }}</span>
+                  <span class="metric-label">Total Dados</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.sitesMonitored }}</span>
+                  <span class="metric-label">Sites</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.dataQuality }}%</span>
+                  <span class="metric-label">Qualidade</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="section-title mt-4">
+            <i class="fas fa-list-alt section-icon text-primary"></i>
+            LISTA DE BOTS ATIVOS
+          </h3>
+          <p class="section-description">
+            Detalhes e performance de cada bot de coleta automatizada.
+          </p>
+          <div class="feature-cards-grid">
+            <div 
+              v-for="bot in bots" 
+              :key="bot.id" 
+              class="feature-card"
+            >
+              <div class="feature-icon">
+                <i :class="bot.icon"></i>
+              </div>
+              <div class="feature-title">{{ bot.name }}</div>
+              <div class="feature-description">{{ bot.status }} - {{ bot.pagesScraped }} páginas</div>
+              <div class="feature-actions">
+                <button class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-pause"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="canonika-footer">
+        <div class="footer-content">
+          <div class="footer-info">
+            <h3>Web Scraping - Fisher Service</h3>
+            <p>Sistema de gerenciamento e monitoramento de bots de coleta de dados</p>
+          </div>
+          <div class="footer-stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ bots.length }}</span>
+              <span class="stat-label">Bots</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ scrapingStatus.pagesScraped }}</span>
+              <span class="stat-label">Páginas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ dataStats.totalData }}</span>
+              <span class="stat-label">Dados</span>
             </div>
           </div>
         </div>
@@ -214,62 +225,6 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos do Scraping seguindo padrão Beacon */
-.bots-list {
-  margin-top: 1rem;
-}
 
-.bot-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.bot-item:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
-}
-
-.bot-icon {
-  width: 2rem;
-  height: 2rem;
-  background: #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-}
-
-.bot-content {
-  flex: 1;
-}
-
-.bot-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.25rem;
-}
-
-.bot-status {
-  font-size: 0.7rem;
-  color: #10b981;
-  font-weight: 500;
-}
-
-.bot-metrics {
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-</style>
 
 

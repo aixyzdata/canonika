@@ -1,0 +1,21 @@
+{
+  "name": "fisher-ag-grid-tests",
+  "version": "1.0.0",
+  "description": "Testes BDD para AG-Grid Canonika Theme no Fisher",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:bootstrap": "cucumber-js bootstrap-table.feature --require steps/bootstrap-table-steps.js",
+    "test:headless": "cucumber-js --format progress-bar",
+    "test:report": "cucumber-js --format html:cucumber-report.html"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^9.0.0",
+    "chai": "^4.3.0",
+    "puppeteer": "^21.0.0",
+    "@babel/register": "^7.22.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0"
+  }
+} 

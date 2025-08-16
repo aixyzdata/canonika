@@ -1,5 +1,5 @@
 <template>
-  <div class="canonika-view">
+  <div class="canonika-view files-view">
     <!-- View Header seguindo padrão do Beacon -->
     <div class="view-header">
       <div class="view-title">
@@ -30,10 +30,10 @@
       <!-- Seção: Status do Processamento -->
       <div class="canonika-section">
         <div class="section-header">
-          <h3 class="section-title">
+          <span class="section-title">
             <i class="fas fa-file-alt text-success me-2"></i>
             Status do Processamento
-          </h3>
+          </span>
           <p class="section-description">
             Monitoramento do processamento de arquivos locais.
           </p>
@@ -125,20 +125,20 @@
                 </div>
               </div>
               <div class="card-content">
-                <div class="filetypes-list">
+                <div class="marketplaces-list">
                   <div 
                     v-for="fileType in fileTypes" 
                     :key="fileType.id" 
-                    class="filetype-item"
+                    class="marketplace-item"
                   >
-                    <div class="filetype-icon">
+                    <div class="marketplace-icon">
                       <i :class="fileType.icon"></i>
                     </div>
-                    <div class="filetype-content">
-                      <div class="filetype-name">{{ fileType.name }}</div>
-                      <div class="filetype-status">{{ fileType.status }}</div>
+                    <div class="marketplace-content">
+                      <div class="marketplace-name">{{ fileType.name }}</div>
+                      <div class="marketplace-status">{{ fileType.status }}</div>
                     </div>
-                    <div class="filetype-metrics">
+                    <div class="marketplace-metrics">
                       <span>{{ fileType.count }} arquivos</span>
                     </div>
                   </div>
@@ -228,62 +228,5 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos dos Files seguindo padrão Beacon */
-.filetypes-list {
-  margin-top: 1rem;
-}
-
-.filetype-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.filetype-item:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
-}
-
-.filetype-icon {
-  width: 2rem;
-  height: 2rem;
-  background: #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-}
-
-.filetype-content {
-  flex: 1;
-}
-
-.filetype-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.25rem;
-}
-
-.filetype-status {
-  font-size: 0.7rem;
-  color: #10b981;
-  font-weight: 500;
-}
-
-.filetype-metrics {
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-</style>
 
 

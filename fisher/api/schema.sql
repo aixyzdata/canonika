@@ -1,155 +1,181 @@
--- Schema CNPJ baseado no dicionário de dados oficial da Receita Federal
+-- CNPJ Database Schema based on official Receita Federal data dictionary
 -- https://www.gov.br/receitafederal/dados/cnpj-metadados.pdf
 
--- Tabela de Empresas
-CREATE TABLE IF NOT EXISTS cnpj_empresas (
+-- Companies table
+CREATE TABLE IF NOT EXISTS cnpj_companies (
     id SERIAL PRIMARY KEY,
-    cnpj_basico VARCHAR(8) NOT NULL UNIQUE,
-    razao_social TEXT,
-    natureza_juridica VARCHAR(4),
-    qualificacao_responsavel VARCHAR(2),
+    cnpj_base VARCHAR(8) NOT NULL UNIQUE,
+    company_name TEXT,
+    legal_nature VARCHAR(4),
+    responsible_qualification VARCHAR(2),
     capital_social DECIMAL(15,2),
-    porte_empresa VARCHAR(2),
-    ente_federativo_responsavel TEXT,
+    company_size VARCHAR(2),
+    responsible_federative_entity TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Tabela de Estabelecimentos
-CREATE TABLE IF NOT EXISTS cnpj_estabelecimentos (
+-- Establishments table
+CREATE TABLE IF NOT EXISTS cnpj_establishments (
     id SERIAL PRIMARY KEY,
-    cnpj_basico VARCHAR(8) NOT NULL,
-    cnpj_ordem VARCHAR(4) NOT NULL,
+    cnpj_base VARCHAR(8) NOT NULL,
+    cnpj_order VARCHAR(4) NOT NULL,
     cnpj_dv VARCHAR(2) NOT NULL,
-    identificador_matriz_filial VARCHAR(1),
-    nome_fantasia TEXT,
-    situacao_cadastral VARCHAR(2),
-    data_situacao_cadastral DATE,
-    motivo_situacao_cadastral VARCHAR(2),
-    nome_cidade_exterior TEXT,
-    pais VARCHAR(3),
-    data_inicio_atividade DATE,
-    cnae_fiscal_principal VARCHAR(7),
-    cnae_fiscal_secundaria TEXT,
-    tipo_logradouro VARCHAR(20),
-    logradouro TEXT,
-    numero VARCHAR(10),
-    complemento TEXT,
-    bairro VARCHAR(50),
-    cep VARCHAR(8),
-    uf VARCHAR(2),
-    municipio VARCHAR(4),
-    ddd1 VARCHAR(2),
-    telefone1 VARCHAR(9),
-    ddd2 VARCHAR(2),
-    telefone2 VARCHAR(9),
-    ddd_fax VARCHAR(2),
+    matrix_branch_identifier VARCHAR(1),
+    trade_name TEXT,
+    registration_status VARCHAR(2),
+    registration_status_date DATE,
+    registration_status_reason VARCHAR(2),
+    foreign_city_name TEXT,
+    country VARCHAR(3),
+    activity_start_date DATE,
+    main_fiscal_cnae VARCHAR(7),
+    secondary_fiscal_cnae TEXT,
+    street_type VARCHAR(20),
+    street TEXT,
+    number VARCHAR(10),
+    complement TEXT,
+    neighborhood VARCHAR(50),
+    zip_code VARCHAR(8),
+    state VARCHAR(2),
+    city VARCHAR(4),
+    phone1_ddd VARCHAR(2),
+    phone1 VARCHAR(9),
+    phone2_ddd VARCHAR(2),
+    phone2 VARCHAR(9),
+    fax_ddd VARCHAR(2),
     fax VARCHAR(9),
-    correio_eletronico TEXT,
-    situacao_especial VARCHAR(2),
-    data_situacao_especial DATE,
+    email TEXT,
+    special_status VARCHAR(2),
+    special_status_date DATE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(cnpj_basico, cnpj_ordem, cnpj_dv)
+    UNIQUE(cnpj_base, cnpj_order, cnpj_dv)
 );
 
--- Tabela de Sócios
-CREATE TABLE IF NOT EXISTS cnpj_socios (
+-- Partners table
+CREATE TABLE IF NOT EXISTS cnpj_partners (
     id SERIAL PRIMARY KEY,
-    cnpj_basico VARCHAR(8) NOT NULL,
-    identificador_socio VARCHAR(1) NOT NULL,
-    nome_socio TEXT NOT NULL,
-    cnpj_cpf_socio VARCHAR(14),
-    qualificacao_socio VARCHAR(2),
-    data_entrada_sociedade DATE,
-    pais VARCHAR(3),
-    representante_legal VARCHAR(11),
-    nome_representante TEXT,
-    qualificacao_representante_legal VARCHAR(2),
-    faixa_etaria VARCHAR(1),
+    cnpj_base VARCHAR(8) NOT NULL,
+    partner_identifier VARCHAR(1) NOT NULL,
+    partner_name TEXT NOT NULL,
+    partner_cnpj_cpf VARCHAR(14),
+    partner_qualification VARCHAR(2),
+    partnership_entry_date DATE,
+    country VARCHAR(3),
+    legal_representative VARCHAR(11),
+    representative_name TEXT,
+    legal_representative_qualification VARCHAR(2),
+    age_range VARCHAR(1),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(cnpj_basico, identificador_socio, nome_socio)
+    UNIQUE(cnpj_base, partner_identifier, partner_name)
 );
 
--- Tabela do Simples Nacional
+-- Simples Nacional table
 CREATE TABLE IF NOT EXISTS cnpj_simples (
     id SERIAL PRIMARY KEY,
-    cnpj_basico VARCHAR(8) NOT NULL UNIQUE,
-    opcao_simples VARCHAR(1),
-    data_opcao_simples DATE,
-    data_exclusao_simples DATE,
-    opcao_mei VARCHAR(1),
-    data_opcao_mei DATE,
-    data_exclusao_mei DATE,
+    cnpj_base VARCHAR(8) NOT NULL UNIQUE,
+    simples_option VARCHAR(1),
+    simples_option_date DATE,
+    simples_exclusion_date DATE,
+    mei_option VARCHAR(1),
+    mei_option_date DATE,
+    mei_exclusion_date DATE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Tabelas de Domínio
+-- Domain tables
 
--- Países
-CREATE TABLE IF NOT EXISTS cnpj_paises (
+-- Countries
+CREATE TABLE IF NOT EXISTS cnpj_countries (
     id SERIAL PRIMARY KEY,
-    codigo VARCHAR(3) NOT NULL UNIQUE,
-    descricao TEXT NOT NULL,
+    code VARCHAR(3) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Municípios
-CREATE TABLE IF NOT EXISTS cnpj_municipios (
+-- Cities
+CREATE TABLE IF NOT EXISTS cnpj_cities (
     id SERIAL PRIMARY KEY,
-    codigo VARCHAR(4) NOT NULL UNIQUE,
-    descricao TEXT NOT NULL,
+    code VARCHAR(4) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Qualificações de Sócios
-CREATE TABLE IF NOT EXISTS cnpj_qualificacoes (
+-- Partner qualifications
+CREATE TABLE IF NOT EXISTS cnpj_qualifications (
     id SERIAL PRIMARY KEY,
-    codigo VARCHAR(2) NOT NULL UNIQUE,
-    descricao TEXT NOT NULL,
+    code VARCHAR(2) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Naturezas Jurídicas
-CREATE TABLE IF NOT EXISTS cnpj_naturezas_juridicas (
+-- Legal natures
+CREATE TABLE IF NOT EXISTS cnpj_legal_natures (
     id SERIAL PRIMARY KEY,
-    codigo VARCHAR(4) NOT NULL UNIQUE,
-    descricao TEXT NOT NULL,
+    code VARCHAR(4) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- CNAEs (Classificação Nacional de Atividades Econômicas)
+-- CNAEs (National Classification of Economic Activities)
 CREATE TABLE IF NOT EXISTS cnpj_cnaes (
     id SERIAL PRIMARY KEY,
-    codigo VARCHAR(7) NOT NULL UNIQUE,
-    descricao TEXT NOT NULL,
+    code VARCHAR(7) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_cnpj_empresas_cnpj_basico ON cnpj_empresas(cnpj_basico);
-CREATE INDEX IF NOT EXISTS idx_cnpj_estabelecimentos_cnpj_basico ON cnpj_estabelecimentos(cnpj_basico);
-CREATE INDEX IF NOT EXISTS idx_cnpj_estabelecimentos_cnpj_completo ON cnpj_estabelecimentos(cnpj_basico, cnpj_ordem, cnpj_dv);
-CREATE INDEX IF NOT EXISTS idx_cnpj_socios_cnpj_basico ON cnpj_socios(cnpj_basico);
-CREATE INDEX IF NOT EXISTS idx_cnpj_simples_cnpj_basico ON cnpj_simples(cnpj_basico);
-CREATE INDEX IF NOT EXISTS idx_cnpj_estabelecimentos_situacao ON cnpj_estabelecimentos(situacao_cadastral);
-CREATE INDEX IF NOT EXISTS idx_cnpj_estabelecimentos_uf ON cnpj_estabelecimentos(uf);
-CREATE INDEX IF NOT EXISTS idx_cnpj_estabelecimentos_cnae ON cnpj_estabelecimentos(cnae_fiscal_principal);
+-- File control table for CNPJ synchronization
+CREATE TABLE IF NOT EXISTS cnpj_file_control (
+    id SERIAL PRIMARY KEY,
+                    folder VARCHAR(10) NOT NULL,
+    filename VARCHAR(100) NOT NULL,
+    file_url TEXT NOT NULL,
+    file_size_bytes BIGINT,
+    last_modified TIMESTAMP,
+                    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    download_date TIMESTAMP,
+    import_date TIMESTAMP,
+    local_path TEXT,
+    download_attempts INTEGER DEFAULT 0,
+    import_attempts INTEGER DEFAULT 0,
+    last_error TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(folder, filename)
+);
 
--- Comentários das tabelas
-COMMENT ON TABLE cnpj_empresas IS 'Dados das empresas conforme dicionário oficial da Receita Federal';
-COMMENT ON TABLE cnpj_estabelecimentos IS 'Dados dos estabelecimentos conforme dicionário oficial da Receita Federal';
-COMMENT ON TABLE cnpj_socios IS 'Dados dos sócios conforme dicionário oficial da Receita Federal';
-COMMENT ON TABLE cnpj_simples IS 'Dados do Simples Nacional conforme dicionário oficial da Receita Federal';
-COMMENT ON TABLE cnpj_paises IS 'Tabela de domínio - Países';
-COMMENT ON TABLE cnpj_municipios IS 'Tabela de domínio - Municípios';
-COMMENT ON TABLE cnpj_qualificacoes IS 'Tabela de domínio - Qualificações de Sócios';
-COMMENT ON TABLE cnpj_naturezas_juridicas IS 'Tabela de domínio - Naturezas Jurídicas';
-COMMENT ON TABLE cnpj_cnaes IS 'Tabela de domínio - CNAEs (Classificação Nacional de Atividades Econômicas)'; 
+-- Performance indexes (criados após as tabelas)
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_companies_cnpj_base ON cnpj_companies(cnpj_base);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_establishments_cnpj_base ON cnpj_establishments(cnpj_base);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_establishments_cnpj_complete ON cnpj_establishments(cnpj_base, cnpj_order, cnpj_dv);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_partners_cnpj_base ON cnpj_partners(cnpj_base);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_simples_cnpj_base ON cnpj_simples(cnpj_base);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_establishments_status ON cnpj_establishments(registration_status);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_establishments_state ON cnpj_establishments(state);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_establishments_cnae ON cnpj_establishments(main_fiscal_cnae);
+
+-- File control indexes (criados após as tabelas)
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_file_control_folder ON cnpj_file_control(folder);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_file_control_status ON cnpj_file_control(status);
+-- CREATE INDEX IF NOT EXISTS idx_cnpj_file_control_last_modified ON cnpj_file_control(last_modified);
+
+-- Table comments (executados após as tabelas)
+-- COMMENT ON TABLE cnpj_companies IS 'Company data according to official Receita Federal dictionary';
+-- COMMENT ON TABLE cnpj_establishments IS 'Establishment data according to official Receita Federal dictionary';
+-- COMMENT ON TABLE cnpj_partners IS 'Partner data according to official Receita Federal dictionary';
+-- COMMENT ON TABLE cnpj_simples IS 'Simples Nacional data according to official Receita Federal dictionary';
+-- COMMENT ON TABLE cnpj_countries IS 'Domain table - Countries';
+-- COMMENT ON TABLE cnpj_cities IS 'Domain table - Cities';
+-- COMMENT ON TABLE cnpj_qualifications IS 'Domain table - Partner Qualifications';
+-- COMMENT ON TABLE cnpj_legal_natures IS 'Domain table - Legal Natures';
+-- COMMENT ON TABLE cnpj_cnaes IS 'Domain table - CNAEs (National Classification of Economic Activities)';
+-- COMMENT ON TABLE cnpj_file_control IS 'Control of downloaded and processed CNPJ files'; 

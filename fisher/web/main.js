@@ -4,6 +4,8 @@ import App from './src/App.vue'
 import FisherView from './src/views/FisherView.vue'
 import StatusView from './src/views/StatusView.vue'
 
+// AG-Grid removido - usando apenas Bootstrap
+
 // Importar views de fontes de dados
 import SefazView from './src/views/sources/SefazView.vue'
 import MarketplacesView from './src/views/sources/MarketplacesView.vue'
@@ -13,7 +15,7 @@ import ScrapingView from './src/views/sources/ScrapingView.vue'
 import FilesView from './src/views/sources/FilesView.vue'
 
 // Importar estilos compartilhados
-import '../shared/styles/scss/main.scss'
+import '../../shared/styles/scss/main.scss'
 
 // Configuração das rotas
 const routes = [
@@ -27,6 +29,7 @@ const routes = [
     name: 'StatusView',
     component: StatusView
   },
+
   // Rotas para fontes de dados
   {
     path: '/sources/sefaz',

@@ -5,5 +5,10 @@
 // Import shared design system
 @import "../../../shared/styles/scss/main";
 
+// AG Grid removido - usando apenas Bootstrap
+
 // Fisher-specific styles (consistente com Beacon)
-@import "./scss/_fisher-specific"; 
+@import "./scss/_fisher-specific";
+
+// Views styles (centralizados)
+@import "./scss/_views"; 

@@ -1,149 +1,160 @@
 <template>
   <div class="canonika-view">
-    <!-- View Header seguindo padrão do Beacon -->
-    <div class="view-header">
-      <div class="view-title">
-        <i class="fas fa-plug"></i>
-        <div class="title-content">
-          <h1>APIs Externas</h1>
-          <p>Integração com serviços terceiros</p>
+    <!-- View Header (padrão template) -->
+    <div class="view-header-card">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="service-icon">
+            <i class="fas fa-plug"></i>
+          </div>
+          <div class="service-info">
+            <h2>APIS EXTERNAS - Sistema de Integração</h2>
+            <p>Gerenciamento e monitoramento de APIs de terceiros</p>
+          </div>
         </div>
-      </div>
-      <div class="view-status">
-        <div class="status-indicator online"></div>
-        <span>Conectado</span>
-      </div>
-      <div class="view-actions">
-        <button @click="testConnections" class="btn btn-primary btn-sm">
-          <i class="fas fa-play me-2"></i>
-          Testar Conexões
-        </button>
-        <button @click="configureApis" class="btn btn-secondary btn-sm">
-          <i class="fas fa-cog me-2"></i>
-          Configurar
-        </button>
+        <div class="header-center">
+          <div class="status-indicator-large">
+            <div class="status-dot online"></div>
+            <span>Sistema Operacional</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button @click="testConnections" class="btn btn-primary">
+            <i class="fas fa-play me-2"></i>
+            Testar Conexões
+          </button>
+          <button @click="configureApis" class="btn btn-secondary">
+            <i class="fas fa-cog me-2"></i>
+            Configurar
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- View Content -->
     <div class="view-content">
-      <!-- Seção: Status da Conexão -->
+      <!-- Seção: Monitoramento de APIs -->
       <div class="canonika-section">
         <div class="section-header">
           <h3 class="section-title">
-            <i class="fas fa-plug text-success me-2"></i>
-            Status da Conexão
+            <i class="fas fa-chart-line section-icon text-success"></i>
+            MONITORAMENTO DE APIS
           </h3>
           <p class="section-description">
-            Monitoramento das APIs externas conectadas.
+            Status em tempo real das conexões e performance das APIs externas.
           </p>
         </div>
-        
         <div class="section-content">
-          <div class="service-cards">
-            <div class="service-card">
+          <div class="service-cards-grid">
+            <div class="service-card-large">
               <div class="card-header">
                 <div class="card-icon">
                   <i class="fas fa-plug"></i>
                 </div>
-                <div class="card-title">
-                  <h4>Conexão APIs</h4>
-                  <span class="card-subtitle">8 APIs conectadas</span>
+                <div class="card-info">
+                  <h4>STATUS DAS CONEXÕES</h4>
+                  <p class="card-subtitle">Monitoramento em tempo real</p>
                 </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Conectado</span>
+                <div class="card-status">
+                  <span class="status-badge functioning">Funcionando</span>
                 </div>
               </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.activeApis }}</span>
-                    <span class="metric-label">APIs Ativas</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.successRate }}%</span>
-                    <span class="metric-label">Taxa Sucesso</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.avgResponse }}ms</span>
-                    <span class="metric-label">Tempo Médio</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ connectionStatus.lastTest }}</span>
-                    <span class="metric-label">Último Teste</span>
-                  </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.activeApis }}</span>
+                  <span class="metric-label">APIs Ativas</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.successRate }}%</span>
+                  <span class="metric-label">Taxa Sucesso</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ connectionStatus.avgResponse }}ms</span>
+                  <span class="metric-label">Tempo Médio</span>
                 </div>
               </div>
             </div>
 
-            <div class="service-card">
+            <div class="service-card-large">
               <div class="card-header">
                 <div class="card-icon">
                   <i class="fas fa-chart-bar"></i>
                 </div>
-                <div class="card-title">
-                  <h4>Estatísticas</h4>
-                  <span class="card-subtitle">Dados coletados</span>
+                <div class="card-info">
+                  <h4>ESTATÍSTICAS DE USO</h4>
+                  <p class="card-subtitle">Volume de requisições</p>
                 </div>
-                <div class="card-actions">
-                  <span class="status-badge online">Ativo</span>
+                <div class="card-status">
+                  <span class="status-badge functioning">Ativo</span>
                 </div>
               </div>
-              <div class="card-content">
-                <div class="metric-grid">
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.totalRequests }}</span>
-                    <span class="metric-label">Total Requisições</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.successfulRequests }}</span>
-                    <span class="metric-label">Requisições OK</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.failedRequests }}</span>
-                    <span class="metric-label">Falhas</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-value">{{ dataStats.dataVolume }}</span>
-                    <span class="metric-label">Volume de Dados</span>
-                  </div>
+              <div class="card-metrics">
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.totalRequests }}</span>
+                  <span class="metric-label">Total Requisições</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.successfulRequests }}</span>
+                  <span class="metric-label">Sucessos</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value blue">{{ dataStats.dataVolume }}</span>
+                  <span class="metric-label">Volume</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="service-card">
-              <div class="card-header">
-                <div class="card-icon">
-                  <i class="fas fa-code"></i>
-                </div>
-                <div class="card-title">
-                  <h4>APIs Conectadas</h4>
-                  <span class="card-subtitle">Serviços ativos</span>
-                </div>
-                <div class="card-actions">
-                  <span class="status-badge online">{{ apis.length }} Ativas</span>
-                </div>
+          <h3 class="section-title mt-4">
+            <i class="fas fa-list-alt section-icon text-primary"></i>
+            LISTA DE APIS CONECTADAS
+          </h3>
+          <p class="section-description">
+            Detalhes e performance de cada API integrada.
+          </p>
+          <div class="feature-cards-grid">
+            <div 
+              v-for="api in apis" 
+              :key="api.id" 
+              class="feature-card"
+            >
+              <div class="feature-icon">
+                <i :class="api.icon"></i>
               </div>
-              <div class="card-content">
-                <div class="apis-list">
-                  <div 
-                    v-for="api in apis" 
-                    :key="api.id" 
-                    class="api-item"
-                  >
-                    <div class="api-icon">
-                      <i :class="api.icon"></i>
-                    </div>
-                    <div class="api-content">
-                      <div class="api-name">{{ api.name }}</div>
-                      <div class="api-status">{{ api.status }}</div>
-                    </div>
-                    <div class="api-metrics">
-                      <span>{{ api.responseTime }}ms</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="feature-title">{{ api.name }}</div>
+              <div class="feature-description">{{ api.status }} - {{ api.responseTime }}ms</div>
+              <div class="feature-actions">
+                <button class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-cog"></i>
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="canonika-footer">
+        <div class="footer-content">
+          <div class="footer-info">
+            <h3>APIs Externas - Fisher Service</h3>
+            <p>Sistema de integração e monitoramento de APIs de terceiros</p>
+          </div>
+          <div class="footer-stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ apis.length }}</span>
+              <span class="stat-label">APIs</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ connectionStatus.successRate }}%</span>
+              <span class="stat-label">Sucesso</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ dataStats.totalRequests }}</span>
+              <span class="stat-label">Requisições</span>
             </div>
           </div>
         </div>
@@ -242,61 +253,5 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos específicos das APIs seguindo padrão Beacon */
-.apis-list {
-  margin-top: 1rem;
-}
 
-.api-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.api-item:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
-}
-
-.api-icon {
-  width: 2rem;
-  height: 2rem;
-  background: #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-}
-
-.api-content {
-  flex: 1;
-}
-
-.api-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.25rem;
-}
-
-.api-status {
-  font-size: 0.7rem;
-  color: #10b981;
-  font-weight: 500;
-}
-
-.api-metrics {
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-</style>
 

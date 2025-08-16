@@ -5,7 +5,7 @@ echo "🚀 Iniciando Fisher Service..."
 # Iniciar o backend Python em background
 echo "🐍 Iniciando backend Python..."
 cd /app/api
-python main.py &
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
 
 # Aguardar um pouco para o backend inicializar
@@ -17,14 +17,14 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
     exit 1
 fi
 
-echo "✅ Backend iniciado com PID: $BACKEND_PID"
+echo "✅ Backend iniciado com PID: $BACKEND_PID na porta 8000"
 
-# Iniciar o Nginx
-echo "🌐 Iniciando Nginx..."
+# Iniciar o Nginx na porta 3706
+echo "🌐 Iniciando Nginx na porta 3706..."
 nginx -g "daemon off;" &
 NGINX_PID=$!
 
-echo "✅ Nginx iniciado com PID: $NGINX_PID"
+echo "✅ Nginx iniciado com PID: $NGINX_PID na porta 3706"
 
 # Função para limpeza ao sair
 cleanup() {
@@ -38,5 +38,5 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 # Manter o container rodando
-echo "🎣 Fisher Service rodando com Frontend + Backend..."
+echo "🎣 Fisher Service rodando em http://localhost:3706"
 wait 
