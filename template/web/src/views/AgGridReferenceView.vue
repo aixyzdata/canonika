@@ -34,10 +34,10 @@
         <div class="section-header">
           <h3 class="canonika-section-title">
             <i class="fas fa-table section-icon text-success"></i>
-            AG-GRID THEME PARTS
+            AG-GRID CANONIKA THEME
           </h3>
           <p class="section-description">
-            Implementação avançada com combinação de temas base, esquemas de cor e conjuntos de ícones.
+            Tema personalizado com as cores do design system Canonika + sistema avançado de Theme Parts.
           </p>
         </div>
         <div class="section-content">
@@ -139,8 +139,18 @@
                 <h4>Versão AG-Grid</h4>
               </div>
               <div class="card-body">
-                <div class="metric-value">v32+</div>
+                <div class="metric-value">v34+</div>
                 <p class="metric-description">Community Edition</p>
+              </div>
+            </div>
+            <div class="service-card">
+              <div class="card-header">
+                <i class="fas fa-palette text-info"></i>
+                <h4>Tema Canonika</h4>
+              </div>
+              <div class="card-body">
+                <div class="metric-value">Custom</div>
+                <p class="metric-description">Design System</p>
               </div>
             </div>
             <div class="service-card">
@@ -224,6 +234,7 @@ export default {
       { id: "themeQuartz", theme: themeQuartz },
       { id: "themeBalham", theme: themeBalham },
       { id: "themeAlpine", theme: themeAlpine },
+      { id: "canonikaTheme", theme: canonikaTheme },
     ];
 
     // Color Schemes
@@ -249,9 +260,68 @@ export default {
     ];
 
     // Theme selectors
-    const baseTheme = ref(baseThemes[0]);
+    const baseTheme = ref(baseThemes[3]); // Default to Canonika Theme
     const iconSet = ref(iconSets[0]);
-    const colorScheme = ref(colorSchemes[6]); // Default to DarkBlue
+    const colorScheme = ref(colorSchemes[0]); // No color scheme for Canonika (already included)
+
+    // Canonika Custom Theme
+    const canonikaTheme = themeQuartz
+      .withPart(colorSchemeDarkBlue)
+      .withParams({
+        // Canonika Design System Colors
+        backgroundColor: '#0f172a', // $dark-bg
+        foregroundColor: '#e2e8f0', // $dark-text
+        accentColor: '#3b82f6', // $primary-color
+        
+        // Chrome and UI Colors
+        chromeBackgroundColor: '#1e293b', // $dark-surface
+        borderColor: '#475569', // $dark-border
+        headerBackgroundColor: '#1e293b', // $dark-surface
+        headerTextColor: '#e2e8f0', // $dark-text
+        
+        // Text Colors
+        textColor: '#e2e8f0', // $dark-text
+        cellTextColor: '#e2e8f0', // $dark-text
+        headerTextColor: '#e2e8f0', // $dark-text
+        
+        // Row Colors
+        oddRowBackgroundColor: 'rgba(30, 41, 59, 0.5)', // $dark-surface with transparency
+        evenRowBackgroundColor: 'rgba(15, 23, 42, 0.8)', // $dark-bg with transparency
+        rowHoverBackgroundColor: 'rgba(59, 130, 246, 0.1)', // $primary-color with transparency
+        
+        // Selection Colors
+        selectedRowBackgroundColor: 'rgba(59, 130, 246, 0.2)', // $primary-color with transparency
+        rangeSelectionBackgroundColor: 'rgba(59, 130, 246, 0.15)', // $primary-color with transparency
+        
+        // Input and Control Colors
+        inputBackgroundColor: '#1e293b', // $dark-surface
+        inputBorderColor: '#475569', // $dark-border
+        inputTextColor: '#e2e8f0', // $dark-text
+        
+        // Button Colors
+        buttonBackgroundColor: 'rgba(59, 130, 246, 0.2)', // $primary-color with transparency
+        buttonTextColor: '#3b82f6', // $primary-color
+        buttonBorderColor: 'rgba(59, 130, 246, 0.3)', // $primary-color with transparency
+        
+        // Pagination Colors
+        paginationBackgroundColor: '#1e293b', // $dark-surface
+        paginationTextColor: '#e2e8f0', // $dark-text
+        
+        // Filter and Menu Colors
+        menuBackgroundColor: '#1e293b', // $dark-surface
+        menuTextColor: '#e2e8f0', // $dark-text
+        menuBorderColor: '#475569', // $dark-border
+        
+        // Tool Panel Colors
+        toolPanelBackgroundColor: '#1e293b', // $dark-surface
+        toolPanelTextColor: '#e2e8f0', // $dark-text
+        
+        // Status Colors
+        successColor: '#10b981', // $success
+        warningColor: '#f59e0b', // $warning
+        errorColor: '#ef4444', // $error
+        infoColor: '#3b82f6', // $info
+      });
 
     // Row Data: The data to be displayed (seguindo exemplo oficial)
     const rowData = ref([
