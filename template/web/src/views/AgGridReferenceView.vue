@@ -206,8 +206,8 @@ export default {
         filter: true,
         cellRenderer: params => {
           return params.value ? 
-            '<span class="badge bg-success">Sim</span>' : 
-            '<span class="badge bg-secondary">Não</span>';
+            '<span class="canonika-badge canonika-badge-success">✅ Sim</span>' : 
+            '<span class="canonika-badge canonika-badge-secondary">❌ Não</span>';
         }
       }
     ]);
@@ -265,19 +265,78 @@ export default {
   /* Tema customizado será aplicado via CSS global */
 }
 
-.badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+/* Canonika Badges - Padrão oficial */
+.canonika-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
   font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.bg-success {
-  background-color: #10b981 !important;
-  color: white;
+.canonika-badge-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-.bg-secondary {
-  background-color: #6b7280 !important;
-  color: white;
+.canonika-badge-secondary {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94a3b8;
+  border-color: rgba(100, 116, 139, 0.3);
+}
+
+/* AG-Grid Pagination - Padrão Canonika */
+:deep(.ag-paging-panel) {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
+  padding: 1rem !important;
+  color: #e2e8f0 !important;
+}
+
+:deep(.ag-paging-row-summary-panel) {
+  color: #94a3b8 !important;
+}
+
+:deep(.ag-paging-button) {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  color: #3b82f6 !important;
+  border-radius: 0.375rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+:deep(.ag-paging-button:hover) {
+  background: rgba(59, 130, 246, 0.3) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+:deep(.ag-paging-button:disabled) {
+  background: rgba(71, 85, 105, 0.2) !important;
+  border-color: rgba(71, 85, 105, 0.3) !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+}
+
+:deep(.ag-paging-page-size-select) {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(71, 85, 105, 0.3) !important;
+  color: #e2e8f0 !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.5rem !important;
+}
+
+:deep(.ag-paging-page-summary-panel) {
+  color: #e2e8f0 !important;
+  font-weight: 600 !important;
 }
 </style>
