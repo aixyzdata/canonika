@@ -1,9 +1,10 @@
 // =============================================================================
-// CANONIKA DESIGN SYSTEM - VIEW CONTENT LAYOUT
+// CANONIKA DESIGN SYSTEM - VIEW CONTENT LAYOUT (GENÉRICO)
 // =============================================================================
 
-// Canonika view container - PADRÃO UNIFICADO PARA TODA A PLATAFORMA
-.canonika-view {
+// View containers genéricos - PADRÃO UNIFICADO PARA TODA A PLATAFORMA
+.canonika-view,
+.tollgate-view {
   width: 100%;
   min-height: calc(100vh - 60px);
   padding: 2rem;
@@ -33,14 +34,16 @@
   }
 }
 
-// View content area
-.canonika-view .view-content {
+// View content area (genérico)
+.canonika-view .view-content,
+.tollgate-view .view-content {
   padding: 0;
   margin-top: 1.5rem;
 }
 
-// Canonika sections - Glassmorphism effect
-.canonika-view .canonika-section {
+// Canonika sections - Glassmorphism effect (genérico)
+.canonika-view .canonika-section,
+.tollgate-view .canonika-section {
   margin-bottom: 2.5rem;
   padding: 2rem;
   background: rgba(30, 41, 59, 0.6);
@@ -55,7 +58,7 @@
     box-shadow: 0 8px 30px rgba(59, 130, 246, 0.1);
   }
 
-  .canonika-section .section-header {
+  .section-header {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(71, 85, 105, 0.3);
@@ -85,17 +88,124 @@
   }
 }
 
-// Service cards grid
-.canonika-view .service-cards {
+// Service cards grid (genérico)
+.canonika-view .service-cards,
+.tollgate-view .service-cards,
+.canonika-view .service-cards-grid,
+.tollgate-view .service-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
 }
 
-// Responsive
+// Service cards (genérico)
+.canonika-view .service-card,
+.tollgate-view .service-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid #475569;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 1.5rem;
+    }
+
+    h4 {
+      color: #e2e8f0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .card-body {
+    .metric-value {
+      color: #3b82f6;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-description {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      margin: 0;
+    }
+  }
+}
+
+// Canonika footer (genérico)
+.canonika-view .canonika-footer,
+.tollgate-view .canonika-footer {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  border-radius: 1.25rem;
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+
+    .footer-info {
+      h3 {
+        color: #e2e8f0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin: 0;
+      }
+    }
+
+    .footer-stats {
+      display: flex;
+      gap: 2rem;
+
+      .stat-item {
+        text-align: center;
+
+        .stat-value {
+          display: block;
+          color: #3b82f6;
+          font-size: 1.5rem;
+          font-weight: 700;
+        }
+
+        .stat-label {
+          color: #94a3b8;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsive (genérico)
 @media (max-width: 768px) {
-  .canonika-view {
+  .canonika-view,
+  .tollgate-view {
     padding: 1rem;
   }
 
