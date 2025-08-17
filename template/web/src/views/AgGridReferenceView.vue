@@ -1,33 +1,31 @@
 <template>
-  <div class="canonika-view">
-    <!-- View Header (padrão template) -->
-    <div class="view-header-card">
-      <div class="header-content">
-        <div class="header-left">
-          <div class="service-icon">
-            <i class="fas fa-table"></i>
-          </div>
-          <div class="service-info">
-            <h2>AG-GRID - Template de Referência</h2>
-            <p>Implementação oficial do AG-Grid seguindo documentação Vue</p>
-          </div>
+  <div class="tollgate-view">
+    <!-- View Header (padrão oficial) -->
+    <div class="view-header">
+      <div class="view-title">
+        <div class="service-icon">
+          <i class="fas fa-table"></i>
         </div>
-        <div class="header-center">
-          <div class="status-indicator-large">
-            <div class="status-dot online"></div>
-            <span>Sistema Operacional</span>
-          </div>
+        <div class="title-content">
+          <h1>AG-GRID - Template de Referência</h1>
+          <p>Implementação oficial do AG-Grid seguindo documentação Vue</p>
         </div>
-        <div class="header-right">
-          <button @click="addRow" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>
-            Adicionar Linha
-          </button>
-          <button @click="exportData" class="btn btn-secondary">
-            <i class="fas fa-download me-2"></i>
-            Exportar
-          </button>
+      </div>
+      <div class="view-status">
+        <div class="status-indicator">
+          <div class="status-dot online"></div>
+          <span>Sistema Operacional</span>
         </div>
+      </div>
+      <div class="view-actions">
+        <button @click="addRow" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>
+          Adicionar Linha
+        </button>
+        <button @click="exportData" class="btn btn-secondary">
+          <i class="fas fa-download me-2"></i>
+          Exportar
+        </button>
       </div>
     </div>
 
@@ -36,7 +34,7 @@
       <!-- Seção: AG-Grid Oficial -->
       <div class="canonika-section">
         <div class="section-header">
-          <h3 class="section-title">
+          <h3 class="canonika-section-title">
             <i class="fas fa-table section-icon text-success"></i>
             AG-GRID OFICIAL TEMPLATE
           </h3>
@@ -65,7 +63,7 @@
       <!-- Seção: Informações -->
       <div class="canonika-section mt-4">
         <div class="section-header">
-          <h3 class="section-title">
+          <h3 class="canonika-section-title">
             <i class="fas fa-info-circle section-icon text-primary"></i>
             INFORMAÇÕES DO TEMPLATE
           </h3>
@@ -74,26 +72,46 @@
           </p>
         </div>
         <div class="section-content">
-          <div class="info-cards-grid">
-            <div class="info-card">
-              <div class="info-label">Total de Linhas</div>
-              <div class="info-value">{{ rowData.length }}</div>
-              <div class="info-description">Registros carregados</div>
+          <div class="service-cards-grid">
+            <div class="service-card">
+              <div class="card-header">
+                <i class="fas fa-list text-primary"></i>
+                <h4>Total de Linhas</h4>
+              </div>
+              <div class="card-body">
+                <div class="metric-value">{{ rowData.length }}</div>
+                <p class="metric-description">Registros carregados</p>
+              </div>
             </div>
-            <div class="info-card">
-              <div class="info-label">Colunas</div>
-              <div class="info-value">{{ colDefs.length }}</div>
-              <div class="info-description">Campos definidos</div>
+            <div class="service-card">
+              <div class="card-header">
+                <i class="fas fa-columns text-success"></i>
+                <h4>Colunas</h4>
+              </div>
+              <div class="card-body">
+                <div class="metric-value">{{ colDefs.length }}</div>
+                <p class="metric-description">Campos definidos</p>
+              </div>
             </div>
-            <div class="info-card">
-              <div class="info-label">Versão AG-Grid</div>
-              <div class="info-value">v32+</div>
-              <div class="info-description">Community Edition</div>
+            <div class="service-card">
+              <div class="card-header">
+                <i class="fas fa-code text-warning"></i>
+                <h4>Versão AG-Grid</h4>
+              </div>
+              <div class="card-body">
+                <div class="metric-value">v32+</div>
+                <p class="metric-description">Community Edition</p>
+              </div>
             </div>
-            <div class="info-card">
-              <div class="info-label">Framework</div>
-              <div class="info-value">Vue 3</div>
-              <div class="info-description">ag-grid-vue3</div>
+            <div class="service-card">
+              <div class="card-header">
+                <i class="fab fa-vuejs text-info"></i>
+                <h4>Framework</h4>
+              </div>
+              <div class="card-body">
+                <div class="metric-value">Vue 3</div>
+                <p class="metric-description">ag-grid-vue3</p>
+              </div>
             </div>
           </div>
         </div>
