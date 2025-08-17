@@ -48,9 +48,9 @@
           <!-- AG Grid Component -->
           <div class="ag-grid-container">
             <ag-grid-vue
+              :theme="theme"
               :rowData="rowData"
               :columnDefs="colDefs"
-              class="ag-theme-canonika"
               style="height: 400px; width: 100%;"
               :defaultColDef="defaultColDef"
               :pagination="true"
@@ -129,10 +129,19 @@
 <script>
 import { ref } from 'vue';
 import { AgGridVue } from "ag-grid-vue3"; // Vue Data Grid Component
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry, themeQuartz } from 'ag-grid-community';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+// =============================================================================
+// TEMA DARK NATIVO com pequenos ajustes Canonika
+// =============================================================================
+// Usando o tema Quartz dark nativo que é superior ao nosso customizado
+const canonikaTheme = themeQuartz.withParams({
+  colorScheme: 'dark',
+  accentColor: '#3b82f6', // Accent azul Canonika
+});
 
 export default {
   name: 'AgGridReferenceView',
@@ -217,6 +226,7 @@ export default {
     };
 
     return {
+      theme: canonikaTheme,
       rowData,
       colDefs,
       defaultColDef,
