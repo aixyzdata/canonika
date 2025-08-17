@@ -185,10 +185,10 @@
 }
 
 // =============================================================================
-// SECTION TITLES (Template-style section headers) - SHARED COMPONENT
+// VIEW SECTION TITLES (Template-style section headers) - SHARED COMPONENT
 // =============================================================================
 
-.section-title {
+.view-section-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -201,5 +201,114 @@
 
   .section-icon {
     font-size: 1.25rem;
+  }
+}
+
+// =============================================================================
+// VIEW HEADER CARDS (Template-style headers) - SHARED COMPONENT
+// =============================================================================
+
+.view-header-card {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(30, 64, 175, 0.3);
+
+  .view-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+
+    .service-icon {
+      width: 3rem;
+      height: 3rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .title-content {
+      h1 {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 0.25rem 0;
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .view-status {
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 2rem;
+
+      .status-indicator {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+
+        &.online {
+          background: #10b981;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+      }
+
+      span {
+        color: #10b981;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .view-actions {
+    display: flex;
+    gap: 1rem;
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &.btn-primary {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: translateY(-2px);
+        }
+      }
+
+      &.btn-secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateY(-2px);
+        }
+      }
+    }
   }
 } 
