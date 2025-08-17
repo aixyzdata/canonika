@@ -34,25 +34,53 @@
         <div class="section-header">
           <h3 class="canonika-section-title">
             <i class="fas fa-table section-icon text-success"></i>
-            AG-GRID OFICIAL TEMPLATE
+            AG-GRID THEME PARTS
           </h3>
           <p class="section-description">
-            Implementação seguindo exatamente o exemplo da documentação oficial AG-Grid Vue.
+            Implementação avançada com combinação de temas base, esquemas de cor e conjuntos de ícones.
           </p>
         </div>
         <div class="section-content">
-          <!-- Theme Selector -->
-          <div class="theme-selector">
-            <label for="theme-select">Tema:</label>
-            <select 
-              id="theme-select" 
-              v-model="theme" 
-              class="theme-select"
-            >
-              <option v-for="(themeValue, themeName) in themes" :key="themeName" :value="themeValue">
-                {{ themeName }}
-              </option>
-            </select>
+          <!-- Theme Parts Selectors -->
+          <div class="theme-parts-selector">
+            <div class="selector-group">
+              <label for="base-theme-select">Tema Base:</label>
+              <select 
+                id="base-theme-select" 
+                v-model="baseTheme" 
+                class="theme-select"
+              >
+                <option v-for="t in baseThemes" :key="t.id" :value="t">
+                  {{ t.id }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="selector-group">
+              <label for="color-scheme-select">Esquema de Cor:</label>
+              <select 
+                id="color-scheme-select" 
+                v-model="colorScheme" 
+                class="theme-select"
+              >
+                <option v-for="cs in colorSchemes" :key="cs.id" :value="cs">
+                  {{ cs.id }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="selector-group">
+              <label for="icon-set-select">Conjunto de Ícones:</label>
+              <select 
+                id="icon-set-select" 
+                v-model="iconSet" 
+                class="theme-select"
+              >
+                <option v-for="is in iconSets" :key="is.id" :value="is">
+                  {{ is.id }}
+                </option>
+              </select>
+            </div>
           </div>
           
           <!-- AG Grid Component -->
@@ -157,15 +185,29 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { AgGridVue } from "ag-grid-vue3"; // Vue Data Grid Component
 import { 
   AllCommunityModule, 
   ModuleRegistry,
+  // Base Themes
   themeAlpine,
   themeBalham,
-  themeMaterial,
-  themeQuartz
+  themeQuartz,
+  // Color Schemes
+  colorSchemeDark,
+  colorSchemeDarkBlue,
+  colorSchemeDarkWarm,
+  colorSchemeLight,
+  colorSchemeLightCold,
+  colorSchemeLightWarm,
+  colorSchemeVariable,
+  // Icon Sets
+  iconSetAlpine,
+  iconSetMaterial,
+  iconSetQuartzBold,
+  iconSetQuartzLight,
+  iconSetQuartzRegular
 } from 'ag-grid-community';
 
 // Register all Community features
@@ -177,14 +219,39 @@ export default {
     AgGridVue, // Add Vue Data Grid component
   },
   setup() {
-    // Theme selector
-    const theme = ref(themeQuartz);
-    const themes = {
-      themeQuartz,
-      themeBalham,
-      themeMaterial,
-      themeAlpine,
-    };
+    // Base Themes
+    const baseThemes = [
+      { id: "themeQuartz", theme: themeQuartz },
+      { id: "themeBalham", theme: themeBalham },
+      { id: "themeAlpine", theme: themeAlpine },
+    ];
+
+    // Color Schemes
+    const colorSchemes = [
+      { id: "(unchanged)", part: null },
+      { id: "colorSchemeLight", part: colorSchemeLight },
+      { id: "colorSchemeLightCold", part: colorSchemeLightCold },
+      { id: "colorSchemeLightWarm", part: colorSchemeLightWarm },
+      { id: "colorSchemeDark", part: colorSchemeDark },
+      { id: "colorSchemeDarkWarm", part: colorSchemeDarkWarm },
+      { id: "colorSchemeDarkBlue", part: colorSchemeDarkBlue },
+      { id: "colorSchemeVariable", part: colorSchemeVariable },
+    ];
+
+    // Icon Sets
+    const iconSets = [
+      { id: "(unchanged)", part: null },
+      { id: "iconSetQuartzLight", part: iconSetQuartzLight },
+      { id: "iconSetQuartzRegular", part: iconSetQuartzRegular },
+      { id: "iconSetQuartzBold", part: iconSetQuartzBold },
+      { id: "iconSetAlpine", part: iconSetAlpine },
+      { id: "iconSetMaterial", part: iconSetMaterial },
+    ];
+
+    // Theme selectors
+    const baseTheme = ref(baseThemes[0]);
+    const iconSet = ref(iconSets[0]);
+    const colorScheme = ref(colorSchemes[6]); // Default to DarkBlue
 
     // Row Data: The data to be displayed (seguindo exemplo oficial)
     const rowData = ref([
@@ -260,9 +327,29 @@ export default {
       }
     };
 
+    // Computed theme with parts
+    const theme = computed(() => {
+      let theme = baseTheme.value.theme;
+      if (colorScheme.value.part) {
+        theme = theme.withPart(colorScheme.value.part);
+      }
+      if (iconSet.value.part) {
+        theme = theme.withPart(iconSet.value.part);
+      }
+      return theme;
+    });
+
     return {
+      // Theme selectors
+      baseTheme,
+      baseThemes,
+      iconSet,
+      iconSets,
+      colorScheme,
+      colorSchemes,
       theme,
-      themes,
+      
+      // Grid data
       rowData,
       colDefs,
       defaultColDef,
@@ -279,21 +366,29 @@ export default {
   margin: 1rem 0;
 }
 
-.theme-selector {
+.theme-parts-selector {
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background: rgba(30, 41, 59, 0.8);
   border: 1px solid rgba(71, 85, 105, 0.3);
   border-radius: 0.5rem;
   display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
   align-items: center;
-  gap: 1rem;
 }
 
-.theme-selector label {
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.selector-group label {
   color: #e2e8f0;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
 }
