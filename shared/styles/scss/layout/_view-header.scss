@@ -1,9 +1,10 @@
 // =============================================================================
-// CANONIKA DESIGN SYSTEM - VIEW HEADER LAYOUT (OFICIAL)
+// CANONIKA DESIGN SYSTEM - VIEW HEADER LAYOUT (GENÉRICO)
 // =============================================================================
 
-// View header padrão - usado por todos os serviços
-.canonika-view .view-header {
+// View header padrão - usado por todos os serviços (genérico)
+.canonika-view .view-header,
+.tollgate-view .view-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,8 +37,9 @@
   }
 }
 
-// View title component
-.canonika-view .view-title {
+// View title component (genérico)
+.canonika-view .view-title,
+.tollgate-view .view-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -49,7 +51,8 @@
   }
 }
 
-.canonika-view .title-content {
+.canonika-view .title-content,
+.tollgate-view .title-content {
   flex: 1;
 
   h1 {
@@ -68,8 +71,9 @@
   }
 }
 
-// View status component
-.canonika-view .view-status {
+// View status component (genérico)
+.canonika-view .view-status,
+.tollgate-view .view-status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -82,7 +86,8 @@
   border-radius: 0.5rem;
 }
 
-.canonika-view .status-indicator {
+.canonika-view .status-indicator,
+.tollgate-view .status-indicator {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -95,8 +100,9 @@
   }
 }
 
-// View actions component
-.canonika-view .view-actions {
+// View actions component (genérico)
+.canonika-view .view-actions,
+.tollgate-view .view-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
