@@ -12,10 +12,8 @@
         </div>
       </div>
       <div class="view-status">
-        <div class="status-indicator">
-          <div class="status-dot online"></div>
-          <span>Sistema Operacional</span>
-        </div>
+        <div class="status-dot online"></div>
+        <span>Sistema Operacional</span>
       </div>
       <div class="view-actions">
         <button @click="addRow" class="btn btn-primary">
