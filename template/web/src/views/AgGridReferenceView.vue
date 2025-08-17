@@ -229,42 +229,7 @@ export default {
     AgGridVue, // Add Vue Data Grid component
   },
   setup() {
-    // Base Themes
-    const baseThemes = [
-      { id: "themeQuartz", theme: themeQuartz },
-      { id: "themeBalham", theme: themeBalham },
-      { id: "themeAlpine", theme: themeAlpine },
-      { id: "canonikaTheme", theme: canonikaTheme },
-    ];
-
-    // Color Schemes
-    const colorSchemes = [
-      { id: "(unchanged)", part: null },
-      { id: "colorSchemeLight", part: colorSchemeLight },
-      { id: "colorSchemeLightCold", part: colorSchemeLightCold },
-      { id: "colorSchemeLightWarm", part: colorSchemeLightWarm },
-      { id: "colorSchemeDark", part: colorSchemeDark },
-      { id: "colorSchemeDarkWarm", part: colorSchemeDarkWarm },
-      { id: "colorSchemeDarkBlue", part: colorSchemeDarkBlue },
-      { id: "colorSchemeVariable", part: colorSchemeVariable },
-    ];
-
-    // Icon Sets
-    const iconSets = [
-      { id: "(unchanged)", part: null },
-      { id: "iconSetQuartzLight", part: iconSetQuartzLight },
-      { id: "iconSetQuartzRegular", part: iconSetQuartzRegular },
-      { id: "iconSetQuartzBold", part: iconSetQuartzBold },
-      { id: "iconSetAlpine", part: iconSetAlpine },
-      { id: "iconSetMaterial", part: iconSetMaterial },
-    ];
-
-    // Theme selectors
-    const baseTheme = ref(baseThemes[3]); // Default to Canonika Theme
-    const iconSet = ref(iconSets[0]);
-    const colorScheme = ref(colorSchemes[0]); // No color scheme for Canonika (already included)
-
-    // Canonika Custom Theme
+    // Canonika Custom Theme (definido primeiro)
     const canonikaTheme = themeQuartz
       .withPart(colorSchemeDarkBlue)
       .withParams({
@@ -322,6 +287,41 @@ export default {
         errorColor: '#ef4444', // $error
         infoColor: '#3b82f6', // $info
       });
+
+    // Base Themes (definido após canonikaTheme)
+    const baseThemes = [
+      { id: "themeQuartz", theme: themeQuartz },
+      { id: "themeBalham", theme: themeBalham },
+      { id: "themeAlpine", theme: themeAlpine },
+      { id: "canonikaTheme", theme: canonikaTheme },
+    ];
+
+    // Color Schemes
+    const colorSchemes = [
+      { id: "(unchanged)", part: null },
+      { id: "colorSchemeLight", part: colorSchemeLight },
+      { id: "colorSchemeLightCold", part: colorSchemeLightCold },
+      { id: "colorSchemeLightWarm", part: colorSchemeLightWarm },
+      { id: "colorSchemeDark", part: colorSchemeDark },
+      { id: "colorSchemeDarkWarm", part: colorSchemeDarkWarm },
+      { id: "colorSchemeDarkBlue", part: colorSchemeDarkBlue },
+      { id: "colorSchemeVariable", part: colorSchemeVariable },
+    ];
+
+    // Icon Sets
+    const iconSets = [
+      { id: "(unchanged)", part: null },
+      { id: "iconSetQuartzLight", part: iconSetQuartzLight },
+      { id: "iconSetQuartzRegular", part: iconSetQuartzRegular },
+      { id: "iconSetQuartzBold", part: iconSetQuartzBold },
+      { id: "iconSetAlpine", part: iconSetAlpine },
+      { id: "iconSetMaterial", part: iconSetMaterial },
+    ];
+
+    // Theme selectors
+    const baseTheme = ref(baseThemes[3]); // Default to Canonika Theme
+    const iconSet = ref(iconSets[0]);
+    const colorScheme = ref(colorSchemes[0]); // No color scheme for Canonika (already included)
 
     // Row Data: The data to be displayed (seguindo exemplo oficial)
     const rowData = ref([
