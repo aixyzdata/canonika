@@ -41,9 +41,24 @@
           </p>
         </div>
         <div class="section-content">
+          <!-- Theme Selector -->
+          <div class="theme-selector">
+            <label for="theme-select">Tema:</label>
+            <select 
+              id="theme-select" 
+              v-model="theme" 
+              class="theme-select"
+            >
+              <option v-for="(themeValue, themeName) in themes" :key="themeName" :value="themeValue">
+                {{ themeName }}
+              </option>
+            </select>
+          </div>
+          
           <!-- AG Grid Component -->
           <div class="ag-grid-container">
             <ag-grid-vue
+              :theme="theme"
               :rowData="rowData"
               :columnDefs="colDefs"
               style="height: 400px; width: 100%;"
@@ -144,7 +159,14 @@
 <script>
 import { ref } from 'vue';
 import { AgGridVue } from "ag-grid-vue3"; // Vue Data Grid Component
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { 
+  AllCommunityModule, 
+  ModuleRegistry,
+  themeAlpine,
+  themeBalham,
+  themeMaterial,
+  themeQuartz
+} from 'ag-grid-community';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -155,6 +177,15 @@ export default {
     AgGridVue, // Add Vue Data Grid component
   },
   setup() {
+    // Theme selector
+    const theme = ref(themeQuartz);
+    const themes = {
+      themeQuartz,
+      themeBalham,
+      themeMaterial,
+      themeAlpine,
+    };
+
     // Row Data: The data to be displayed (seguindo exemplo oficial)
     const rowData = ref([
       { make: "Tesla", model: "Model Y", price: 64950, electric: true },
@@ -230,6 +261,8 @@ export default {
     };
 
     return {
+      theme,
+      themes,
       rowData,
       colDefs,
       defaultColDef,
@@ -244,5 +277,54 @@ export default {
 <style scoped>
 .ag-grid-container {
   margin: 1rem 0;
+}
+
+.theme-selector {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-selector label {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.theme-select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  color: #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 150px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-select:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.theme-select option {
+  background: rgba(15, 23, 42, 0.95);
+  color: #e2e8f0;
+  padding: 0.5rem;
 }
 </style>
