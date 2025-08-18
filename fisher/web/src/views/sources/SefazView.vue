@@ -164,20 +164,7 @@
                     <i class="fas fa-trash me-1"></i>
                     Excluir Selecionados
                   </button>
-                  <button 
-                    @click="selectAll" 
-                    class="btn btn-outline-primary btn-sm"
-                  >
-                    <i class="fas fa-check-square me-1"></i>
-                    Selecionar Todos
-                  </button>
-                  <button 
-                    @click="clearSelection" 
-                    class="btn btn-outline-secondary btn-sm"
-                  >
-                    <i class="fas fa-square me-1"></i>
-                    Limpar Seleção
-                  </button>
+
                 </div>
               </div>
             </div>
@@ -195,9 +182,7 @@
               :paginationPageSize="20"
               :paginationPageSizeSelector="[20, 50, 100]"
               :getRowClass="getRowClass"
-              :rowSelection="rowSelectionConfig"
               @grid-ready="onGridReady"
-              @selection-changed="onSelectionChanged"
             >
             </ag-grid-vue>
           </div>
@@ -513,42 +498,7 @@ export default {
       });
     };
 
-    // Funções de seleção
-    const selectAll = () => {
-      if (gridApi) {
-        gridApi.selectAll();
-        updateSelectedFiles();
-      }
-    };
 
-    const clearSelection = () => {
-      if (gridApi) {
-        gridApi.deselectAll();
-        updateSelectedFiles();
-      }
-    };
-
-    // Função para atualizar arquivos selecionados
-    const updateSelectedFiles = () => {
-      if (gridApi) {
-        const selectedNodes = gridApi.getSelectedNodes();
-        selectedFiles.value = selectedNodes.map(node => ({
-          file: node.data.file,
-          version: node.data.version,
-          status: node.data.status
-        }));
-      }
-    };
-
-    // Event handler para mudanças de seleção
-    const onSelectionChanged = () => {
-      updateSelectedFiles();
-    };
-
-    // Computed properties
-    const hasSelectedFiles = computed(() => {
-      return selectedFiles.value.length > 0;
-    });
 
     // Funções de ações em massa
     const bulkDownload = async () => {
@@ -564,7 +514,6 @@ export default {
         if (window.showSuccess) {
           window.showSuccess(`${selectedFiles.value.length} arquivos baixados com sucesso!`, 3000);
         }
-        clearSelection();
       } catch (err) {
         console.error('Erro no download em massa:', err);
         if (window.showError) {
@@ -588,7 +537,6 @@ export default {
         if (window.showSuccess) {
           window.showSuccess(`${selectedFiles.value.length} arquivos processados com sucesso!`, 3000);
         }
-        clearSelection();
       } catch (err) {
         console.error('Erro no processamento em massa:', err);
         if (window.showError) {
@@ -873,9 +821,7 @@ export default {
       return '';
     };
 
-    const rowSelectionConfig = ref({
-      mode: 'none'
-    });
+
 
     return {
       theme,
@@ -895,16 +841,11 @@ export default {
       availableVersions,
       bulkLoading,
       selectedFiles,
-      hasSelectedFiles,
       filterByVersion,
-      selectAll,
-      clearSelection,
-      updateSelectedFiles,
-      onSelectionChanged,
       bulkDownload,
       bulkProcess,
       bulkDelete,
-      rowSelectionConfig,
+
       // WebSocket e notificações
       wsConnected,
       downloadProgress,
