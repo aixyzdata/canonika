@@ -570,7 +570,7 @@ class FisherService:
                 head_response = await client.head(file_url)
                 total_size = int(head_response.headers.get("content-length", 0))
                 
-                self.download_progress[download_id]["total_size"] = total_size
+                active_downloads[download_id]["total_size"] = total_size
                 
                 # Download com progresso
                 async with client.stream("GET", file_url) as response:
