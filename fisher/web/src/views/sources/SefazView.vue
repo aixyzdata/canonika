@@ -182,6 +182,9 @@
               :paginationPageSize="20"
               :paginationPageSizeSelector="[20, 50, 100]"
               :getRowClass="getRowClass"
+              :suppressRowClickSelection="true"
+              :suppressCellSelection="true"
+              :suppressRowSelection="true"
               @grid-ready="onGridReady"
             >
             </ag-grid-vue>
@@ -801,6 +804,12 @@ export default {
       flex: 1,
       minWidth: 100,
       resizable: true,
+      suppressMenu: false,
+      sortable: true,
+      filter: true,
+      // Desabilitar seleção completamente
+      suppressRowClickSelection: true,
+      suppressCellSelection: true,
     });
 
     let gridApi = null;
