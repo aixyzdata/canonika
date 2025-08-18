@@ -1042,22 +1042,68 @@ fisher_service = FisherService()
 async def test_endpoint():
     return {"message": "Teste funcionando!"}
 
-# WebSocket endpoint simples para teste
+# WebSocket endpoint para Fisher
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     logger.info("WebSocket: Tentativa de conexão recebida")
-    await websocket.accept()
-    logger.info("WebSocket: Conexão aceita")
+    await manager.connect(websocket)
+    logger.info("WebSocket: Conexão aceita e registrada")
     
     try:
-        await websocket.send_text("Conectado!")
-        logger.info("WebSocket: Mensagem enviada")
+        # Enviar mensagem de conexão em formato JSON
+        connection_message = {
+            "type": "connection_status",
+            "status": "connected",
+            "message": "Conectado ao Fisher WebSocket!",
+            "timestamp": time.time()
+        }
+        await websocket.send_text(json.dumps(connection_message))
+        logger.info("WebSocket: Mensagem de conexão enviada")
         
         while True:
             data = await websocket.receive_text()
-            await websocket.send_text(f"Echo: {data}")
+            logger.info(f"WebSocket: Mensagem recebida: {data}")
+            
+            try:
+                # Tentar parsear como JSON
+                parsed_data = json.loads(data)
+                
+                # Processar diferentes tipos de mensagem
+                if parsed_data.get("type") == "ping":
+                    response = {
+                        "type": "pong",
+                        "timestamp": time.time()
+                    }
+                    await websocket.send_text(json.dumps(response))
+                    
+                elif parsed_data.get("type") == "echo":
+                    response = {
+                        "type": "echo_response",
+                        "message": parsed_data.get("message", ""),
+                        "timestamp": time.time()
+                    }
+                    await websocket.send_text(json.dumps(response))
+                    
+                else:
+                    # Echo genérico para outras mensagens
+                    response = {
+                        "type": "message_received",
+                        "original_data": parsed_data,
+                        "timestamp": time.time()
+                    }
+                    await websocket.send_text(json.dumps(response))
+                    
+            except json.JSONDecodeError:
+                # Se não for JSON, tratar como texto simples
+                response = {
+                    "type": "text_response",
+                    "message": f"Echo: {data}",
+                    "timestamp": time.time()
+                }
+                await websocket.send_text(json.dumps(response))
             
     except WebSocketDisconnect:
+        manager.disconnect(websocket)
         logger.info("WebSocket: Cliente desconectou")
 
 # Endpoint de saúde
