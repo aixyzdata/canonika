@@ -394,8 +394,19 @@ export default {
     // Função para excluir arquivo
     const deleteFile = async (filename, version, event) => {
       try {
-        if (!confirm(`Tem certeza que deseja excluir o arquivo ${filename}?`)) {
-          return;
+        if (window.confirmDialog) {
+          const confirmed = await window.confirmDialog(
+            `Tem certeza que deseja excluir o arquivo ${filename}?`,
+            'Confirmar exclusão'
+          );
+          if (!confirmed) {
+            return;
+          }
+        } else {
+          // Fallback para confirm nativo se o sistema de confirmação não estiver disponível
+          if (!confirm(`Tem certeza que deseja excluir o arquivo ${filename}?`)) {
+            return;
+          }
         }
 
         console.log(`Iniciando exclusão: ${filename} (${version})`);
@@ -423,13 +434,18 @@ export default {
           if (fileIndex !== -1) {
             rowData.value.splice(fileIndex, 1);
           }
-          alert(`Arquivo ${filename} excluído com sucesso!`);
+          // Mostrar alerta de sucesso
+          if (window.showSuccess) {
+            window.showSuccess(`Arquivo ${filename} excluído com sucesso!`, 3000);
+          }
         } else {
           throw new Error(data.error || data.message || 'Erro na exclusão');
         }
       } catch (err) {
         console.error('Erro na exclusão:', err);
-        alert(`Erro ao excluir ${filename}: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro ao excluir ${filename}: ${err.message}`, 5000);
+        }
       } finally {
         const button = event.target.closest('button');
         button.innerHTML = '<i class="fas fa-trash me-1"></i> Excluir';
@@ -512,11 +528,15 @@ export default {
         );
         
         await Promise.all(promises);
-        alert(`${selectedFiles.value.length} arquivos baixados com sucesso!`);
+        if (window.showSuccess) {
+          window.showSuccess(`${selectedFiles.value.length} arquivos baixados com sucesso!`, 3000);
+        }
         clearSelection();
       } catch (err) {
         console.error('Erro no download em massa:', err);
-        alert(`Erro no download em massa: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro no download em massa: ${err.message}`, 5000);
+        }
       } finally {
         bulkLoading.value = false;
       }
@@ -532,11 +552,15 @@ export default {
         );
         
         await Promise.all(promises);
-        alert(`${selectedFiles.value.length} arquivos processados com sucesso!`);
+        if (window.showSuccess) {
+          window.showSuccess(`${selectedFiles.value.length} arquivos processados com sucesso!`, 3000);
+        }
         clearSelection();
       } catch (err) {
         console.error('Erro no processamento em massa:', err);
-        alert(`Erro no processamento em massa: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro no processamento em massa: ${err.message}`, 5000);
+        }
       } finally {
         bulkLoading.value = false;
       }
@@ -545,8 +569,19 @@ export default {
     const bulkDelete = async () => {
       if (!hasSelectedFiles.value) return;
       
-      if (!confirm(`Tem certeza que deseja excluir ${selectedFiles.value.length} arquivos?`)) {
-        return;
+      if (window.confirmDialog) {
+        const confirmed = await window.confirmDialog(
+          `Tem certeza que deseja excluir ${selectedFiles.value.length} arquivos?`,
+          'Confirmar exclusão em massa'
+        );
+        if (!confirmed) {
+          return;
+        }
+      } else {
+        // Fallback para confirm nativo se o sistema de confirmação não estiver disponível
+        if (!confirm(`Tem certeza que deseja excluir ${selectedFiles.value.length} arquivos?`)) {
+          return;
+        }
       }
       
       try {
@@ -556,11 +591,15 @@ export default {
         );
         
         await Promise.all(promises);
-        alert(`${selectedFiles.value.length} arquivos excluídos com sucesso!`);
+        if (window.showSuccess) {
+          window.showSuccess(`${selectedFiles.value.length} arquivos excluídos com sucesso!`, 3000);
+        }
         clearSelection();
       } catch (err) {
         console.error('Erro na exclusão em massa:', err);
-        alert(`Erro na exclusão em massa: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro na exclusão em massa: ${err.message}`, 5000);
+        }
       } finally {
         bulkLoading.value = false;
       }

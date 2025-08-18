@@ -5,14 +5,19 @@
       <div 
         v-for="alert in alerts" 
         :key="alert.id"
+        :data-alert-id="alert.id"
         :class="['alert', `alert-${alert.type}`, 'alert-dismissible', 'fade', 'show']"
         role="alert"
       >
         <div class="alert-content">
+          <div v-if="alert.title" class="alert-title">
+            <strong>{{ alert.title }}</strong>
+          </div>
           <i :class="getAlertIcon(alert.type)" class="alert-icon me-2"></i>
           <span class="alert-message">{{ alert.message }}</span>
         </div>
         <button 
+          v-if="!alert.isConfirm"
           @click="removeAlert(alert.id)" 
           type="button" 
           class="btn-close" 
@@ -238,6 +243,56 @@ export default {
       return icons[type] || 'fas fa-info-circle'
     },
     
+    // Sistema de confirmação
+    async confirmAction(message, title = 'Confirmar ação') {
+      return new Promise((resolve) => {
+        const confirmId = ++this.alertCounter;
+        
+        const confirmAlert = {
+          id: confirmId,
+          type: 'warning',
+          message: message,
+          title: title,
+          isConfirm: true,
+          timestamp: Date.now()
+        };
+        
+        this.alerts.push(confirmAlert);
+        
+        // Adicionar botões de confirmação
+        setTimeout(() => {
+          const alertElement = document.querySelector(`[data-alert-id="${confirmId}"]`);
+          if (alertElement) {
+            const buttonContainer = alertElement.querySelector('.alert-content');
+            if (buttonContainer) {
+              buttonContainer.innerHTML += `
+                <div class="confirm-buttons mt-2">
+                  <button class="btn btn-success btn-sm me-2" onclick="window.confirmAction(${confirmId}, true)">
+                    <i class="fas fa-check me-1"></i> Confirmar
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="window.confirmAction(${confirmId}, false)">
+                    <i class="fas fa-times me-1"></i> Cancelar
+                  </button>
+                </div>
+              `;
+            }
+          }
+        }, 100);
+        
+        // Armazenar resolver para usar depois
+        this.confirmResolvers = this.confirmResolvers || {};
+        this.confirmResolvers[confirmId] = resolve;
+      });
+    },
+    
+    handleConfirmAction(alertId, confirmed) {
+      if (this.confirmResolvers && this.confirmResolvers[alertId]) {
+        this.confirmResolvers[alertId](confirmed);
+        delete this.confirmResolvers[alertId];
+      }
+      this.removeAlert(alertId);
+    },
+    
     // Métodos existentes
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed
@@ -382,6 +437,8 @@ export default {
       window.showWarning = (message, duration) => this.addAlert('warning', message, duration)
       window.showInfo = (message, duration) => this.addAlert('info', message, duration)
       window.clearAlerts = this.clearAlerts
+      window.confirmAction = this.handleConfirmAction.bind(this)
+      window.confirmDialog = this.confirmAction.bind(this)
     }
 }
 </script>
@@ -421,9 +478,25 @@ export default {
   font-size: 1.1rem;
 }
 
+.alert-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
 .alert-message {
   flex: 1;
   font-weight: 500;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.confirm-buttons .btn {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
 }
 
 .btn-close {
