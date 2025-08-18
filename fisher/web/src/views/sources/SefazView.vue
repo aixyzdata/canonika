@@ -259,61 +259,64 @@ export default {
         loading.value = true;
         error.value = null;
         
+        console.log('🔄 Buscando arquivos CNPJ da API...');
+        
         const response = await fetch('http://localhost:3706/api/cnpj/files/refresh');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
         
-        if (data.status === 'success') {
+        if (data.status === 'success' && data.files && Array.isArray(data.files)) {
+          console.log(`✅ ${data.files.length} arquivos carregados da API`);
+          
           // Transformar dados da API para o formato do grid
           rowData.value = data.files.map(file => ({
-            version: file.month_year,
-            file: file.filename,
-            status: file.status === 'downloaded' ? 'Baixado' : 'Disponível'
+            version: file.month_year || file.version || 'N/A',
+            file: file.filename || file.file || 'Arquivo desconhecido',
+            status: getFileStatus(file.status)
           }));
           
           // Atualizar versões disponíveis
           updateAvailableVersions();
+          
+          if (window.showSuccess) {
+            window.showSuccess(`${rowData.value.length} arquivos carregados com sucesso!`, 3000);
+          }
         } else {
-          throw new Error(data.error || 'Erro ao buscar dados');
+          throw new Error(data.error || 'Resposta inválida da API');
         }
       } catch (err) {
-        console.error('Erro ao buscar arquivos CNPJ:', err);
-        error.value = err.message;
-        // Fallback para dados de exemplo
-        rowData.value = [
-          { version: "2025-08", file: "Cnaes.zip", status: "Baixado" },
-          { version: "2025-08", file: "Empresas0.zip", status: "Baixado" },
-          { version: "2025-08", file: "Empresas1.zip", status: "Disponível" },
-          { version: "2025-08", file: "Empresas2.zip", status: "Disponível" },
-          { version: "2025-08", file: "Empresas3.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos0.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos1.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos2.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos3.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos4.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos5.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos6.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos7.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos8.zip", status: "Disponível" },
-          { version: "2025-08", file: "Estabelecimentos9.zip", status: "Disponível" },
-          { version: "2025-08", file: "Motivos.zip", status: "Disponível" },
-          { version: "2025-08", file: "Municipios.zip", status: "Disponível" },
-          { version: "2025-08", file: "Naturezas.zip", status: "Disponível" },
-          { version: "2025-08", file: "Paises.zip", status: "Disponível" },
-          { version: "2025-08", file: "Qualificacoes.zip", status: "Disponível" },
-          { version: "2025-08", file: "Simples.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios0.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios1.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios2.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios3.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios4.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios5.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios6.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios7.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios8.zip", status: "Disponível" },
-          { version: "2025-08", file: "Socios9.zip", status: "Disponível" },
-        ];
+        console.error('❌ Erro ao buscar arquivos CNPJ:', err);
+        error.value = `Erro ao carregar dados: ${err.message}`;
+        
+        // Em caso de erro, mostrar lista vazia
+        rowData.value = [];
+        
+        if (window.showError) {
+          window.showError(`Falha ao carregar arquivos: ${err.message}`, 5000);
+        }
       } finally {
         loading.value = false;
+      }
+    };
+
+    // Função auxiliar para mapear status
+    const getFileStatus = (status) => {
+      if (!status) return 'Disponível';
+      
+      const statusLower = status.toLowerCase();
+      
+      if (statusLower.includes('downloaded') || statusLower.includes('baixado')) {
+        return 'Baixado';
+      } else if (statusLower.includes('processed') || statusLower.includes('processado')) {
+        return 'Processado';
+      } else if (statusLower.includes('available') || statusLower.includes('disponível')) {
+        return 'Disponível';
+      } else {
+        return 'Disponível'; // Status padrão
       }
     };
 
