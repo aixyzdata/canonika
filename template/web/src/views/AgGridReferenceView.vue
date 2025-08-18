@@ -34,10 +34,10 @@
         <div class="section-header">
           <h3 class="canonika-section-title">
             <i class="fas fa-table section-icon text-success"></i>
-            AG-GRID CANONIKA THEME
+            AG-GRID CANONIKA THEME - OFICIAL
           </h3>
           <p class="section-description">
-            Tema personalizado com as cores do design system Canonika + sistema avançado de Theme Parts.
+            Tema oficial do projeto Canonika com design system + configuração padrão para todos os serviços.
           </p>
         </div>
         <div class="section-content">
@@ -220,6 +220,13 @@ import {
   iconSetQuartzRegular
 } from 'ag-grid-community';
 
+// Import Canonika AG-Grid Theme (configuração oficial)
+import { 
+  canonikaAgGridTheme,
+  canonikaAgGridCellRenderers,
+  canonikaAgGridDefaultConfig
+} from '../config/ag-grid-canonika-theme.js';
+
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -229,64 +236,8 @@ export default {
     AgGridVue, // Add Vue Data Grid component
   },
   setup() {
-    // Canonika Custom Theme (definido primeiro)
-    const canonikaTheme = themeQuartz
-      .withPart(colorSchemeDarkBlue)
-      .withParams({
-        // Canonika Design System Colors
-        backgroundColor: '#0f172a', // $dark-bg
-        foregroundColor: '#e2e8f0', // $dark-text
-        accentColor: '#3b82f6', // $primary-color
-        
-        // Chrome and UI Colors
-        chromeBackgroundColor: '#1e293b', // $dark-surface
-        borderColor: '#475569', // $dark-border
-        headerBackgroundColor: '#1e293b', // $dark-surface
-        headerTextColor: '#e2e8f0', // $dark-text
-        
-        // Text Colors
-        textColor: '#e2e8f0', // $dark-text
-        cellTextColor: '#e2e8f0', // $dark-text
-        headerTextColor: '#e2e8f0', // $dark-text
-        
-        // Row Colors
-        oddRowBackgroundColor: 'rgba(30, 41, 59, 0.5)', // $dark-surface with transparency
-        evenRowBackgroundColor: 'rgba(15, 23, 42, 0.8)', // $dark-bg with transparency
-        rowHoverBackgroundColor: 'rgba(59, 130, 246, 0.1)', // $primary-color with transparency
-        
-        // Selection Colors
-        selectedRowBackgroundColor: 'rgba(59, 130, 246, 0.2)', // $primary-color with transparency
-        rangeSelectionBackgroundColor: 'rgba(59, 130, 246, 0.15)', // $primary-color with transparency
-        
-        // Input and Control Colors
-        inputBackgroundColor: '#1e293b', // $dark-surface
-        inputBorderColor: '#475569', // $dark-border
-        inputTextColor: '#e2e8f0', // $dark-text
-        
-        // Button Colors
-        buttonBackgroundColor: 'rgba(59, 130, 246, 0.2)', // $primary-color with transparency
-        buttonTextColor: '#3b82f6', // $primary-color
-        buttonBorderColor: 'rgba(59, 130, 246, 0.3)', // $primary-color with transparency
-        
-        // Pagination Colors
-        paginationBackgroundColor: '#1e293b', // $dark-surface
-        paginationTextColor: '#e2e8f0', // $dark-text
-        
-        // Filter and Menu Colors
-        menuBackgroundColor: '#1e293b', // $dark-surface
-        menuTextColor: '#e2e8f0', // $dark-text
-        menuBorderColor: '#475569', // $dark-border
-        
-        // Tool Panel Colors
-        toolPanelBackgroundColor: '#1e293b', // $dark-surface
-        toolPanelTextColor: '#e2e8f0', // $dark-text
-        
-        // Status Colors
-        successColor: '#10b981', // $success
-        warningColor: '#f59e0b', // $warning
-        errorColor: '#ef4444', // $error
-        infoColor: '#3b82f6', // $info
-      });
+    // Usando o tema oficial Canonika AG-Grid
+    const canonikaTheme = canonikaAgGridTheme;
 
     // Base Themes (definido após canonikaTheme)
     const baseThemes = [
@@ -348,21 +299,14 @@ export default {
         headerName: "Preço", 
         sortable: true, 
         filter: 'agNumberColumnFilter',
-        valueFormatter: params => {
-          return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'USD'
-          }).format(params.value);
-        }
+        valueFormatter: canonikaAgGridCellRenderers.currency
       },
       { 
         field: "electric", 
         headerName: "Elétrico", 
         sortable: true, 
         filter: true,
-        cellRenderer: params => {
-          return params.value ? '✅ Sim' : '❌ Não';
-        }
+        cellRenderer: canonikaAgGridCellRenderers.boolean
       }
     ]);
 
