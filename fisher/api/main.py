@@ -45,14 +45,15 @@ logger = logging.getLogger(__name__)
 # FastAPI app
 app = FastAPI(title="Fisher API", description="API para download de dados CNPJ")
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS - comentado temporariamente para teste
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+#     allow_websockets=True,
+# )
 
 # WebSocket connections
 active_connections: List[WebSocket] = []
@@ -1036,46 +1037,36 @@ class FisherService:
 # Instância global do serviço
 fisher_service = FisherService()
 
-# Instância global do processador CNPJ
-cnpj_processor = CNPJProcessor()
+# Endpoint de teste simples
+@app.get("/test")
+async def test_endpoint():
+    return {"message": "Teste funcionando!"}
+
+# WebSocket endpoint simples para teste
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    logger.info("WebSocket: Tentativa de conexão recebida")
+    await websocket.accept()
+    logger.info("WebSocket: Conexão aceita")
+    
+    try:
+        await websocket.send_text("Conectado!")
+        logger.info("WebSocket: Mensagem enviada")
+        
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Echo: {data}")
+            
+    except WebSocketDisconnect:
+        logger.info("WebSocket: Cliente desconectou")
 
 # Endpoint de saúde
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": time.time()}
 
-# WebSocket endpoint
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
-    
-    # Enviar mensagem de boas-vindas
-    welcome_message = {
-        "type": "connection",
-        "message": "WebSocket conectado com sucesso!",
-        "timestamp": time.time(),
-        "connections_count": len(manager.active_connections)
-    }
-    await websocket.send_text(json.dumps(welcome_message))
-    
-    try:
-        while True:
-            # Receber mensagem do cliente
-            data = await websocket.receive_text()
-            logger.info(f"Mensagem recebida: {data}")
-            
-            # Echo da mensagem (resposta simples)
-            response = {
-                "type": "echo",
-                "original_message": data,
-                "timestamp": time.time(),
-                "connections_count": len(manager.active_connections)
-            }
-            await websocket.send_text(json.dumps(response))
-            
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        logger.info("WebSocket desconectado")
+# Instância global do processador CNPJ
+cnpj_processor = CNPJProcessor()
 
 # Função para broadcast de progresso
 async def broadcast_download_progress(download_id: str, progress_data: dict):

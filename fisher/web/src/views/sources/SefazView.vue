@@ -288,15 +288,17 @@ export default {
     };
 
     // Função para download de arquivo
-    const downloadFile = async (filename, version) => {
+    const downloadFile = async (filename, version, event) => {
       try {
         console.log(`Iniciando download: ${filename} (${version})`);
         
         // Mostrar loading no botão
-        const button = event.target.closest('button');
-        const originalContent = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        button.disabled = true;
+        const button = event?.target?.closest('button');
+        if (button) {
+          const originalContent = button.innerHTML;
+          button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          button.disabled = true;
+        }
         
         // Chamar API de download
         const response = await fetch(`http://localhost:3706/api/cnpj/download/${filename}?month_year=${version}`, {
@@ -333,13 +335,15 @@ export default {
     };
 
     // Função para processar arquivo
-    const processFile = async (filename, version) => {
+    const processFile = async (filename, version, event) => {
       try {
         console.log(`Iniciando processamento: ${filename} (${version})`);
-        const button = event.target.closest('button');
-        const originalContent = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-        button.disabled = true;
+        const button = event?.target?.closest('button');
+        if (button) {
+          const originalContent = button.innerHTML;
+          button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+          button.disabled = true;
+        }
 
         // Chamar API de processamento
         const response = await fetch(`http://localhost:3706/api/cnpj/process/${filename}`, {
@@ -373,17 +377,19 @@ export default {
     };
 
     // Função para excluir arquivo
-    const deleteFile = async (filename, version) => {
+    const deleteFile = async (filename, version, event) => {
       try {
         if (!confirm(`Tem certeza que deseja excluir o arquivo ${filename}?`)) {
           return;
         }
 
         console.log(`Iniciando exclusão: ${filename} (${version})`);
-        const button = event.target.closest('button');
-        const originalContent = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Excluindo...';
-        button.disabled = true;
+        const button = event?.target?.closest('button');
+        if (button) {
+          const originalContent = button.innerHTML;
+          button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Excluindo...';
+          button.disabled = true;
+        }
 
         // Chamar API de exclusão
         const response = await fetch(`http://localhost:3706/api/cnpj/files/${filename}`, {
@@ -690,56 +696,56 @@ export default {
           const filename = params.data.file;
           const version = params.data.version;
           
-          // Determinar ação baseada no status real
-          if (status === 'disponível' || status === 'available') {
-            // Arquivo não encontrado - botão Download
-            return `
-              <button 
-                onclick="window.downloadFile('${filename}', '${version}')" 
-                class="btn btn-success btn-sm"
-                style="width: 100%;"
-              >
-                <i class="fas fa-download me-1"></i>
-                Download
-              </button>
-            `;
-          } else if (status === 'baixado' || status === 'downloaded') {
-            // Arquivo baixado mas não processado - botão Processar
-            return `
-              <button 
-                onclick="window.processFile('${filename}', '${version}')" 
-                class="btn btn-warning btn-sm"
-                style="width: 100%;"
-              >
-                <i class="fas fa-cogs me-1"></i>
-                Processar
-              </button>
-            `;
-          } else if (status === 'processado' || status === 'processed') {
-            // Arquivo já no banco - botão Excluir
-            return `
-              <button 
-                onclick="window.deleteFile('${filename}', '${version}')" 
-                class="btn btn-danger btn-sm"
-                style="width: 100%;"
-              >
-                <i class="fas fa-trash me-1"></i>
-                Excluir
-              </button>
-            `;
-          } else {
-            // Status desconhecido - botão Download como fallback
-            return `
-              <button 
-                onclick="window.downloadFile('${filename}', '${version}')" 
-                class="btn btn-primary btn-sm"
-                style="width: 100%;"
-              >
-                <i class="fas fa-download me-1"></i>
-                Download
-              </button>
-            `;
-          }
+                            // Determinar ação baseada no status real
+                  if (status === 'disponível' || status === 'available') {
+                    // Arquivo não encontrado - botão Download
+                    return `
+                      <button
+                        onclick="window.downloadFile('${filename}', '${version}', event)"
+                        class="btn btn-success btn-sm"
+                        style="width: 100%;"
+                      >
+                        <i class="fas fa-download me-1"></i>
+                        Download
+                      </button>
+                    `;
+                  } else if (status === 'baixado' || status === 'downloaded') {
+                    // Arquivo baixado mas não processado - botão Processar
+                    return `
+                      <button
+                        onclick="window.processFile('${filename}', '${version}', event)"
+                        class="btn btn-warning btn-sm"
+                        style="width: 100%;"
+                      >
+                        <i class="fas fa-cogs me-1"></i>
+                        Processar
+                      </button>
+                    `;
+                  } else if (status === 'processado' || status === 'processed') {
+                    // Arquivo já no banco - botão Excluir
+                    return `
+                      <button
+                        onclick="window.deleteFile('${filename}', '${version}', event)"
+                        class="btn btn-danger btn-sm"
+                        style="width: 100%;"
+                      >
+                        <i class="fas fa-trash me-1"></i>
+                        Excluir
+                      </button>
+                    `;
+                  } else {
+                    // Status desconhecido - botão Download como fallback
+                    return `
+                      <button
+                        onclick="window.downloadFile('${filename}', '${version}', event)"
+                        class="btn btn-primary btn-sm"
+                        style="width: 100%;"
+                      >
+                        <i class="fas fa-download me-1"></i>
+                        Download
+                      </button>
+                    `;
+                  }
         }
       }
     ]);
