@@ -280,12 +280,37 @@ export default {
         error.value = err.message;
         // Fallback para dados de exemplo
         rowData.value = [
-          { version: "2024-01-15", file: "DADOS_ABERTOS_CNPJ_15_01_2024.zip", status: "Disponível" },
-          { version: "2024-01-14", file: "DADOS_ABERTOS_CNPJ_14_01_2024.zip", status: "Baixado" },
-          { version: "2024-01-13", file: "DADOS_ABERTOS_CNPJ_13_01_2024.zip", status: "Processado" },
-          { version: "2024-01-12", file: "DADOS_ABERTOS_CNPJ_12_01_2024.zip", status: "Disponível" },
-          { version: "2024-01-11", file: "DADOS_ABERTOS_CNPJ_11_01_2024.zip", status: "Baixado" },
-          { version: "2024-01-10", file: "DADOS_ABERTOS_CNPJ_10_01_2024.zip", status: "Processado" },
+          { version: "2025-08", file: "Cnaes.zip", status: "Baixado" },
+          { version: "2025-08", file: "Empresas0.zip", status: "Baixado" },
+          { version: "2025-08", file: "Empresas1.zip", status: "Disponível" },
+          { version: "2025-08", file: "Empresas2.zip", status: "Disponível" },
+          { version: "2025-08", file: "Empresas3.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos0.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos1.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos2.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos3.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos4.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos5.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos6.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos7.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos8.zip", status: "Disponível" },
+          { version: "2025-08", file: "Estabelecimentos9.zip", status: "Disponível" },
+          { version: "2025-08", file: "Motivos.zip", status: "Disponível" },
+          { version: "2025-08", file: "Municipios.zip", status: "Disponível" },
+          { version: "2025-08", file: "Naturezas.zip", status: "Disponível" },
+          { version: "2025-08", file: "Paises.zip", status: "Disponível" },
+          { version: "2025-08", file: "Qualificacoes.zip", status: "Disponível" },
+          { version: "2025-08", file: "Simples.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios0.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios1.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios2.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios3.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios4.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios5.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios6.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios7.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios8.zip", status: "Disponível" },
+          { version: "2025-08", file: "Socios9.zip", status: "Disponível" },
         ];
       } finally {
         loading.value = false;
@@ -718,6 +743,17 @@ export default {
 
     // Column Definitions: Defines the columns to be displayed (arquivos da Receita Federal)
     const colDefs = ref([
+      {
+        headerName: '',
+        field: 'selected',
+        width: 50,
+        pinned: 'left',
+        sortable: false,
+        filter: false,
+        resizable: false,
+        checkboxSelection: true,
+        headerCheckboxSelection: true
+      },
       { 
         field: "version", 
         headerName: "Versão", 
@@ -846,9 +882,7 @@ export default {
     };
 
     const rowSelectionConfig = ref({
-      mode: 'multiRow',
-      checkboxes: true,
-      headerCheckbox: true
+      mode: 'multiple'
     });
 
     return {
