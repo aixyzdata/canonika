@@ -3,8 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './src/App.vue'
 import FisherView from './src/views/FisherView.vue'
 import StatusView from './src/views/StatusView.vue'
-import GridTestView from './src/views/GridTestView.vue'
-import SimpleTestView from './src/views/SimpleTestView.vue'
 
 // Importar views de fontes de dados
 import SefazView from './src/views/sources/SefazView.vue'
@@ -16,6 +14,9 @@ import FilesView from './src/views/sources/FilesView.vue'
 
 // Importar estilos compartilhados
 import '../../shared/styles/scss/main.scss'
+
+// Importar estilos do AG-Grid (Theming API)
+import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 // Configuração das rotas
 const routes = [
@@ -29,16 +30,7 @@ const routes = [
     name: 'StatusView',
     component: StatusView
   },
-  {
-    path: '/grid-test',
-    name: 'GridTestView',
-    component: GridTestView
-  },
-  {
-    path: '/simple-test',
-    name: 'SimpleTestView',
-    component: SimpleTestView
-  },
+
   // Rotas para fontes de dados
   {
     path: '/sources/sefaz',

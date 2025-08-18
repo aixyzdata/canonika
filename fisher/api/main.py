@@ -17,7 +17,7 @@ from pathlib import Path
 import hashlib
 import os
 import websockets
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import httpx
@@ -25,6 +25,10 @@ from urllib.parse import urljoin, urlparse
 import re
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import uuid
+import time
 
 from cnpj_processor import CNPJProcessor
 from cnpj_scraper import CNPJScraper
@@ -52,6 +56,41 @@ app.add_middleware(
 
 # WebSocket connections
 active_connections: List[WebSocket] = []
+
+# Gerenciador de conexões WebSocket
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+        logger.info(f"WebSocket conectado. Total de conexões: {len(self.active_connections)}")
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+        logger.info(f"WebSocket desconectado. Total de conexões: {len(self.active_connections)}")
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        logger.info(f"Broadcast: enviando para {len(self.active_connections)} conexões")
+        for i, connection in enumerate(self.active_connections):
+            try:
+                logger.info(f"Enviando para conexão {i+1}/{len(self.active_connections)} (ID: {id(connection)})")
+                await connection.send_text(message)
+            except Exception as e:
+                logger.error(f"Erro ao enviar mensagem: {e}")
+                # Remover conexão problemática
+                if connection in self.active_connections:
+                    self.active_connections.remove(connection)
+
+manager = ConnectionManager()
+
+# Armazenar downloads ativos
+active_downloads = {}
 
 class FisherService:
     """Serviço principal do Fisher para pesca de dados"""
@@ -498,21 +537,32 @@ class FisherService:
                 logger.info(f"🗑️ Arquivo existente removido: {local_path}")
             
             # Inicializar progresso
-            download_id = f"download_{filename}_{datetime.now().timestamp()}"
-            self.download_progress[download_id] = {
+            download_id = f"download_{filename}_{int(time.time() * 1000)}"
+            active_downloads[download_id] = {
                 "filename": filename,
                 "status": "downloading",
                 "progress": 0,
                 "speed": "0 MB/s",
                 "eta": "calculando...",
                 "message": "Iniciando download...",
-                "start_time": datetime.now(),
+                "start_time": time.time(),
                 "bytes_downloaded": 0,
-                "total_size": 0
+                "total_size": 0,
+                "month_year": month_year
             }
             
             # Notificar início via WebSocket
-            await self.broadcast_progress(download_id)
+            await broadcast_download_progress(download_id, {
+                "filename": filename,
+                "status": "downloading",
+                "progress": 0,
+                "speed": "0 MB/s",
+                "eta": "calculando...",
+                "message": "Iniciando download...",
+                "bytes_downloaded": 0,
+                "total_size": 0,
+                "month_year": month_year
+            })
             
             async with httpx.AsyncClient(timeout=300.0) as client:
                 # Fazer HEAD request para obter tamanho do arquivo
@@ -530,20 +580,20 @@ class FisherService:
                             f.write(chunk)
                             
                             # Atualizar progresso
-                            self.download_progress[download_id]["bytes_downloaded"] += len(chunk)
-                            progress = (self.download_progress[download_id]["bytes_downloaded"] / total_size) * 100
+                            active_downloads[download_id]["bytes_downloaded"] += len(chunk)
+                            progress = (active_downloads[download_id]["bytes_downloaded"] / total_size) * 100
                             
                             # Calcular velocidade
-                            elapsed = (datetime.now() - self.download_progress[download_id]["start_time"]).total_seconds()
+                            elapsed = time.time() - active_downloads[download_id]["start_time"]
                             if elapsed > 0:
-                                speed_mbps = (self.download_progress[download_id]["bytes_downloaded"] / elapsed) / (1024 * 1024)
+                                speed_mbps = (active_downloads[download_id]["bytes_downloaded"] / elapsed) / (1024 * 1024)
                                 speed = f"{speed_mbps:.1f} MB/s"
                                 
                                 # Calcular ETA
                                 if speed_mbps > 0:
-                                    remaining_bytes = total_size - self.download_progress[download_id]["bytes_downloaded"]
+                                    remaining_bytes = total_size - active_downloads[download_id]["bytes_downloaded"]
                                     eta_seconds = remaining_bytes / (speed_mbps * 1024 * 1024)
-                                    eta = self.format_time(eta_seconds)
+                                    eta = format_time(eta_seconds)
                                 else:
                                     eta = "calculando..."
                             else:
@@ -551,31 +601,108 @@ class FisherService:
                                 eta = "calculando..."
                             
                             # Atualizar progresso
-                            self.download_progress[download_id].update({
+                            active_downloads[download_id].update({
                                 "progress": round(progress, 1),
                                 "speed": speed,
                                 "eta": eta,
-                                "message": f"Baixando... {progress:.1f}%"
+                                "message": f"Baixando... {progress:.1f}%",
+                                "total_size": total_size
                             })
                             
                             # Broadcast progresso via WebSocket
-                            await self.broadcast_progress(download_id)
+                            await broadcast_download_progress(download_id, {
+                                "filename": filename,
+                                "status": "downloading",
+                                "progress": round(progress, 1),
+                                "speed": speed,
+                                "eta": eta,
+                                "message": f"Baixando... {progress:.1f}%",
+                                "bytes_downloaded": active_downloads[download_id]["bytes_downloaded"],
+                                "total_size": total_size,
+                                "month_year": month_year
+                            })
                             
                             # Pequena pausa para não sobrecarregar
                             await asyncio.sleep(0.1)
                 
                 # Download concluído
-                self.download_progress[download_id].update({
+                active_downloads[download_id].update({
                     "status": "completed",
                     "progress": 100,
                     "message": "Download concluído com sucesso!",
                     "local_path": str(local_path),
-                                        "month_year": month_year,
+                    "month_year": month_year,
                     "directory": str(month_dir)
                 })
                 
                 # Broadcast conclusão
-                await self.broadcast_progress(download_id)
+                await broadcast_download_completed(download_id, {
+                    "filename": filename,
+                    "status": "completed",
+                    "progress": 100,
+                    "message": "Download concluído com sucesso!",
+                    "local_path": str(local_path),
+                    "month_year": month_year,
+                    "directory": str(month_dir),
+                    "total_size": total_size,
+                    "bytes_downloaded": total_size
+                })
+                
+                # Atualizar tabela de controle no banco de dados
+                try:
+                    if not cnpj_processor.engine:
+                        await cnpj_processor.initialize_db()
+                    
+                    async with cnpj_processor.session_factory() as session:
+                        # Verificar se já existe registro
+                        result = await session.execute(text("""
+                            SELECT id FROM cnpj_file_control 
+                            WHERE folder = :folder AND filename = :filename
+                        """), {
+                            "folder": month_year,
+                            "filename": filename
+                        })
+                        
+                        existing_record = result.fetchone()
+                        
+                        if existing_record:
+                            # Atualizar registro existente
+                            await session.execute(text("""
+                                UPDATE cnpj_file_control 
+                                SET status = 'DOWNLOADED',
+                                    download_date = NOW(),
+                                    local_path = :local_path,
+                                    file_size_bytes = :file_size_bytes,
+                                    download_attempts = download_attempts + 1,
+                                    last_error = NULL,
+                                    updated_at = NOW()
+                                WHERE folder = :folder AND filename = :filename
+                            """), {
+                                "folder": month_year,
+                                "filename": filename,
+                                "local_path": str(local_path),
+                                "file_size_bytes": total_size
+                            })
+                        else:
+                            # Inserir novo registro
+                            await session.execute(text("""
+                                INSERT INTO cnpj_file_control 
+                                (folder, filename, file_url, file_size_bytes, last_modified, status, download_date, local_path, download_attempts, created_at, updated_at)
+                                VALUES (:folder, :filename, :file_url, :file_size_bytes, NOW(), 'DOWNLOADED', NOW(), :local_path, 1, NOW(), NOW())
+                            """), {
+                                "folder": month_year,
+                                "filename": filename,
+                                "file_url": file_url,
+                                "file_size_bytes": total_size,
+                                "local_path": str(local_path)
+                            })
+                        
+                        await session.commit()
+                        logger.info(f"✅ Controle de download atualizado no banco: {filename}")
+                        
+                except Exception as db_error:
+                    logger.error(f"❌ Erro ao atualizar controle no banco: {db_error}")
+                    # Não falhar o download por erro no banco
                 
                 logger.info(f"✅ Download concluído: {filename} -> {local_path}")
                 
@@ -593,12 +720,17 @@ class FisherService:
             logger.error(f"❌ Erro no download de {filename}: {str(e)}")
             
             # Atualizar progresso com erro
-            if download_id in self.download_progress:
-                self.download_progress[download_id].update({
+            if download_id in active_downloads:
+                active_downloads[download_id].update({
                     "status": "error",
                     "message": f"Erro: {str(e)}"
                 })
-                await self.broadcast_progress(download_id)
+                await broadcast_download_error(download_id, {
+                    "filename": filename,
+                    "status": "error",
+                    "message": f"Erro: {str(e)}",
+                    "month_year": month_year
+                })
             
             return {
                 "status": "error",
@@ -815,11 +947,39 @@ class FisherService:
                                         for file_path in month_dir.glob("*.zip"):
                                             downloaded_files.append(file_path.name)
                     
+                    # Buscar status dos arquivos no banco de dados
+                    file_status_from_db = {}
+                    try:
+                        if not cnpj_processor.engine:
+                            await cnpj_processor.initialize_db()
+                        
+                        async with cnpj_processor.session_factory() as session:
+                            result = await session.execute(text("""
+                                SELECT folder, filename, status, download_date, import_date, local_path
+                                FROM cnpj_file_control 
+                                WHERE folder IN :folders
+                            """), {
+                                "folders": tuple(directory_links)
+                            })
+                            
+                            for row in result.fetchall():
+                                key = f"{row[0]}/{row[1]}"
+                                file_status_from_db[key] = {
+                                    'status': row[2],
+                                    'download_date': row[3],
+                                    'import_date': row[4],
+                                    'local_path': row[5]
+                                }
+                    except Exception as db_error:
+                        logger.warning(f"Erro ao buscar status no banco: {db_error}")
+                        # Continuar sem dados do banco
+                    
                     # Mapear status de cada arquivo
                     files_status = []
                     for file_info in all_files:
                         filename = file_info["filename"]
                         month_year = file_info["month_year"]
+                        key = f"{month_year}/{filename}"
                         
                         # Verificar se arquivo está baixado na estrutura correta
                         year = month_year.split('-')[0]
@@ -827,17 +987,30 @@ class FisherService:
                         expected_path = cnpj_dir / year / month / filename
                         is_downloaded = expected_path.exists()
                         
+                        # Determinar status baseado no banco de dados
+                        db_status = file_status_from_db.get(key, {})
+                        status = "available"
+                        
+                        if db_status.get('status') == 'IMPORTED':
+                            status = "processed"
+                        elif db_status.get('status') == 'DOWNLOADED' or is_downloaded:
+                            status = "downloaded"
+                        elif db_status.get('status') == 'FAILED':
+                            status = "failed"
+                        
                         files_status.append({
                             "filename": filename,
                             "month_year": file_info["month_year"],
                             "size": file_info["size"],
                             "last_updated": file_info["last_updated"],
-                            "status": "downloaded" if is_downloaded else "available",
-                            "local_path": str(expected_path) if is_downloaded else None,
+                            "status": status,
+                            "local_path": str(expected_path) if is_downloaded else db_status.get('local_path'),
                             "url": file_info["url"],
                             "directory": file_info["directory"],
                             "year": year,
-                            "month": month
+                            "month": month,
+                            "download_date": db_status.get('download_date'),
+                            "import_date": db_status.get('import_date')
                         })
                     
                     return {
@@ -866,20 +1039,108 @@ fisher_service = FisherService()
 # Instância global do processador CNPJ
 cnpj_processor = CNPJProcessor()
 
+# Endpoint de saúde
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": time.time()}
+
 # WebSocket endpoint
-@app.websocket("/ws/downloads")
+@app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    active_connections.append(websocket)
-    logger.info(f"🔌 Nova conexão WebSocket aceita. Total: {len(active_connections)}")
+    await manager.connect(websocket)
+    
+    # Enviar mensagem de boas-vindas
+    welcome_message = {
+        "type": "connection",
+        "message": "WebSocket conectado com sucesso!",
+        "timestamp": time.time(),
+        "connections_count": len(manager.active_connections)
+    }
+    await websocket.send_text(json.dumps(welcome_message))
     
     try:
         while True:
-            # Manter conexão ativa
-            await websocket.receive_text()
+            # Receber mensagem do cliente
+            data = await websocket.receive_text()
+            logger.info(f"Mensagem recebida: {data}")
+            
+            # Echo da mensagem (resposta simples)
+            response = {
+                "type": "echo",
+                "original_message": data,
+                "timestamp": time.time(),
+                "connections_count": len(manager.active_connections)
+            }
+            await websocket.send_text(json.dumps(response))
+            
     except WebSocketDisconnect:
-        active_connections.remove(websocket)
-        logger.info(f"🔌 Conexão WebSocket fechada. Total: {len(active_connections)}")
+        manager.disconnect(websocket)
+        logger.info("WebSocket desconectado")
+
+# Função para broadcast de progresso
+async def broadcast_download_progress(download_id: str, progress_data: dict):
+    """Envia progresso de download para todos os clientes conectados"""
+    message = {
+        "type": "download_progress",
+        "download_id": download_id,
+        **progress_data,
+        "timestamp": time.time()
+    }
+    await manager.broadcast(json.dumps(message))
+
+# Função para broadcast de conclusão
+async def broadcast_download_completed(download_id: str, completion_data: dict):
+    """Envia notificação de conclusão de download"""
+    message = {
+        "type": "download_completed",
+        "download_id": download_id,
+        **completion_data,
+        "timestamp": time.time()
+    }
+    await manager.broadcast(json.dumps(message))
+
+# Função para broadcast de erro
+async def broadcast_download_error(download_id: str, error_data: dict):
+    """Envia notificação de erro de download"""
+    message = {
+        "type": "download_error",
+        "download_id": download_id,
+        **error_data,
+        "timestamp": time.time()
+    }
+    await manager.broadcast(json.dumps(message))
+
+# Função para formatar tempo
+def format_time(seconds):
+    """Formata segundos em formato legível"""
+    if seconds < 60:
+        return f"{int(seconds)}s"
+    elif seconds < 3600:
+        minutes = int(seconds // 60)
+        secs = int(seconds % 60)
+        return f"{minutes}m {secs}s"
+    else:
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        return f"{hours}h {minutes}m"
+
+# Endpoint para obter status dos downloads ativos
+@app.get("/api/downloads/status")
+async def get_downloads_status():
+    """Retorna o status de todos os downloads ativos"""
+    return {
+        "active_downloads": len(active_downloads),
+        "downloads": active_downloads
+    }
+
+# Endpoint para obter status de um download específico
+@app.get("/api/downloads/status/{download_id}")
+async def get_download_status(download_id: str):
+    """Retorna o status de um download específico"""
+    if download_id in active_downloads:
+        return active_downloads[download_id]
+    else:
+        raise HTTPException(status_code=404, detail="Download não encontrado")
 
 # Endpoints REST
 @app.get("/cnpj/files/status")
@@ -1525,11 +1786,6 @@ async def load_test_data():
             "status": "error",
             "error": str(e)
         }
-
-@app.get("/health")
-async def health_check():
-    """Health check da API"""
-    return {"status": "healthy", "service": "fisher"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 
