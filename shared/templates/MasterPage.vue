@@ -451,17 +451,22 @@ export default {
   left: 0;
   right: 0;
   z-index: 9999;
-  padding: 1rem;
+  padding: 0.75rem;
   pointer-events: none;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .alerts-container .alert {
   pointer-events: auto;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
   border: none;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideInDown 0.3s ease-out;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  animation: slideInDown 0.25s ease-out;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .alerts-container .alert:last-child {
@@ -471,52 +476,65 @@ export default {
 .alert-content {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  flex: 1;
 }
 
 .alert-icon {
-  font-size: 1.1rem;
+  font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
 .alert-title {
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
+  font-size: 0.875rem;
 }
 
 .alert-message {
   flex: 1;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 0.875rem;
 }
 
 .confirm-buttons {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
 }
 
 .confirm-buttons .btn {
-  font-size: 0.875rem;
-  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
 
 .btn-close {
   background: none;
   border: none;
   color: inherit;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  padding: 0.25rem;
-  margin-left: 0.5rem;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  padding: 0.125rem;
+  margin-left: 0.375rem;
+  font-size: 0.75rem;
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-close:hover {
-  opacity: 1;
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Animações */
 @keyframes slideInDown {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-20px);
     opacity: 0;
   }
   to {
@@ -529,10 +547,21 @@ export default {
 @media (max-width: 768px) {
   .alerts-container {
     padding: 0.5rem;
+    max-width: calc(100% - 1rem);
   }
   
   .alerts-container .alert {
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .alert-icon {
+    font-size: 0.8125rem;
+  }
+  
+  .confirm-buttons .btn {
+    font-size: 0.6875rem;
+    padding: 0.1875rem 0.375rem;
   }
 }
 </style>
