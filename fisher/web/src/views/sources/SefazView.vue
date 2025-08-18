@@ -718,45 +718,39 @@ export default {
 
     // Column Definitions: Defines the columns to be displayed (arquivos da Receita Federal)
     const colDefs = ref([
-      {
-        headerName: '',
-        field: 'selected',
-        width: 50,
-        pinned: 'left',
-        sortable: false,
-        filter: false,
-        resizable: false
-      },
       { 
         field: "version", 
         headerName: "Versão", 
         sortable: true, 
         filter: true,
-        width: 120
+        width: 120,
+        cellStyle: { fontWeight: '600' }
       },
       { 
         field: "file", 
         headerName: "Arquivo", 
         sortable: true, 
         filter: true,
-        flex: 2
+        flex: 2,
+        cellStyle: { fontFamily: 'monospace', fontSize: '0.9rem' }
       },
       { 
         field: "status", 
         headerName: "Status", 
         sortable: true, 
         filter: true,
+        cellStyle: { textAlign: 'left' },
         cellRenderer: (params) => {
           const status = params.value?.toLowerCase();
           switch (status) {
             case 'disponível':
-              return '<span style="color: #3b82f6;">📁 Disponível</span>';
+              return '<span style="color: #3b82f6; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-folder-open"></i> Disponível</span>';
             case 'baixado':
-              return '<span style="color: #f59e0b;">⬇️ Baixado</span>';
+              return '<span style="color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-download"></i> Baixado</span>';
             case 'processado':
-              return '<span style="color: #10b981;">✅ Processado</span>';
+              return '<span style="color: #10b981; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-check-circle"></i> Processado</span>';
             default:
-              return `<span style="color: #6b7280;">❓ ${params.value}</span>`;
+              return `<span style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-question-circle"></i> ${params.value}</span>`;
           }
         },
         width: 150
@@ -766,62 +760,62 @@ export default {
         headerName: "Ações", 
         sortable: false, 
         filter: false,
-        width: 150,
+        width: 140,
         cellRenderer: (params) => {
           const status = params.data.status?.toLowerCase();
           const filename = params.data.file;
           const version = params.data.version;
           
-                            // Determinar ação baseada no status real
-                  if (status === 'disponível' || status === 'available') {
-                    // Arquivo não encontrado - botão Download
-                    return `
-                      <button
-                        onclick="window.downloadFile('${filename}', '${version}', event)"
-                        class="btn btn-success btn-sm"
-                        style="width: 100%;"
-                      >
-                        <i class="fas fa-download me-1"></i>
-                        Download
-                      </button>
-                    `;
-                  } else if (status === 'baixado' || status === 'downloaded') {
-                    // Arquivo baixado mas não processado - botão Processar
-                    return `
-                      <button
-                        onclick="window.processFile('${filename}', '${version}', event)"
-                        class="btn btn-warning btn-sm"
-                        style="width: 100%;"
-                      >
-                        <i class="fas fa-cogs me-1"></i>
-                        Processar
-                      </button>
-                    `;
-                  } else if (status === 'processado' || status === 'processed') {
-                    // Arquivo já no banco - botão Excluir
-                    return `
-                      <button
-                        onclick="window.deleteFile('${filename}', '${version}', event)"
-                        class="btn btn-danger btn-sm"
-                        style="width: 100%;"
-                      >
-                        <i class="fas fa-trash me-1"></i>
-                        Excluir
-                      </button>
-                    `;
-                  } else {
-                    // Status desconhecido - botão Download como fallback
-                    return `
-                      <button
-                        onclick="window.downloadFile('${filename}', '${version}', event)"
-                        class="btn btn-primary btn-sm"
-                        style="width: 100%;"
-                      >
-                        <i class="fas fa-download me-1"></i>
-                        Download
-                      </button>
-                    `;
-                  }
+          // Determinar ação baseada no status real
+          if (status === 'disponível' || status === 'available') {
+            // Arquivo não encontrado - botão Download
+            return `
+              <button
+                onclick="window.downloadFile('${filename}', '${version}', event)"
+                class="btn btn-success btn-sm"
+                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border-radius: 6px; transition: all 0.2s ease;"
+              >
+                <i class="fas fa-cloud-download-alt"></i>
+                Download
+              </button>
+            `;
+          } else if (status === 'baixado' || status === 'downloaded') {
+            // Arquivo baixado mas não processado - botão Processar
+            return `
+              <button
+                onclick="window.processFile('${filename}', '${version}', event)"
+                class="btn btn-warning btn-sm"
+                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border-radius: 6px; transition: all 0.2s ease;"
+              >
+                <i class="fas fa-cogs"></i>
+                Processar
+              </button>
+            `;
+          } else if (status === 'processado' || status === 'processed') {
+            // Arquivo já no banco - botão Excluir
+            return `
+              <button
+                onclick="window.deleteFile('${filename}', '${version}', event)"
+                class="btn btn-danger btn-sm"
+                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border-radius: 6px; transition: all 0.2s ease;"
+              >
+                <i class="fas fa-trash-alt"></i>
+                Excluir
+              </button>
+            `;
+          } else {
+            // Status desconhecido - botão Download como fallback
+            return `
+              <button
+                onclick="window.downloadFile('${filename}', '${version}', event)"
+                class="btn btn-primary btn-sm"
+                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border-radius: 6px; transition: all 0.2s ease;"
+              >
+                <i class="fas fa-cloud-download-alt"></i>
+                Download
+              </button>
+            `;
+          }
         }
       }
     ]);
@@ -1407,6 +1401,118 @@ export default {
   
   .notification-message {
     font-size: 0.8125rem;
+  }
+}
+
+/* Estilos para o AG-Grid melhorado */
+:deep(.ag-theme-quartz) {
+  --ag-header-height: 48px;
+  --ag-header-foreground-color: #f8fafc;
+  --ag-header-background-color: #1e293b;
+  --ag-header-cell-hover-background-color: #334155;
+  --ag-header-cell-moving-background-color: #475569;
+  --ag-row-hover-color: rgba(59, 130, 246, 0.08);
+  --ag-selected-row-background-color: rgba(59, 130, 246, 0.12);
+  --ag-cell-horizontal-border: solid 1px rgba(255, 255, 255, 0.05);
+  --ag-row-border-color: rgba(255, 255, 255, 0.05);
+  --ag-font-size: 0.875rem;
+  --ag-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:deep(.ag-header-cell) {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-size: 0.75rem;
+}
+
+:deep(.ag-cell) {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:deep(.ag-row) {
+  transition: all 0.2s ease;
+}
+
+:deep(.ag-row:hover) {
+  background-color: rgba(59, 130, 246, 0.04);
+}
+
+/* Estilos para botões do grid */
+:deep(.ag-cell button) {
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.ag-cell button:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.ag-cell button:active) {
+  transform: translateY(0);
+}
+
+/* Estilos para status */
+:deep(.ag-cell .status-display) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+/* Melhorias para linhas baixadas/processadas */
+.downloaded-row {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.04) 100%);
+  border-left: 4px solid #3b82f6;
+  position: relative;
+}
+
+.downloaded-row::before {
+  content: '⬇️';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.processed-row {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+  border-left: 4px solid #10b981;
+  position: relative;
+}
+
+.processed-row::before {
+  content: '⚡';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Responsividade para o grid */
+@media (max-width: 768px) {
+  :deep(.ag-header-cell) {
+    font-size: 0.6875rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  :deep(.ag-cell) {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+  
+  :deep(.ag-cell button) {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
   }
 }
 </style>
