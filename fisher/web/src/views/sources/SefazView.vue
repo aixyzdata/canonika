@@ -20,14 +20,19 @@
     <div class="view-content">
       <!-- Seção de Notificações -->
       <div v-if="notifications.length > 0" class="notifications-section mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="notifications-title">
-            <i class="fas fa-bell me-2"></i>
-            Notificações de Download
-          </h4>
-          <button @click="clearNotifications" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-trash me-1"></i>
-            Limpar
+        <div class="notifications-header">
+          <div class="notifications-header-content">
+            <div class="notifications-icon-wrapper">
+              <i class="fas fa-bell notifications-icon"></i>
+            </div>
+            <div class="notifications-title-wrapper">
+              <h4 class="notifications-title">Notificações de Download</h4>
+              <span class="notifications-count">{{ notifications.length }} {{ notifications.length === 1 ? 'notificação' : 'notificações' }}</span>
+            </div>
+          </div>
+          <button @click="clearNotifications" class="btn-clear-notifications">
+            <i class="fas fa-trash-alt"></i>
+            <span>Limpar</span>
           </button>
         </div>
         <div class="notifications-list">
@@ -1151,16 +1156,106 @@ export default {
 .notifications-section {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: 1px solid #475569;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15), 0 4px 10px -2px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.notifications-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+  border-radius: 12px 12px 0 0;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notifications-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.notifications-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.notifications-icon {
+  color: #ffffff;
+  font-size: 1rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.notifications-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
 .notifications-title {
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  font-weight: 600;
+  color: #f8fafc;
+  font-size: 1.125rem;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.notifications-count {
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.btn-clear-notifications {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-clear-notifications:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-clear-notifications:active {
+  transform: translateY(0);
+}
+
+.btn-clear-notifications i {
+  font-size: 0.875rem;
 }
 
 .notifications-list {
@@ -1254,6 +1349,64 @@ export default {
 .notification-time {
   color: #6b7280;
   font-size: 0.75rem;
-  text-align: right;
+  font-weight: 500;
+}
+
+/* Responsividade para notificações */
+@media (max-width: 768px) {
+  .notifications-section {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  
+  .notifications-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.875rem;
+  }
+  
+  .notifications-header-content {
+    gap: 0.75rem;
+  }
+  
+  .notifications-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  
+  .notifications-icon {
+    font-size: 0.875rem;
+  }
+  
+  .notifications-title {
+    font-size: 1rem;
+  }
+  
+  .notifications-count {
+    font-size: 0.75rem;
+  }
+  
+  .btn-clear-notifications {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.375rem;
+  }
+  
+  .btn-clear-notifications span {
+    display: none;
+  }
+  
+  .notification-item {
+    padding: 0.875rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  .notification-title {
+    font-size: 0.875rem;
+  }
+  
+  .notification-message {
+    font-size: 0.8125rem;
+  }
 }
 </style>
