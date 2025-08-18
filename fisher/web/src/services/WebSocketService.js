@@ -45,11 +45,14 @@ class WebSocketService {
 
       this.ws.onmessage = (event) => {
         try {
+          // Tentar parsear como JSON primeiro
           const data = JSON.parse(event.data);
-          console.log('Mensagem recebida do Fisher:', data);
+          console.log('Mensagem JSON recebida do Fisher:', data);
           this.handleMessage(data);
         } catch (error) {
-          console.error('Erro ao processar mensagem do Fisher:', error);
+          // Se não for JSON, tratar como texto simples
+          console.log('Mensagem de texto recebida do Fisher:', event.data);
+          this.handleTextMessage(event.data);
         }
       };
 
@@ -108,8 +111,11 @@ class WebSocketService {
     
     // Processar mensagens especiais
     switch (type) {
-      case 'connection':
-        console.log('Conexão Fisher estabelecida:', data);
+      case 'connection_status':
+        console.log('Status de conexão Fisher:', data);
+        if (data.status === 'connected') {
+          console.log('✅ Fisher WebSocket conectado com sucesso');
+        }
         break;
       case 'download_progress':
         console.log('Progresso de download recebido:', data);
@@ -123,11 +129,34 @@ class WebSocketService {
         console.log('Erro de download:', data);
         this.notifyDownloadProgress(data);
         break;
-      case 'echo':
-        console.log('Echo recebido:', data);
+      case 'pong':
+        console.log('Pong recebido:', data);
+        break;
+      case 'echo_response':
+        console.log('Echo response recebido:', data);
+        break;
+      case 'text_response':
+        console.log('Text response recebido:', data);
+        break;
+      case 'message_received':
+        console.log('Message received:', data);
         break;
       default:
         console.log('Tipo de mensagem desconhecido:', type);
+    }
+  }
+
+  /**
+   * Processar mensagem de texto simples
+   */
+  handleTextMessage(text) {
+    console.log('🔍 Fisher handleTextMessage chamado com:', text);
+    
+    // Processar mensagens de texto simples
+    if (text.includes('Conectado')) {
+      console.log('✅ Fisher WebSocket conectado (texto simples)');
+    } else {
+      console.log('Mensagem de texto recebida:', text);
     }
   }
 

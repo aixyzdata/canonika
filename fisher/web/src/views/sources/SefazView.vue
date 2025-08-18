@@ -317,14 +317,23 @@ export default {
           if (fileIndex !== -1) {
             rowData.value[fileIndex].status = 'Baixado';
           }
+          
+          // Mostrar alerta de sucesso
+          if (window.showSuccess) {
+            window.showSuccess(`Download iniciado: ${filename}`, 3000);
+          }
         } else {
           console.error(`Erro no download: ${result.error}`);
-          alert(`Erro ao baixar ${filename}: ${result.error}`);
+          if (window.showError) {
+            window.showError(`Erro ao baixar ${filename}: ${result.error}`, 5000);
+          }
         }
         
       } catch (err) {
         console.error('Erro no download:', err);
-        alert(`Erro ao baixar ${filename}: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro ao baixar ${filename}: ${err.message}`, 5000);
+        }
       } finally {
         // Restaurar botão
         const button = event.target.closest('button');
@@ -362,13 +371,19 @@ export default {
           if (fileIndex !== -1) {
             rowData.value[fileIndex].status = 'Processado';
           }
-          alert(`Arquivo ${filename} processado com sucesso!`);
+          
+          // Mostrar alerta de sucesso
+          if (window.showSuccess) {
+            window.showSuccess(`Arquivo ${filename} processado com sucesso!`, 3000);
+          }
         } else {
           throw new Error(data.error || data.message || 'Erro no processamento');
         }
       } catch (err) {
         console.error('Erro no processamento:', err);
-        alert(`Erro ao processar ${filename}: ${err.message}`);
+        if (window.showError) {
+          window.showError(`Erro ao processar ${filename}: ${err.message}`, 5000);
+        }
       } finally {
         const button = event.target.closest('button');
         button.innerHTML = '<i class="fas fa-cogs me-1"></i> Processar';
@@ -568,6 +583,23 @@ export default {
       fisherWebSocketService.onConnectionChange((status) => {
         wsConnected.value = status === 'connected';
         console.log('🔌 Status WebSocket Fisher:', status);
+        
+        if (status === 'connected') {
+          console.log('✅ WebSocket Fisher conectado com sucesso');
+          if (window.showSuccess) {
+            window.showSuccess('WebSocket conectado com sucesso!', 3000);
+          }
+        } else if (status === 'disconnected') {
+          console.log('❌ WebSocket Fisher desconectado');
+          if (window.showWarning) {
+            window.showWarning('WebSocket desconectado. Tentando reconectar...', 5000);
+          }
+        } else if (status === 'error') {
+          console.log('❌ Erro no WebSocket Fisher');
+          if (window.showError) {
+            window.showError('Erro na conexão WebSocket', 5000);
+          }
+        }
       });
 
       fisherWebSocketService.onDownloadProgress((data) => {

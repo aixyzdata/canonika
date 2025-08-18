@@ -1,5 +1,29 @@
 <template>
   <div id="app" class="canonika-app">
+    <!-- Sistema de Alertas Bootstrap no topo -->
+    <div class="alerts-container" v-if="alerts.length > 0">
+      <div 
+        v-for="alert in alerts" 
+        :key="alert.id"
+        :class="['alert', `alert-${alert.type}`, 'alert-dismissible', 'fade', 'show']"
+        role="alert"
+      >
+        <div class="alert-content">
+          <i :class="getAlertIcon(alert.type)" class="alert-icon me-2"></i>
+          <span class="alert-message">{{ alert.message }}</span>
+        </div>
+        <button 
+          @click="removeAlert(alert.id)" 
+          type="button" 
+          class="btn-close" 
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- Header futurista -->
     <header class="canonika-header">
       <div class="header-content">
@@ -166,10 +190,55 @@ export default {
       loginForm: {
         username: '',
         password: ''
-      }
+      },
+      alerts: [],
+      alertCounter: 0
     }
   },
   methods: {
+    // Sistema de Alertas
+    addAlert(type, message, duration = 5000) {
+      const alert = {
+        id: ++this.alertCounter,
+        type: type, // 'success', 'danger', 'warning', 'info'
+        message: message,
+        timestamp: Date.now()
+      }
+      
+      this.alerts.push(alert)
+      
+      // Auto-remover após duração especificada
+      if (duration > 0) {
+        setTimeout(() => {
+          this.removeAlert(alert.id)
+        }, duration)
+      }
+      
+      return alert.id
+    },
+    
+    removeAlert(alertId) {
+      const index = this.alerts.findIndex(alert => alert.id === alertId)
+      if (index > -1) {
+        this.alerts.splice(index, 1)
+      }
+    },
+    
+    clearAlerts() {
+      this.alerts = []
+    },
+    
+    getAlertIcon(type) {
+      const icons = {
+        success: 'fas fa-check-circle',
+        danger: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      }
+      return icons[type] || 'fas fa-info-circle'
+    },
+    
+    // Métodos existentes
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed
     },
@@ -305,7 +374,93 @@ export default {
         console.log('Redirecionando para Quarter...')
         this.redirectToQuarter()
       }
+      
+      // Expor métodos de alerta globalmente
+      window.showAlert = this.addAlert
+      window.showSuccess = (message, duration) => this.addAlert('success', message, duration)
+      window.showError = (message, duration) => this.addAlert('danger', message, duration)
+      window.showWarning = (message, duration) => this.addAlert('warning', message, duration)
+      window.showInfo = (message, duration) => this.addAlert('info', message, duration)
+      window.clearAlerts = this.clearAlerts
     }
 }
 </script>
+
+<style scoped>
+/* Sistema de Alertas Bootstrap */
+.alerts-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.alerts-container .alert {
+  pointer-events: auto;
+  margin-bottom: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInDown 0.3s ease-out;
+}
+
+.alerts-container .alert:last-child {
+  margin-bottom: 0;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alert-icon {
+  font-size: 1.1rem;
+}
+
+.alert-message {
+  flex: 1;
+  font-weight: 500;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* Animações */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .alerts-container {
+    padding: 0.5rem;
+  }
+  
+  .alerts-container .alert {
+    font-size: 0.9rem;
+  }
+}
+</style>
 
