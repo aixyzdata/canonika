@@ -211,15 +211,88 @@
         </div>
       </div>
 
-      <!-- Seção: Tabela de Arquivos CNPJ com AG-Grid -->
+      <!-- Seção: Arquivos da Receita Federal -->
       <div class="canonika-section">
         <div class="section-header">
           <h3 class="canonika-section-title">
-            <i class="fas fa-table text-success me-2"></i>
-            ARQUIVOS CNPJ - AG-GRID CANONIKA
+            <i class="fas fa-download text-primary me-2"></i>
+            ARQUIVOS DA RECEITA FEDERAL
           </h3>
           <p class="section-description">
-            Tabela avançada com tema Canonika, ordenação, filtros e paginação.
+            Lista de arquivos CNPJ disponíveis na Receita Federal e status de download/processamento.
+          </p>
+        </div>
+        
+        <div class="section-content">
+          <!-- Controles de Sincronização -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <button @click="syncReceitaFederal" class="btn btn-primary" :disabled="isSyncing">
+                <i class="fas fa-sync-alt me-2" :class="{ 'fa-spin': isSyncing }"></i>
+                {{ isSyncing ? 'Sincronizando...' : 'Sincronizar Receita Federal' }}
+              </button>
+              <button @click="downloadSelected" class="btn btn-success ms-2" :disabled="!hasSelectedFiles">
+                <i class="fas fa-download me-2"></i>
+                Baixar Selecionados
+              </button>
+            </div>
+            <div class="col-md-6 text-end">
+              <span class="badge bg-info me-2">
+                <i class="fas fa-info-circle me-1"></i>
+                {{ receitaFederalFiles.length }} arquivos disponíveis
+              </span>
+              <span class="badge bg-success me-2">
+                <i class="fas fa-check me-1"></i>
+                {{ downloadedFiles.length }} baixados
+              </span>
+              <span class="badge bg-warning">
+                <i class="fas fa-clock me-1"></i>
+                {{ pendingFiles.length }} pendentes
+              </span>
+            </div>
+          </div>
+
+          <!-- AG-Grid Container -->
+          <div class="ag-grid-container">
+            <ag-grid-vue
+              class="ag-theme-canonika"
+              :columnDefs="receitaFederalColumnDefs"
+              :rowData="receitaFederalFiles"
+              :defaultColDef="defaultColDef"
+              :pagination="true"
+              :paginationPageSize="15"
+              :paginationPageSizeSelector="[10, 15, 25, 50]"
+              :rowSelection="'multiple'"
+              :animateRows="true"
+              :tooltipShowDelay="500"
+              :sideBar="{
+                toolPanels: ['columns', 'filters'],
+                defaultToolPanel: 'columns'
+              }"
+              :statusBar="{
+                statusPanels: [
+                  { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+                  { statusPanel: 'agSelectedRowCountComponent', align: 'center' },
+                  { statusPanel: 'agAggregationComponent', align: 'right' }
+                ]
+              }"
+              @grid-ready="onReceitaFederalGridReady"
+              @row-selected="onReceitaFederalRowSelected"
+            >
+            </ag-grid-vue>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção: Nossos Arquivos Processados -->
+      <div class="canonika-section">
+        <div class="section-header">
+          <h3 class="canonika-section-title">
+            <i class="fas fa-database text-success me-2"></i>
+            NOSSOS ARQUIVOS PROCESSADOS
+          </h3>
+          <p class="section-description">
+            Arquivos CNPJ já baixados e processados em nossa base de dados.
           </p>
         </div>
         
@@ -348,10 +421,12 @@ export default {
   setup() {
     // Estado da aplicação
     const isProcessing = ref(false)
+    const isSyncing = ref(false)
     const showUploadModal = ref(false)
     const selectedUploadFile = ref(null)
     const selectedFile = ref(null)
     const gridApi = ref(null)
+    const receitaFederalGridApi = ref(null)
 
     // Métricas do dashboard
     const metrics = ref({
@@ -370,7 +445,7 @@ export default {
       search: ''
     })
 
-    // Dados dos arquivos CNPJ
+    // Dados dos arquivos CNPJ processados (nossa base)
     const cnpjFiles = ref([
       { 
         id: 1, 
@@ -419,7 +494,121 @@ export default {
       }
     ])
 
-    // Configuração do AG-Grid
+    // Dados dos arquivos da Receita Federal
+    const receitaFederalFiles = ref([
+      {
+        id: '2024-01',
+        name: 'CNPJ_2024_01.zip',
+        period: '2024-01',
+        size: 2847563,
+        lastModified: '2024-01-15 10:00:00',
+        status: 'Baixado',
+        downloadDate: '2024-01-15 10:00:00',
+        processingStatus: 'Processado',
+        recordsCount: 125000
+      },
+      {
+        id: '2024-02',
+        name: 'CNPJ_2024_02.zip',
+        period: '2024-02',
+        size: 2958471,
+        lastModified: '2024-02-15 10:00:00',
+        status: 'Baixado',
+        downloadDate: '2024-02-15 10:00:00',
+        processingStatus: 'Processando',
+        recordsCount: 0
+      },
+      {
+        id: '2024-03',
+        name: 'CNPJ_2024_03.zip',
+        period: '2024-03',
+        size: 3124567,
+        lastModified: '2024-03-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-04',
+        name: 'CNPJ_2024_04.zip',
+        period: '2024-04',
+        size: 2987654,
+        lastModified: '2024-04-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-05',
+        name: 'CNPJ_2024_05.zip',
+        period: '2024-05',
+        size: 3054321,
+        lastModified: '2024-05-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-06',
+        name: 'CNPJ_2024_06.zip',
+        period: '2024-06',
+        size: 3187654,
+        lastModified: '2024-06-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-07',
+        name: 'CNPJ_2024_07.zip',
+        period: '2024-07',
+        size: 3256789,
+        lastModified: '2024-07-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-08',
+        name: 'CNPJ_2024_08.zip',
+        period: '2024-08',
+        size: 3324567,
+        lastModified: '2024-08-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-09',
+        name: 'CNPJ_2024_09.zip',
+        period: '2024-09',
+        size: 3398765,
+        lastModified: '2024-09-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      },
+      {
+        id: '2024-10',
+        name: 'CNPJ_2024_10.zip',
+        period: '2024-10',
+        size: 3467890,
+        lastModified: '2024-10-15 10:00:00',
+        status: 'Pendente',
+        downloadDate: null,
+        processingStatus: 'Não baixado',
+        recordsCount: 0
+      }
+    ])
+
+    // Configuração do AG-Grid para nossos arquivos
     const columnDefs = ref([
       { 
         field: "name", 
@@ -468,6 +657,82 @@ export default {
       }
     ])
 
+    // Configuração do AG-Grid para Receita Federal
+    const receitaFederalColumnDefs = ref([
+      { 
+        field: "name", 
+        headerName: "Nome do Arquivo", 
+        sortable: true, 
+        filter: true,
+        flex: 2,
+        checkboxSelection: true,
+        headerCheckboxSelection: true
+      },
+      { 
+        field: "period", 
+        headerName: "Período", 
+        sortable: true, 
+        filter: true,
+        flex: 1
+      },
+      { 
+        field: "size", 
+        headerName: "Tamanho", 
+        sortable: true, 
+        filter: 'agNumberColumnFilter',
+        valueFormatter: (params) => formatFileSize(params.value),
+        flex: 1
+      },
+      { 
+        field: "lastModified", 
+        headerName: "Última Modificação", 
+        sortable: true, 
+        filter: true,
+        flex: 1.5
+      },
+      { 
+        field: "status", 
+        headerName: "Status Download", 
+        sortable: true, 
+        filter: true,
+        cellRenderer: (params) => {
+          const status = params.value
+          switch (status) {
+            case 'Baixado': return '<span class="canonika-ag-badge canonika-ag-badge-success">✅ Baixado</span>'
+            case 'Pendente': return '<span class="canonika-ag-badge canonika-ag-badge-warning">⏳ Pendente</span>'
+            case 'Erro': return '<span class="canonika-ag-badge canonika-ag-badge-error">❌ Erro</span>'
+            default: return '<span class="canonika-ag-badge canonika-ag-badge-secondary">⚪ Desconhecido</span>'
+          }
+        },
+        flex: 1
+      },
+      { 
+        field: "processingStatus", 
+        headerName: "Status Processamento", 
+        sortable: true, 
+        filter: true,
+        cellRenderer: (params) => {
+          const status = params.value
+          switch (status) {
+            case 'Processado': return '<span class="canonika-ag-badge canonika-ag-badge-success">✅ Processado</span>'
+            case 'Processando': return '<span class="canonika-ag-badge canonika-ag-badge-warning">🔄 Processando</span>'
+            case 'Não baixado': return '<span class="canonika-ag-badge canonika-ag-badge-secondary">⏸️ Não baixado</span>'
+            case 'Erro': return '<span class="canonika-ag-badge canonika-ag-badge-error">❌ Erro</span>'
+            default: return '<span class="canonika-ag-badge canonika-ag-badge-secondary">⚪ Desconhecido</span>'
+          }
+        },
+        flex: 1.5
+      },
+      { 
+        field: "recordsCount", 
+        headerName: "Registros", 
+        sortable: true, 
+        filter: 'agNumberColumnFilter',
+        valueFormatter: (params) => formatNumber(params.value),
+        flex: 1
+      }
+    ])
+
     const defaultColDef = ref({
       flex: 1,
       minWidth: 100,
@@ -509,6 +774,21 @@ export default {
       }
 
       return filtered
+    })
+
+    // Computed para Receita Federal
+    const downloadedFiles = computed(() => {
+      return receitaFederalFiles.value.filter(file => file.status === 'Baixado')
+    })
+
+    const pendingFiles = computed(() => {
+      return receitaFederalFiles.value.filter(file => file.status === 'Pendente')
+    })
+
+    const hasSelectedFiles = computed(() => {
+      if (!receitaFederalGridApi.value) return false
+      const selectedRows = receitaFederalGridApi.value.getSelectedRows()
+      return selectedRows.length > 0
     })
 
     // Methods
@@ -555,11 +835,99 @@ export default {
       console.log('📊 AG-Grid Canonika inicializado')
     }
 
+    const onReceitaFederalGridReady = (params) => {
+      receitaFederalGridApi.value = params.api
+      console.log('📊 AG-Grid Receita Federal inicializado')
+    }
+
     const onRowSelected = (event) => {
       if (event.node.isSelected()) {
         selectedFile.value = event.data
         console.log('📁 Arquivo selecionado:', selectedFile.value.name)
       }
+    }
+
+    const onReceitaFederalRowSelected = (event) => {
+      console.log('📁 Arquivo Receita Federal selecionado:', event.data?.name)
+    }
+
+    const syncReceitaFederal = async () => {
+      isSyncing.value = true
+      console.log('🔄 Sincronizando com Receita Federal...')
+      
+      try {
+        // Simular chamada para API da Receita Federal
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        
+        // Atualizar dados (simulação)
+        const newFiles = [
+          {
+            id: '2024-11',
+            name: 'CNPJ_2024_11.zip',
+            period: '2024-11',
+            size: 3523456,
+            lastModified: '2024-11-15 10:00:00',
+            status: 'Pendente',
+            downloadDate: null,
+            processingStatus: 'Não baixado',
+            recordsCount: 0
+          },
+          {
+            id: '2024-12',
+            name: 'CNPJ_2024_12.zip',
+            period: '2024-12',
+            size: 3587654,
+            lastModified: '2024-12-15 10:00:00',
+            status: 'Pendente',
+            downloadDate: null,
+            processingStatus: 'Não baixado',
+            recordsCount: 0
+          }
+        ]
+        
+        receitaFederalFiles.value.push(...newFiles)
+        
+        // Atualizar métricas
+        metrics.value.lastUpdate = new Date().toLocaleString('pt-BR')
+        metrics.value.timeAgo = 'agora mesmo'
+        metrics.value.totalFiles = receitaFederalFiles.value.length
+        
+        console.log('✅ Sincronização com Receita Federal concluída')
+      } catch (error) {
+        console.error('❌ Erro na sincronização:', error)
+      } finally {
+        isSyncing.value = false
+      }
+    }
+
+    const downloadSelected = async () => {
+      if (!receitaFederalGridApi.value) return
+      
+      const selectedRows = receitaFederalGridApi.value.getSelectedRows()
+      if (selectedRows.length === 0) return
+      
+      console.log('📥 Iniciando download de arquivos selecionados...')
+      
+      for (const file of selectedRows) {
+        if (file.status === 'Pendente') {
+          console.log(`📥 Baixando: ${file.name}`)
+          
+          // Simular download
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          // Atualizar status
+          file.status = 'Baixado'
+          file.downloadDate = new Date().toLocaleString('pt-BR')
+          file.processingStatus = 'Processando'
+          
+          console.log(`✅ Download concluído: ${file.name}`)
+        }
+      }
+      
+      // Atualizar grid
+      receitaFederalGridApi.value.refreshCells()
+      
+      console.log('✅ Downloads concluídos')
     }
 
     const handleFileUpload = (event) => {
@@ -605,6 +973,7 @@ export default {
     return {
       // Estado
       isProcessing,
+      isSyncing,
       showUploadModal,
       selectedUploadFile,
       selectedFile,
@@ -613,19 +982,30 @@ export default {
       metrics,
       filters,
       cnpjFiles,
+      receitaFederalFiles,
+      
+      // Computed
+      downloadedFiles,
+      pendingFiles,
+      hasSelectedFiles,
       
       // AG-Grid
       columnDefs,
+      receitaFederalColumnDefs,
       defaultColDef,
       filteredCnpjFiles,
       
       // Methods
       syncCnpjFiles,
+      syncReceitaFederal,
+      downloadSelected,
       exportData,
       applyFilters,
       clearFilters,
       onGridReady,
+      onReceitaFederalGridReady,
       onRowSelected,
+      onReceitaFederalRowSelected,
       handleFileUpload,
       uploadFile,
       formatFileSize,
