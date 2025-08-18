@@ -746,17 +746,6 @@ export default {
 
     // Column Definitions: Defines the columns to be displayed (arquivos da Receita Federal)
     const colDefs = ref([
-      {
-        headerName: '',
-        field: 'selected',
-        width: 50,
-        pinned: 'left',
-        sortable: false,
-        filter: false,
-        resizable: false,
-        checkboxSelection: true,
-        headerCheckboxSelection: true
-      },
       { 
         field: "version", 
         headerName: "Versão", 
@@ -885,7 +874,7 @@ export default {
     };
 
     const rowSelectionConfig = ref({
-      mode: 'multiple'
+      mode: 'none'
     });
 
     return {
