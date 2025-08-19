@@ -89,10 +89,11 @@
               :theme="theme"
               :rowData="rowData"
               :columnDefs="colDefs"
-              style="height: 400px; width: 100%;"
+              class="ag-grid-reference"
               :defaultColDef="defaultColDef"
               :pagination="true"
-              :paginationPageSize="10"
+              :paginationPageSize="20"
+              :paginationPageSizeSelector="[20, 50, 100]"
               @grid-ready="onGridReady"
             >
             </ag-grid-vue>
@@ -378,6 +379,11 @@ export default {
 <style scoped>
 .ag-grid-container {
   margin: 1rem 0;
+}
+
+.ag-grid-reference {
+  height: 400px;
+  width: 100%;
 }
 
 .theme-parts-selector {

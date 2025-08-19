@@ -18,54 +18,6 @@
 
     <!-- View Content -->
     <div class="view-content">
-      <!-- Seção de Notificações -->
-      <div v-if="notifications.length > 0" class="notifications-section mb-4">
-        <div class="notifications-header">
-          <div class="notifications-header-content">
-            <div class="notifications-icon-wrapper">
-              <i class="fas fa-bell notifications-icon"></i>
-            </div>
-            <div class="notifications-title-wrapper">
-              <h4 class="notifications-title">Notificações de Download</h4>
-              <span class="notifications-count">{{ notifications.length }} {{ notifications.length === 1 ? 'notificação' : 'notificações' }}</span>
-            </div>
-          </div>
-          <button @click="clearNotifications" class="btn-clear-notifications">
-            <i class="fas fa-trash-alt"></i>
-            <span>Limpar</span>
-          </button>
-        </div>
-        <div class="notifications-list">
-          <div
-            v-for="notification in notifications"
-            :key="notification.id"
-            class="notification-item"
-            :class="`notification-${notification.type}`"
-          >
-            <div class="notification-header">
-              <span class="notification-title">{{ notification.title }}</span>
-              <button @click="removeNotification(notification.id)" class="btn-close">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-            <div class="notification-message">{{ notification.message }}</div>
-            <div v-if="notification.progress > 0 && notification.progress < 100" class="notification-progress">
-              <div class="progress">
-                <div 
-                  class="progress-bar" 
-                  :class="`bg-${notification.type === 'success' ? 'success' : notification.type === 'error' ? 'danger' : 'primary'}`"
-                  :style="{ width: `${notification.progress}%` }"
-                ></div>
-              </div>
-              <span class="progress-text">{{ notification.progress.toFixed(1) }}%</span>
-            </div>
-            <div class="notification-time">
-              {{ new Date(notification.timestamp).toLocaleTimeString() }}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Seção: AG-Grid Oficial -->
       <div class="canonika-section">
         <div class="section-header">
@@ -172,22 +124,76 @@
 
           <!-- AG Grid Component -->
           <div class="ag-grid-container">
-            <ag-grid-vue
-              :theme="theme"
-              :rowData="rowData"
-              :columnDefs="colDefs"
-              class="ag-grid-reference"
-              :defaultColDef="defaultColDef"
-              :pagination="true"
-              :paginationPageSize="20"
-              :paginationPageSizeSelector="[20, 50, 100]"
-              :getRowClass="getRowClass"
-              :suppressRowClickSelection="true"
-              :suppressCellSelection="true"
-              :suppressRowSelection="true"
-              @grid-ready="onGridReady"
-            >
+                    <ag-grid-vue
+          :theme="theme"
+          :rowData="rowData"
+          :columnDefs="colDefs"
+          class="ag-grid-reference"
+          :defaultColDef="defaultColDef"
+          :pagination="true"
+          :paginationPageSize="20"
+          :paginationPageSizeSelector="[20, 50, 100]"
+          :rowClassRules="rowClassRules"
+          :suppressRowClickSelection="true"
+          :suppressCellSelection="true"
+          :suppressRowSelection="true"
+          :suppressRowCheckboxSelection="true"
+          :suppressHeaderCheckboxSelection="true"
+          :suppressRowDeselection="true"
+          :rowSelection="'none'"
+          :suppressRowHoverHighlight="false"
+          :rowHeight="48"
+          @grid-ready="onGridReady"
+        >
             </ag-grid-vue>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Notificações -->
+      <div class="notifications-section mb-4">
+        <div class="notifications-header">
+          <div class="notifications-header-content">
+            <div class="notifications-icon-wrapper">
+              <i class="fas fa-bell notifications-icon"></i>
+            </div>
+            <div class="notifications-title-wrapper">
+              <h4 class="notifications-title">Notificações de Download</h4>
+              <span class="notifications-count">{{ notifications.length }} {{ notifications.length === 1 ? 'notificação' : 'notificações' }}</span>
+            </div>
+          </div>
+          <button @click="clearNotifications" class="btn-clear-notifications">
+            <i class="fas fa-trash-alt"></i>
+            <span>Limpar</span>
+          </button>
+        </div>
+        <div class="notifications-list">
+          <div
+            v-for="notification in notifications"
+            :key="notification.id"
+            class="notification-item"
+            :class="`notification-${notification.type}`"
+          >
+            <div class="notification-header">
+              <span class="notification-title">{{ notification.title }}</span>
+              <button @click="removeNotification(notification.id)" class="btn-close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div v-if="notification.progress > 0 && notification.progress < 100" class="notification-progress">
+              <div class="progress">
+                <div 
+                  class="progress-bar" 
+                  :class="`bg-${notification.type === 'success' ? 'success' : notification.type === 'error' ? 'danger' : 'primary'}`"
+                  :style="{ width: `${notification.progress}%` }"
+                ></div>
+              </div>
+              <span class="progress-text">{{ notification.progress.toFixed(1) }}%</span>
+            </div>
+            <div class="notification-time">
+              {{ new Date(notification.timestamp).toLocaleTimeString() }}
+            </div>
           </div>
         </div>
       </div>
@@ -669,11 +675,24 @@ export default {
     };
 
     const addNotification = (notification) => {
-      notifications.value.unshift(notification);
+      // Verificar se já existe uma notificação com este ID
+      const existingIndex = notifications.value.findIndex(n => n.id === notification.id);
       
-      // Manter apenas as últimas 10 notificações
-      if (notifications.value.length > 10) {
-        notifications.value = notifications.value.slice(0, 10);
+      if (existingIndex !== -1) {
+        // Atualizar notificação existente
+        notifications.value[existingIndex] = {
+          ...notifications.value[existingIndex],
+          ...notification,
+          timestamp: Date.now()
+        };
+      } else {
+        // Adicionar nova notificação apenas se não existir
+        notifications.value.unshift(notification);
+        
+        // Manter apenas as últimas 10 notificações
+        if (notifications.value.length > 10) {
+          notifications.value = notifications.value.slice(0, 10);
+        }
       }
 
       // Auto-remover notificações de sucesso após 5 segundos
@@ -703,7 +722,21 @@ export default {
         sortable: true, 
         filter: true,
         width: 120,
-        cellStyle: { fontWeight: '600' }
+        cellStyle: { fontWeight: '600', textAlign: 'left' },
+        cellRenderer: (params) => {
+          const status = params.data.status?.toLowerCase();
+          
+          // Adicionar ícone de engrenagem para itens baixados ou processados
+          if (status === 'baixado' || status === 'downloaded') {
+            return `<span style="text-align: left; display: flex; align-items: center;"><i class="fa fa-gear" style="margin-right: 0.5rem; opacity: 0.6; color: #f59e0b;" aria-hidden="true"></i>${params.value}</span>`;
+          }
+          // Adicionar ícone de check para itens processados
+          else if (status === 'processado' || status === 'processed') {
+            return `<span style="text-align: left; display: flex; align-items: center;"><i class="fas fa-check-circle" style="margin-right: 0.5rem; opacity: 0.6; color: #10b981;" aria-hidden="true"></i>${params.value}</span>`;
+          }
+          // Ícone de seta para itens disponíveis
+          return `<span style="text-align: left; display: flex; align-items: center;"><i class="fas fa-arrow-down" style="margin-right: 0.5rem; opacity: 0.6;"></i>${params.value}</span>`;
+        }
       },
       { 
         field: "file", 
@@ -711,7 +744,7 @@ export default {
         sortable: true, 
         filter: true,
         flex: 2,
-        cellStyle: { fontFamily: 'monospace', fontSize: '0.9rem' }
+        cellStyle: { fontFamily: 'monospace', fontSize: '0.9rem', textAlign: 'left' }
       },
       { 
         field: "status", 
@@ -723,13 +756,13 @@ export default {
           const status = params.value?.toLowerCase();
           switch (status) {
             case 'disponível':
-              return '<span style="color: #3b82f6; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-folder-open"></i> Disponível</span>';
+              return '<span style="color: #3b82f6; display: flex; align-items: center; gap: 0.5rem; text-align: left;"><i class="fas fa-folder-open"></i> Disponível</span>';
             case 'baixado':
-              return '<span style="color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-download"></i> Baixado</span>';
+              return '<span style="color: #f59e0b; display: flex; align-items: center; gap: 0.5rem; text-align: left;"><i class="fas fa-download"></i> Baixado</span>';
             case 'processado':
-              return '<span style="color: #10b981; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-check-circle"></i> Processado</span>';
+              return '<span style="color: #10b981; display: flex; align-items: center; gap: 0.5rem; text-align: left;"><i class="fas fa-check-circle"></i> Processado</span>';
             default:
-              return `<span style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-question-circle"></i> ${params.value}</span>`;
+              return `<span style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem; text-align: left;"><i class="fas fa-question-circle"></i> ${params.value}</span>`;
           }
         },
         width: 150
@@ -810,6 +843,10 @@ export default {
       // Desabilitar seleção completamente
       suppressRowClickSelection: true,
       suppressCellSelection: true,
+      suppressRowSelection: true,
+      suppressRowCheckboxSelection: true,
+      suppressHeaderCheckboxSelection: true,
+      suppressRowDeselection: true,
     });
 
     let gridApi = null;
@@ -818,16 +855,16 @@ export default {
       gridApi = params.api;
     };
 
-        const getRowClass = (params) => {
-      const status = params.data.status?.toLowerCase();
-
-      if (status === 'baixado' || status === 'downloaded') {
-        return 'downloaded-row';
-      } else if (status === 'processado' || status === 'processed') {
-        return 'processed-row';
+    // Row Class Rules para marcação condicional (recomendado pela documentação AG-Grid)
+    const rowClassRules = {
+      'downloaded-row': (params) => {
+        const status = params.data.status?.toLowerCase();
+        return status === 'baixado' || status === 'downloaded';
+      },
+      'processed-row': (params) => {
+        const status = params.data.status?.toLowerCase();
+        return status === 'processado' || status === 'processed';
       }
-
-      return '';
     };
 
 
@@ -844,7 +881,7 @@ export default {
       downloadFile,
       processFile,
       deleteFile,
-      getRowClass,
+      rowClassRules,
       // Filtros e seleção
       selectedVersion,
       availableVersions,
@@ -1006,102 +1043,26 @@ export default {
   }
 }
 
-/* Estilo especial para linhas de registros baixados */
+/* Estilo especial para linhas de registros baixados - Cores sutis */
 :deep(.downloaded-row) {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.04) 0%, rgba(59, 130, 246, 0.02) 100%) !important;
   border-left: 4px solid #3b82f6 !important;
-  position: relative;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
-}
-
-:deep(.downloaded-row::before) {
-  content: "⬇️";
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #3b82f6;
-  font-weight: bold;
-  font-size: 14px;
-  z-index: 1;
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 :deep(.downloaded-row:hover) {
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(59, 130, 246, 0.03) 100%) !important;
 }
 
-/* Estilo especial para linhas de registros processados */
+/* Estilo especial para linhas de registros processados - Cores sutis */
 :deep(.processed-row) {
-  background: linear-gradient(135deg, #065f46 0%, #047857 100%) !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(16, 185, 129, 0.02) 100%) !important;
   border-left: 4px solid #10b981 !important;
-  position: relative;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
-}
-
-:deep(.processed-row::before) {
-  content: "⚡";
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #10b981;
-  font-weight: bold;
-  font-size: 14px;
-  z-index: 1;
-  background: rgba(16, 185, 129, 0.1);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 :deep(.processed-row:hover) {
-  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
-}
-
-/* Ajuste para o conteúdo da linha baixada/processada */
-:deep(.downloaded-row .ag-cell),
-:deep(.processed-row .ag-cell) {
-  padding-left: 35px !important;
-  color: #ffffff !important;
-  font-weight: 500;
-}
-
-/* Melhorar contraste do texto nas linhas marcadas */
-:deep(.downloaded-row .ag-cell-value) {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-:deep(.processed-row .ag-cell-value) {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilo especial para checkboxes nas linhas marcadas */
-:deep(.downloaded-row .ag-checkbox-input-wrapper) {
-  background: rgba(59, 130, 246, 0.2) !important;
-  border: 2px solid #3b82f6 !important;
-}
-
-:deep(.processed-row .ag-checkbox-input-wrapper) {
-  background: rgba(16, 185, 129, 0.2) !important;
-  border: 2px solid #10b981 !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(16, 185, 129, 0.03) 100%) !important;
 }
 
 .section-actions {
@@ -1405,6 +1366,8 @@ export default {
 :deep(.ag-cell) {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
 }
 
 :deep(.ag-row) {
@@ -1414,6 +1377,8 @@ export default {
 :deep(.ag-row:hover) {
   background-color: rgba(59, 130, 246, 0.04);
 }
+
+
 
 /* Estilos para botões do grid */
 :deep(.ag-cell button) {
@@ -1441,38 +1406,9 @@ export default {
   font-weight: 500;
 }
 
-/* Melhorias para linhas baixadas/processadas */
-.downloaded-row {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.04) 100%);
-  border-left: 4px solid #3b82f6;
-  position: relative;
-}
 
-.downloaded-row::before {
-  content: '⬇️';
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
 
-.processed-row {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
-  border-left: 4px solid #10b981;
-  position: relative;
-}
 
-.processed-row::before {
-  content: '⚡';
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
 
 /* Responsividade para o grid */
 @media (max-width: 768px) {

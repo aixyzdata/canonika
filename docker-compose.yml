@@ -219,6 +219,8 @@ services:
       - REDIS_URL=redis://redis:6379
       - OPA_URL=http://opa:8181
       - CLICKHOUSE_URL=http://clickhouse:8123
+    volumes:
+      - fisher_downloads:/app/api/data
     depends_on:
       - quarter
       - clickhouse
@@ -387,4 +389,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
-  clickhouse_data: 
+  clickhouse_data:
+  fisher_downloads: 

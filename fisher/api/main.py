@@ -549,7 +549,9 @@ class FisherService:
                 "start_time": time.time(),
                 "bytes_downloaded": 0,
                 "total_size": 0,
-                "month_year": month_year
+                "month_year": month_year,
+                "last_broadcast": 0,
+                "last_progress_broadcast": 0
             }
             
             # Notificar início via WebSocket
@@ -610,18 +612,29 @@ class FisherService:
                                 "total_size": total_size
                             })
                             
-                            # Broadcast progresso via WebSocket
-                            await broadcast_download_progress(download_id, {
-                                "filename": filename,
-                                "status": "downloading",
-                                "progress": round(progress, 1),
-                                "speed": speed,
-                                "eta": eta,
-                                "message": f"Baixando... {progress:.1f}%",
-                                "bytes_downloaded": active_downloads[download_id]["bytes_downloaded"],
-                                "total_size": total_size,
-                                "month_year": month_year
-                            })
+                            # Broadcast progresso via WebSocket apenas a cada 5% ou 2 segundos
+                            last_broadcast = active_downloads[download_id].get("last_broadcast", 0)
+                            last_progress = active_downloads[download_id].get("last_progress_broadcast", 0)
+                            current_time = time.time()
+                            
+                            # Enviar broadcast apenas se:
+                            # - Progresso mudou em 5% ou mais
+                            # - Ou passou 2 segundos desde o último broadcast
+                            if (round(progress, 1) - last_progress >= 5.0) or (current_time - last_broadcast >= 2.0):
+                                await broadcast_download_progress(download_id, {
+                                    "filename": filename,
+                                    "status": "downloading",
+                                    "progress": round(progress, 1),
+                                    "speed": speed,
+                                    "eta": eta,
+                                    "message": f"Baixando... {progress:.1f}%",
+                                    "bytes_downloaded": active_downloads[download_id]["bytes_downloaded"],
+                                    "total_size": total_size,
+                                    "month_year": month_year
+                                })
+                                
+                                active_downloads[download_id]["last_broadcast"] = current_time
+                                active_downloads[download_id]["last_progress_broadcast"] = round(progress, 1)
                             
                             # Pequena pausa para não sobrecarregar
                             await asyncio.sleep(0.1)
